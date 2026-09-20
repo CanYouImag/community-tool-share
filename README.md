@@ -17,7 +17,7 @@ community-tool-share/
 ├─ frontend/
 ├─ db/
 │  └─ init.sql
-├─ docs/                     # 课程/项目文档（仅本地，不入库）
+
 └─ scripts/
 ```
 
