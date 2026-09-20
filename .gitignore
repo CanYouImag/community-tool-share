@@ -1,0 +1,39 @@
+# ===== 项目文档（不入库，仅本地） =====
+docs/
+
+# ===== Node / 前端 =====
+node_modules/
+dist/
+coverage/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# ===== Java / 后端 =====
+target/
+*.class
+*.jar
+!.mvn/wrapper/maven-wrapper.jar
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# ===== 环境变量与密钥 =====
+.env
+.env.*
+!.env.example
+
+# ===== IDE / 编辑器 =====
+.idea/
+*.iml
+.vscode/
+*.swp
+*~
+
+# ===== 操作系统 =====
+.DS_Store
+Thumbs.db

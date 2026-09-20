@@ -1,0 +1,29 @@
+# 一键启动 MySQL / 后端 / 前端
+# 各服务代码就绪后按需完善环境变量与构建方式
+services:
+  db:
+    image: mysql:8.0
+    container_name: cts-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: community_tool_share
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+
+  backend:
+    build: ./backend
+    container_name: cts-backend
+    depends_on:
+      - db
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build: ./frontend
+    container_name: cts-frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"

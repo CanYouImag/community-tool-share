@@ -1,0 +1,17 @@
+# 自动化构建 / 测试流水线
+# ./backend、./frontend 技术栈确定后在此补充构建与测试步骤
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 占位检查
+        run: echo "CI 待技术栈确定后完善"
