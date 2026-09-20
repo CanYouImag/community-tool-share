@@ -17,7 +17,6 @@ community-tool-share/
 ├─ frontend/
 ├─ db/
 │  └─ init.sql
-
 └─ scripts/
 ```
 
