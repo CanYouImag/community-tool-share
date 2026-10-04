@@ -1,0 +1,1099 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.1.2 Chrome/138.0.7204.243 Electron/37.4.0 Safari/537.36" version="28.1.2" pages="7">
+  <diagram id="uc-overview" name="总用例图">
+    <mxGraphModel dx="2076" dy="1231" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1950" pageHeight="1250" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="probe_extent" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;movable=0;resizable=0;rotatable=0;deletable=0;editable=0;locked=1;connectable=0;" parent="1" vertex="1">
+          <mxGeometry width="1950" height="1250" as="geometry" />
+        </mxCell>
+        <mxCell id="boundary" value="「邻租」社区闲置工具租赁平台" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;verticalAlign=top;fontSize=16;fontStyle=1;spacingTop=8;movable=0;resizable=0;rotatable=0;deletable=0;editable=0;locked=1;connectable=0;" parent="1" vertex="1">
+          <mxGeometry x="400" y="110" width="1130" height="960" as="geometry" />
+        </mxCell>
+        <mxCell id="z_right" value="治理侧用例" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=1;verticalAlign=top;fontSize=11;fontColor=#666666;movable=0;resizable=0;rotatable=0;deletable=0;editable=0;locked=1;connectable=0;" parent="1" vertex="1">
+          <mxGeometry x="1010" y="150" width="490" height="735" as="geometry" />
+        </mxCell>
+        <mxCell id="z_left" value="用户侧用例" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=1;verticalAlign=top;fontSize=11;fontColor=#666666;movable=0;resizable=0;rotatable=0;deletable=0;editable=0;locked=1;connectable=0;" parent="1" vertex="1">
+          <mxGeometry x="430" y="150" width="480" height="880" as="geometry" />
+        </mxCell>
+        <mxCell id="a_guest" value="游客" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;html=1;outlineConnect=0;" parent="1" vertex="1">
+          <mxGeometry x="240" y="170" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="a_cert" value="认证用户" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;html=1;outlineConnect=0;" parent="1" vertex="1">
+          <mxGeometry x="240" y="670" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="a_cadmin" value="社区管理员" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;html=1;outlineConnect=0;" parent="1" vertex="1">
+          <mxGeometry x="1653" y="670" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="a_sadmin" value="系统管理员" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;html=1;outlineConnect=0;" parent="1" vertex="1">
+          <mxGeometry x="1649" y="305" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="e_r1l" value="UC-A1/A2 注册与登录" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="538" y="180" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_r2l" value="UC-B1/C1/C2 浏览社区与物品" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="528" y="315" width="250" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_r3l" value="UC-C3 收藏物品" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="553" y="438" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_r4l" value="UC-C4/C6 发布与管理物品" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="528" y="560" width="250" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_r5l" value="UC-D1~D4 下单与接单" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="538" y="680" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_r6l" value="UC-D5~D9 取还核销与结算" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="528" y="800" width="250" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_r7l" value="UC-E1 钱包与资金流水" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="538" y="920" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_r1r" value="UC-A4 审核认证申请" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="1140" y="190" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_r2r" value="UC-G1/G2 社区与管理员管理" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="1125" y="285" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_r4r" value="UC-C5/C7 物品审核与处置" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="1125" y="783" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_r5r" value="UC-B2~B6 社区成员治理" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="1125" y="591" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_r6r" value="UC-F2~F4 纠纷调解与上报" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="1125" y="687" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_r7r" value="UC-F5/F6 仲裁裁决与划转" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="1130" y="488" width="250" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="a_timer" value="定时任务" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;html=1;outlineConnect=0;" parent="1" vertex="1">
+          <mxGeometry x="1640" y="931" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="e_d10" value="UC-D10 逾期提醒与标记" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="1145" y="941" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="edge1" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" edge="1" target="e_r1l" source="a_guest">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="287" y="210" as="sourcePoint" />
+            <mxPoint x="463" y="216" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge2" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" edge="1" target="e_r2l">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="282" y="210" as="sourcePoint" />
+            <mxPoint x="514" y="324" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge3" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" edge="1" target="e_r3l">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="277" y="461" as="sourcePoint" />
+            <mxPoint x="493" y="463" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge4" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" edge="1" target="e_r4l">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="276" y="460" as="sourcePoint" />
+            <mxPoint x="523" y="565" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge5" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.412;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" edge="1" target="e_r5l" source="a_cert">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="300" y="660" as="sourcePoint" />
+            <mxPoint x="494" y="693" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge6" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" edge="1" target="e_r6l">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="281" y="705" as="sourcePoint" />
+            <mxPoint x="534" y="803" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge7" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" edge="1" target="e_r7l">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="280" y="708" as="sourcePoint" />
+            <mxPoint x="554" y="922" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge8" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" edge="1" target="e_r4r">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1654" y="704" as="sourcePoint" />
+            <mxPoint x="1391" y="819" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge9" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" edge="1" target="e_r5r">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1654" y="699" as="sourcePoint" />
+            <mxPoint x="1334" y="599" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge10" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;exitX=0;exitY=0.3333333333333333;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" edge="1" source="a_cadmin">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1709" y="664" as="sourcePoint" />
+            <mxPoint x="1385" y="717" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge11" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" edge="1" target="e_r1r">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1647" y="337" as="sourcePoint" />
+            <mxPoint x="1318" y="240" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge12" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1645" y="339" as="sourcePoint" />
+            <mxPoint x="1387" y="319" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge13" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" parent="1" edge="1" source="e_r3r">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1640" y="310" as="sourcePoint" />
+            <mxPoint x="1276" y="445" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge14" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" edge="1" target="e_r7r">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1644" y="347" as="sourcePoint" />
+            <mxPoint x="1235" y="801" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge15" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" edge="1" target="e_d10" source="a_timer">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1429" y="972.5" as="sourcePoint" />
+            <mxPoint x="1482" y="969.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge16" style="html=1;endArrow=block;endFill=0;strokeColor=#333333;strokeWidth=1.5;" parent="1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="260" y="380" as="sourcePoint" />
+            <mxPoint x="260" y="250" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="q7BlDhCPb3OAmnS5U5E3-1" value="" style="html=1;endArrow=block;endFill=0;strokeColor=#333333;strokeWidth=1.5;" edge="1" parent="1" target="a_user">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="259.29" y="661" as="sourcePoint" />
+            <mxPoint x="259.29" y="547" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_user" value="注册用户" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;html=1;outlineConnect=0;" parent="1" vertex="1">
+          <mxGeometry x="240" y="415" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="q7BlDhCPb3OAmnS5U5E3-3" value="" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" target="e_r3r">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1647" y="341" as="sourcePoint" />
+            <mxPoint x="1276" y="445" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_r3r" value="UC-G3 封禁/解封账号" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="1140" y="382" width="230" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="uc-account" name="用例图-账户与认证">
+    <mxGraphModel dx="1400" dy="900" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1980" pageHeight="1280" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="probe_extent" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="1980" height="1280" as="geometry" />
+        </mxCell>
+        <mxCell id="boundary" value="账户与认证子系统" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;verticalAlign=top;fontSize=16;fontStyle=1;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="420" y="100" width="1230" height="1080" as="geometry" />
+        </mxCell>
+        <mxCell id="z1" value="游客与注册用户用例" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=1;verticalAlign=top;fontSize=11;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="450" y="140" width="580" height="700" as="geometry" />
+        </mxCell>
+        <mxCell id="z2" value="认证用户与共用用例" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=1;verticalAlign=top;fontSize=11;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="450" y="880" width="580" height="260" as="geometry" />
+        </mxCell>
+        <mxCell id="z3" value="系统管理员用例" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=1;verticalAlign=top;fontSize=11;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="880" width="580" height="260" as="geometry" />
+        </mxCell>
+        <mxCell id="a_guest" value="游客" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="250" y="225" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="a_user" value="注册用户" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="250" y="555" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="a_cert" value="认证用户" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="250" y="965" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="a_sadmin" value="系统管理员" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="1680" y="970" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="e_g1" value="UC-A1 用户注册" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="515" y="180" width="210" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_g2" value="UC-A2 用户登录" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="515" y="290" width="210" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_u1" value="UC-A3 找回密码" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="520" y="400" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_u2" value="UC-A4 管理个人资料" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="505" y="510" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_u3" value="UC-A5 浏览个人主页" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="505" y="620" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_u4" value="UC-A6 退出登录" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="520" y="730" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_s1" value="UC-A7 提交认证申请" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="500" y="920" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_u5" value="UC-A8 浏览社区物品" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="505" y="1030" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_r1" value="UC-A9 审核认证申请" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="1210" y="980" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_c2" value="图形验证码校验" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="830" y="180" width="170" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_c3" value="账号密码校验" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="830" y="290" width="170" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_c4" value="身份核验" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="840" y="400" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_c1" value="账号唯一性校验" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="830" y="510" width="170" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_x1" value="修改登录密码" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="835" y="620" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_x2" value="更换头像" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="845" y="730" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_c5" value="身份证格式校验" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="830" y="920" width="170" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="edge1" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="245" as="sourcePoint" />
+            <mxPoint x="515" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge2" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="285" as="sourcePoint" />
+            <mxPoint x="515" y="320" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge3" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="575" as="sourcePoint" />
+            <mxPoint x="520" y="430" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge4" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="590" as="sourcePoint" />
+            <mxPoint x="505" y="540" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge5" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="605" as="sourcePoint" />
+            <mxPoint x="505" y="650" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge6" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="620" as="sourcePoint" />
+            <mxPoint x="520" y="760" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge7" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="985" as="sourcePoint" />
+            <mxPoint x="500" y="950" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge8" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="1025" as="sourcePoint" />
+            <mxPoint x="505" y="1060" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge9" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1680" y="1010" as="sourcePoint" />
+            <mxPoint x="1450" y="1010" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge10" style="html=1;endArrow=block;endFill=0;strokeColor=#333333;strokeWidth=1.5;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="270" y="965" as="sourcePoint" />
+            <mxPoint x="270" y="675" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge11" value="«include»" style="dashed=1;html=1;endArrow=open;endFill=0;strokeColor=#666666;fontSize=10;verticalAlign=bottom;align=center;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="725" y="210" as="sourcePoint" />
+            <mxPoint x="830" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge12" value="«include»" style="dashed=1;html=1;endArrow=open;endFill=0;strokeColor=#666666;fontSize=10;verticalAlign=bottom;align=center;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="725" y="320" as="sourcePoint" />
+            <mxPoint x="830" y="320" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge13" value="«include»" style="dashed=1;html=1;endArrow=open;endFill=0;strokeColor=#666666;fontSize=10;verticalAlign=bottom;align=center;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="720" y="430" as="sourcePoint" />
+            <mxPoint x="840" y="430" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge14" value="«include»" style="dashed=1;html=1;endArrow=open;endFill=0;strokeColor=#666666;fontSize=10;verticalAlign=bottom;align=center;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="735" y="540" as="sourcePoint" />
+            <mxPoint x="830" y="540" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge15" value="«include»" style="dashed=1;html=1;endArrow=open;endFill=0;strokeColor=#666666;fontSize=10;verticalAlign=bottom;align=center;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="740" y="950" as="sourcePoint" />
+            <mxPoint x="830" y="950" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge16" value="«extend»" style="dashed=1;html=1;endArrow=open;endFill=0;strokeColor=#666666;fontSize=10;verticalAlign=bottom;align=center;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="835" y="650" as="sourcePoint" />
+            <mxPoint x="672" y="567" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge17" value="«extend»" style="dashed=1;html=1;endArrow=open;endFill=0;strokeColor=#666666;fontSize=10;verticalAlign=bottom;align=center;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="845" y="760" as="sourcePoint" />
+            <mxPoint x="674" y="676" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="uc-community" name="用例图-社区模块">
+    <mxGraphModel dx="1400" dy="900" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1980" pageHeight="780" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="probe_extent" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="1980" height="780" as="geometry" />
+        </mxCell>
+        <mxCell id="boundary" value="社区子系统" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;verticalAlign=top;fontSize=16;fontStyle=1;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="420" y="100" width="1230" height="580" as="geometry" />
+        </mxCell>
+        <mxCell id="z1" value="用户侧用例" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=1;verticalAlign=top;fontSize=11;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="450" y="140" width="580" height="500" as="geometry" />
+        </mxCell>
+        <mxCell id="z2" value="社区管理员用例" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=1;verticalAlign=top;fontSize=11;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="140" width="580" height="500" as="geometry" />
+        </mxCell>
+        <mxCell id="a_guest" value="游客" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="250" y="170" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="a_user" value="注册用户" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="250" y="350" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="a_cert" value="认证用户" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="250" y="530" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="a_cadmin" value="社区管理员" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="1680" y="350" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="e_b1" value="UC-B1 浏览社区与主页" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="500" y="180" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_b2" value="UC-B2 申请加入社区" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="505" y="300" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_b4" value="UC-B4 退出社区" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="505" y="420" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_b6" value="UC-B6 我的社区与成员" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="495" y="540" width="250" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_c1" value="自动通过准入" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="830" y="300" width="170" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_c2" value="清理待处理申请" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="820" y="420" width="190" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_r1" value="UC-B3 审核加入申请" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="1335" y="180" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_r2" value="UC-B5 发布/管理社区公告" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="1325" y="300" width="250" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_r3" value="UC-B7 踢出社区成员" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="420" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_r4" value="UC-G7 本社区数据统计" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="540" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_x1" value="编辑/删除公告" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="1070" y="300" width="190" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="edge1" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="210" as="sourcePoint" />
+            <mxPoint x="500" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge2" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="375" as="sourcePoint" />
+            <mxPoint x="505" y="330" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge3" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="405" as="sourcePoint" />
+            <mxPoint x="505" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge4" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="570" as="sourcePoint" />
+            <mxPoint x="495" y="570" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge5" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1680" y="375" as="sourcePoint" />
+            <mxPoint x="1565" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge6" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1680" y="380" as="sourcePoint" />
+            <mxPoint x="1575" y="330" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge7" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1680" y="395" as="sourcePoint" />
+            <mxPoint x="1570" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge8" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1680" y="405" as="sourcePoint" />
+            <mxPoint x="1570" y="570" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge9" style="html=1;endArrow=block;endFill=0;strokeColor=#333333;strokeWidth=1.5;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="270" y="350" as="sourcePoint" />
+            <mxPoint x="270" y="278" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge10" style="html=1;endArrow=block;endFill=0;strokeColor=#333333;strokeWidth=1.5;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="270" y="530" as="sourcePoint" />
+            <mxPoint x="270" y="458" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge11" value="«include»" style="dashed=1;html=1;endArrow=open;endFill=0;strokeColor=#666666;fontSize=10;verticalAlign=bottom;align=center;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="735" y="330" as="sourcePoint" />
+            <mxPoint x="830" y="330" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge12" value="«extend»" style="dashed=1;html=1;endArrow=open;endFill=0;strokeColor=#666666;fontSize=10;verticalAlign=bottom;align=center;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="820" y="450" as="sourcePoint" />
+            <mxPoint x="735" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge13" value="«extend»" style="dashed=1;html=1;endArrow=open;endFill=0;strokeColor=#666666;fontSize=10;verticalAlign=bottom;align=center;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1260" y="330" as="sourcePoint" />
+            <mxPoint x="1325" y="330" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="uc-item" name="用例图-物品模块">
+    <mxGraphModel dx="1400" dy="900" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1980" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="probe_extent" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="1980" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="boundary" value="物品子系统" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;verticalAlign=top;fontSize=16;fontStyle=1;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="420" y="100" width="1230" height="700" as="geometry" />
+        </mxCell>
+        <mxCell id="z1" value="浏览侧用例" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=1;verticalAlign=top;fontSize=11;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="450" y="140" width="580" height="620" as="geometry" />
+        </mxCell>
+        <mxCell id="z2" value="发布与审核用例" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=1;verticalAlign=top;fontSize=11;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="140" width="580" height="620" as="geometry" />
+        </mxCell>
+        <mxCell id="a_guest" value="游客" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="250" y="230" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="a_user" value="注册用户" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="250" y="410" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="a_cert" value="认证用户" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="250" y="590" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="a_cadmin" value="社区管理员" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="1680" y="350" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="e_c1" value="UC-C1 浏览/搜索物品" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="505" y="180" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_c2" value="UC-C2 查看物品详情" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="505" y="300" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_c3" value="UC-C3 收藏/取消收藏" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="505" y="420" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_c4" value="UC-C4 发布出租物品" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="505" y="540" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_c6" value="UC-C6 管理我的物品" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="505" y="660" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_i1" value="信用分准入校验" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="815" y="540" width="190" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_x1" value="重新提交审核" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="820" y="660" width="180" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_c5" value="UC-C5 审核物品（初审）" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="180" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_c7" value="UC-C7 违规下架/置顶" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="540" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_x2" value="驳回并附理由" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="1070" y="300" width="190" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_x3" value="置顶推荐（≤3个）" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="1065" y="660" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="edge1" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="255" as="sourcePoint" />
+            <mxPoint x="505" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge2" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="285" as="sourcePoint" />
+            <mxPoint x="505" y="330" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge3" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="450" as="sourcePoint" />
+            <mxPoint x="505" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge4" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="610" as="sourcePoint" />
+            <mxPoint x="505" y="570" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge5" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="650" as="sourcePoint" />
+            <mxPoint x="505" y="690" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge6" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1680" y="380" as="sourcePoint" />
+            <mxPoint x="1570" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge7" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1680" y="400" as="sourcePoint" />
+            <mxPoint x="1570" y="570" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge8" style="html=1;endArrow=block;endFill=0;strokeColor=#333333;strokeWidth=1.5;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="270" y="410" as="sourcePoint" />
+            <mxPoint x="270" y="338" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge9" style="html=1;endArrow=block;endFill=0;strokeColor=#333333;strokeWidth=1.5;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="270" y="590" as="sourcePoint" />
+            <mxPoint x="270" y="518" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge10" value="«include»" style="dashed=1;html=1;endArrow=open;endFill=0;strokeColor=#666666;fontSize=10;verticalAlign=bottom;align=center;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="735" y="570" as="sourcePoint" />
+            <mxPoint x="815" y="570" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge11" value="«extend»" style="dashed=1;html=1;endArrow=open;endFill=0;strokeColor=#666666;fontSize=10;verticalAlign=bottom;align=center;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="820" y="690" as="sourcePoint" />
+            <mxPoint x="735" y="690" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge12" value="«extend»" style="dashed=1;html=1;endArrow=open;endFill=0;strokeColor=#666666;fontSize=10;verticalAlign=bottom;align=center;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1260" y="330" as="sourcePoint" />
+            <mxPoint x="1406" y="238" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge13" value="«extend»" style="dashed=1;html=1;endArrow=open;endFill=0;strokeColor=#666666;fontSize=10;verticalAlign=bottom;align=center;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1265" y="690" as="sourcePoint" />
+            <mxPoint x="1407" y="598" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="uc-order" name="用例图-订单交易与钱包">
+    <mxGraphModel dx="1400" dy="900" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1980" pageHeight="1320" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="probe_extent" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="1980" height="1320" as="geometry" />
+        </mxCell>
+        <mxCell id="boundary" value="订单交易与钱包子系统" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;verticalAlign=top;fontSize=16;fontStyle=1;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="420" y="100" width="1230" height="1120" as="geometry" />
+        </mxCell>
+        <mxCell id="z1" value="租客用例" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=1;verticalAlign=top;fontSize=11;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="450" y="140" width="580" height="380" as="geometry" />
+        </mxCell>
+        <mxCell id="z3" value="出租者与定时任务用例" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=1;verticalAlign=top;fontSize=11;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="140" width="580" height="380" as="geometry" />
+        </mxCell>
+        <mxCell id="z2" value="认证用户共用用例（租客与出租者）" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=1;verticalAlign=top;fontSize=11;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="450" y="560" width="580" height="620" as="geometry" />
+        </mxCell>
+        <mxCell id="a_renter" value="认证用户（租客）" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="250" y="620" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="a_owner" value="认证用户（出租者）" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="1680" y="560" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="a_timer" value="定时任务" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="1680" y="410" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="e_d1" value="UC-D1 下单租用" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="510" y="180" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_d4" value="UC-D4 取消订单" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="520" y="300" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_d5" value="UC-D5 取物核销" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="520" y="420" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_i1" value="支付与押金冻结" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="815" y="180" width="190" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_i2" value="拍照存证（≥1张）" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="815" y="420" width="190" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_d3" value="UC-D3 确认接单" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="1345" y="180" width="210" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_d10" value="UC-D10 逾期提醒与标记" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="1335" y="420" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_i3" value="逾期 1.5 倍计费" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="1065" y="420" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_d6" value="UC-D6 归还核销与确认" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="500" y="600" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_d7" value="租金结算与押金解冻" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="515" y="720" width="210" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_d8" value="UC-D8 双向评价" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="520" y="840" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_d9" value="UC-D9 订单留言" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="525" y="960" width="190" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_e1" value="UC-E1 查看钱包与流水" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="505" y="1080" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="edge1" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="640" as="sourcePoint" />
+            <mxPoint x="510" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge2" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="650" as="sourcePoint" />
+            <mxPoint x="520" y="330" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge3" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="660" as="sourcePoint" />
+            <mxPoint x="520" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge4" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="670" as="sourcePoint" />
+            <mxPoint x="500" y="630" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge5" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="680" as="sourcePoint" />
+            <mxPoint x="520" y="870" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge6" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="690" as="sourcePoint" />
+            <mxPoint x="525" y="990" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge7" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="700" as="sourcePoint" />
+            <mxPoint x="505" y="1110" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge8" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1680" y="570" as="sourcePoint" />
+            <mxPoint x="1555" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge9" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1680" y="590" as="sourcePoint" />
+            <mxPoint x="740" y="630" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge10" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1680" y="610" as="sourcePoint" />
+            <mxPoint x="720" y="870" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge11" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1680" y="630" as="sourcePoint" />
+            <mxPoint x="715" y="990" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge12" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1680" y="450" as="sourcePoint" />
+            <mxPoint x="1565" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge13" value="«include»" style="dashed=1;html=1;endArrow=open;endFill=0;strokeColor=#666666;fontSize=10;verticalAlign=bottom;align=center;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="730" y="210" as="sourcePoint" />
+            <mxPoint x="815" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge14" value="«include»" style="dashed=1;html=1;endArrow=open;endFill=0;strokeColor=#666666;fontSize=10;verticalAlign=bottom;align=center;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="720" y="450" as="sourcePoint" />
+            <mxPoint x="815" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge15" value="«include»" style="dashed=1;html=1;endArrow=open;endFill=0;strokeColor=#666666;fontSize=10;verticalAlign=bottom;align=center;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="620" y="660" as="sourcePoint" />
+            <mxPoint x="620" y="720" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge16" value="«include»" style="dashed=1;html=1;endArrow=open;endFill=0;strokeColor=#666666;fontSize=10;verticalAlign=bottom;align=center;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1335" y="450" as="sourcePoint" />
+            <mxPoint x="1265" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="uc-dispute" name="用例图-纠纷与举报">
+    <mxGraphModel dx="1400" dy="900" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1980" pageHeight="960" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="probe_extent" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="1980" height="960" as="geometry" />
+        </mxCell>
+        <mxCell id="boundary" value="纠纷与举报子系统" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;verticalAlign=top;fontSize=16;fontStyle=1;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="420" y="100" width="1230" height="760" as="geometry" />
+        </mxCell>
+        <mxCell id="z1" value="当事人用例" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=1;verticalAlign=top;fontSize=11;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="450" y="140" width="580" height="260" as="geometry" />
+        </mxCell>
+        <mxCell id="z2" value="社区调解用例" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=1;verticalAlign=top;fontSize=11;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="450" y="440" width="580" height="380" as="geometry" />
+        </mxCell>
+        <mxCell id="z3" value="平台仲裁与处置用例" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=1;verticalAlign=top;fontSize=11;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="140" width="580" height="260" as="geometry" />
+        </mxCell>
+        <mxCell id="a_cert" value="认证用户（当事人）" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="250" y="230" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="a_cadmin" value="社区管理员" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="250" y="590" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="a_sadmin" value="系统管理员" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="1680" y="230" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f1" value="UC-F1 发起纠纷" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="520" y="180" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f7" value="UC-F7 提交举报" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="520" y="300" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_d9" value="引用订单留言与存证" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="805" y="180" width="210" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_i1" value="上传证据附件" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="820" y="300" width="180" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f2" value="UC-F2 调解留言" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="520" y="600" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f3" value="UC-F3 标记调解成功" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="805" y="480" width="210" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f4" value="UC-F4 上报仲裁" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="810" y="720" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f5" value="UC-F5 仲裁裁决" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="1350" y="180" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f8" value="UC-F8 处理举报" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="1350" y="300" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_f6" value="生成裁决书并划转押金" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="1055" y="180" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_i2" value="移交封禁流程" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="1075" y="300" width="180" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="edge1" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="260" as="sourcePoint" />
+            <mxPoint x="520" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge2" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="290" as="sourcePoint" />
+            <mxPoint x="520" y="330" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge3" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="630" as="sourcePoint" />
+            <mxPoint x="520" y="630" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge4" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="600" as="sourcePoint" />
+            <mxPoint x="805" y="510" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge5" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="660" as="sourcePoint" />
+            <mxPoint x="810" y="750" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge6" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1680" y="260" as="sourcePoint" />
+            <mxPoint x="1550" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge7" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1680" y="290" as="sourcePoint" />
+            <mxPoint x="1550" y="330" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge8" value="«include»" style="dashed=1;html=1;endArrow=open;endFill=0;strokeColor=#666666;fontSize=10;verticalAlign=bottom;align=center;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="720" y="210" as="sourcePoint" />
+            <mxPoint x="805" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge9" value="«include»" style="dashed=1;html=1;endArrow=open;endFill=0;strokeColor=#666666;fontSize=10;verticalAlign=bottom;align=center;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="720" y="330" as="sourcePoint" />
+            <mxPoint x="820" y="330" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge10" value="«extend»" style="dashed=1;html=1;endArrow=open;endFill=0;strokeColor=#666666;fontSize=10;verticalAlign=bottom;align=center;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="805" y="510" as="sourcePoint" />
+            <mxPoint x="663" y="603" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge11" value="«extend»" style="dashed=1;html=1;endArrow=open;endFill=0;strokeColor=#666666;fontSize=10;verticalAlign=bottom;align=center;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="810" y="750" as="sourcePoint" />
+            <mxPoint x="663" y="657" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge12" value="«include»" style="dashed=1;html=1;endArrow=open;endFill=0;strokeColor=#666666;fontSize=10;verticalAlign=bottom;align=center;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1350" y="210" as="sourcePoint" />
+            <mxPoint x="1275" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge13" value="«extend»" style="dashed=1;html=1;endArrow=open;endFill=0;strokeColor=#666666;fontSize=10;verticalAlign=bottom;align=center;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1255" y="330" as="sourcePoint" />
+            <mxPoint x="1350" y="330" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="uc-admin" name="用例图-平台管理">
+    <mxGraphModel dx="1400" dy="900" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1980" pageHeight="1160" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="probe_extent" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="1980" height="1160" as="geometry" />
+        </mxCell>
+        <mxCell id="boundary" value="平台管理子系统" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;verticalAlign=top;fontSize=16;fontStyle=1;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="420" y="100" width="1230" height="960" as="geometry" />
+        </mxCell>
+        <mxCell id="z1" value="系统管理员用例" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=1;verticalAlign=top;fontSize=11;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="450" y="140" width="580" height="860" as="geometry" />
+        </mxCell>
+        <mxCell id="z2" value="社区管理员用例" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#999999;dashed=1;verticalAlign=top;fontSize=11;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="440" width="580" height="260" as="geometry" />
+        </mxCell>
+        <mxCell id="a_sadmin" value="系统管理员" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="250" y="530" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="a_cadmin" value="社区管理员" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="1680" y="530" width="40" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="e_g1" value="UC-G1 创建/编辑社区" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="510" y="180" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_g2" value="UC-G2 任命/罢免社区管理员" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="490" y="300" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_g3" value="UC-G3 封禁/解封账号" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="510" y="420" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_g4" value="UC-G4 平台参数配置" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="510" y="540" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_e2" value="UC-E2 调整用户余额" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="510" y="660" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_g5" value="UC-G5 数据统计（全平台）" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="495" y="780" width="250" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_g6" value="UC-G6 查询操作日志" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="505" y="900" width="230" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_x2" value="社区自动通过开关" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="810" y="180" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_x1" value="佣金比例配置" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="820" y="540" width="180" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_g7" value="UC-G7 数据统计（本社区）" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="1320" y="540" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="e_x3" value="导出统计报表" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="1075" y="540" width="180" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="edge1" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="545" as="sourcePoint" />
+            <mxPoint x="510" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge2" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="555" as="sourcePoint" />
+            <mxPoint x="490" y="330" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge3" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="565" as="sourcePoint" />
+            <mxPoint x="510" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge4" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="575" as="sourcePoint" />
+            <mxPoint x="510" y="570" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge5" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="585" as="sourcePoint" />
+            <mxPoint x="510" y="690" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge6" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="595" as="sourcePoint" />
+            <mxPoint x="495" y="810" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge7" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="290" y="605" as="sourcePoint" />
+            <mxPoint x="505" y="930" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge8" style="edgeStyle=none;html=1;endArrow=open;endFill=0;strokeColor=#333333;strokeWidth=1.3;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1680" y="570" as="sourcePoint" />
+            <mxPoint x="1580" y="570" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge9" value="«extend»" style="dashed=1;html=1;endArrow=open;endFill=0;strokeColor=#666666;fontSize=10;verticalAlign=bottom;align=center;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="810" y="210" as="sourcePoint" />
+            <mxPoint x="730" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge10" value="«extend»" style="dashed=1;html=1;endArrow=open;endFill=0;strokeColor=#666666;fontSize=10;verticalAlign=bottom;align=center;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="820" y="570" as="sourcePoint" />
+            <mxPoint x="730" y="570" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge11" value="«extend»" style="dashed=1;html=1;endArrow=open;endFill=0;strokeColor=#666666;fontSize=10;verticalAlign=bottom;align=center;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1255" y="570" as="sourcePoint" />
+            <mxPoint x="1320" y="570" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
