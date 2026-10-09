@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>个人中心</title>
+        <link rel="stylesheet" href="common.css" />
+        <script src="tabs.js" defer></script>
+        <noscript
+            ><style>
+                .view-panel[hidden] {
+                    display: block !important;
+                }
+            </style></noscript
+        >
+    </head>
+    <body>
+        <header class="top">
+            <div class="top-inner">
+                <a class="brand" href="index.html">
+                    <span class="brand-symbol">邻</span>
+                    <span>邻租</span>
+                </a>
+                <nav class="nav" aria-label="主导航">
+                    <a href="04-items.html" class="">物品广场</a>
+                    <a href="03-community.html" class="">社区</a>
+                    <a href="06-publish.html" class="">发布 / 我的物品</a>
+                    <a href="07-orders.html" class="">我的订单</a>
+                    <a href="09-wallet.html" class="">钱包</a>
+                    <a href="02-account.html" class="active">个人中心</a>
+                </nav>
+                <a href="index.html">原型目录</a>
+            </div>
+        </header>
+        <main class="public-main">
+            <header class="page-head">
+                <div>
+                    <h1>个人中心</h1>
+                </div>
+            </header>
+            <nav class="view-tabs" role="tablist" aria-label="页内功能">
+                <a
+                    id="tab-profile"
+                    class="view-tab"
+                    href="#profile"
+                    role="tab"
+                    aria-controls="profile"
+                    aria-selected="true"
+                    >我的资料</a
+                >
+                <a
+                    id="tab-settings"
+                    class="view-tab"
+                    href="#settings"
+                    role="tab"
+                    aria-controls="settings"
+                    aria-selected="false"
+                    >编辑资料</a
+                >
+                <a
+                    id="tab-verify"
+                    class="view-tab"
+                    href="#verify"
+                    role="tab"
+                    aria-controls="verify"
+                    aria-selected="false"
+                    >实名认证</a
+                >
+                <a
+                    id="tab-notifications"
+                    class="view-tab"
+                    href="#notifications"
+                    role="tab"
+                    aria-controls="notifications"
+                    aria-selected="false"
+                    >消息通知</a
+                >
+            </nav>
+            <section
+                id="profile"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-profile"
+            >
+                <h2 class="view-heading">我的资料</h2>
+                <section class="panel">
+                    <div class="row">
+                        <span class="avatar large">S</span>
+                        <div class="grow">
+                            <h2>Starling</h2>
+                        </div>
+                        <span class="badge">已实名认证</span>
+                    </div>
+                </section>
+                <div class="stats">
+                    <div class="stat">
+                        <small>信用分</small>
+                        <div class="value">86</div>
+                    </div>
+                    <div class="stat">
+                        <small>我的发布</small>
+                        <div class="value">3</div>
+                    </div>
+                    <div class="stat">
+                        <small>进行中订单</small>
+                        <div class="value">2</div>
+                    </div>
+                    <div class="stat">
+                        <small>可用余额</small>
+                        <div class="value">¥500.00</div>
+                    </div>
+                </div>
+                <div class="two">
+                    <div>
+                        <section class="panel">
+                            <div class="panel-title">
+                                <h2>常用功能</h2>
+                            </div>
+                            <div class="stack">
+                                <div class="actions">
+                                    <a class="btn" href="06-publish.html#mine"
+                                        >我的物品</a
+                                    >
+                                    <a class="btn" href="07-orders.html#borrow"
+                                        >我的订单</a
+                                    >
+                                    <a
+                                        class="btn"
+                                        href="04-items.html#favorites"
+                                        >我的收藏</a
+                                    >
+                                </div>
+                                <div class="actions">
+                                    <a
+                                        class="btn"
+                                        href="03-community.html#joined"
+                                        >我的社区</a
+                                    >
+                                    <a class="btn" href="09-wallet.html#wallet"
+                                        >收入钱包</a
+                                    >
+                                    <a class="btn" href="10-dispute.html#report"
+                                        >我的举报</a
+                                    >
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <div>
+                        <section class="panel">
+                            <div class="panel-title">
+                                <h2>账户信息</h2>
+                            </div>
+                            <dl class="line-list">
+                                <div>
+                                    <dt>账号</dt>
+                                    <dd>Starling</dd>
+                                </div>
+                                <div>
+                                    <dt>认证状态</dt>
+                                    <dd>已通过</dd>
+                                </div>
+                                <div>
+                                    <dt>所属社区</dt>
+                                    <dd>青禾社区</dd>
+                                </div>
+                            </dl>
+                            <div class="actions">
+                                <a class="btn" href="02-account.html#settings"
+                                    >编辑资料</a
+                                >
+                                <a
+                                    class="btn primary"
+                                    href="02-account.html#verify"
+                                    >查看认证</a
+                                >
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </section>
+            <section
+                id="settings"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-settings"
+                hidden
+            >
+                <h2 class="view-heading">编辑资料</h2>
+                <div class="two">
+                    <div>
+                        <section class="panel">
+                            <div class="panel-title">
+                                <h2>公开资料</h2>
+                            </div>
+                            <div class="row">
+                                <span class="avatar large">S</span>
+                                <div class="grow">
+                                    <label class="upload">
+                                        <strong>＋ 更换头像</strong>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            multiple
+                                            aria-label="更换头像"
+                                        />
+                                    </label>
+                                </div>
+                            </div>
+                            <hr class="rule" />
+                            <label class="field">
+                                <span>
+                                    昵称
+                                    <em>*</em>
+                                </span>
+                                <input
+                                    type="text"
+                                    aria-label="昵称"
+                                    value="Starling"
+                                />
+                            </label>
+                            <label class="field">
+                                <span>个人简介</span>
+                                <textarea aria-label="个人简介">
+把闲置交给需要它的邻居。</textarea
+                                >
+                            </label>
+                            <div class="actions">
+                                <a
+                                    class="btn primary"
+                                    href="02-account.html#profile"
+                                    >保存资料</a
+                                >
+                                <a class="btn" href="02-account.html#profile"
+                                    >取消</a
+                                >
+                            </div>
+                        </section>
+                    </div>
+                    <div>
+                        <section class="panel">
+                            <div class="panel-title">
+                                <h2>账号与安全</h2>
+                            </div>
+                            <dl class="line-list">
+                                <div>
+                                    <dt>账号</dt>
+                                    <dd>Starling</dd>
+                                </div>
+                                <div>
+                                    <dt>认证</dt>
+                                    <dd>已通过</dd>
+                                </div>
+                            </dl>
+                            <div class="actions">
+                                <a class="btn" href="02-account.html#profile"
+                                    >修改密码</a
+                                >
+                                <a class="btn" href="01-login.html#login"
+                                    >退出登录</a
+                                >
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </section>
+            <section
+                id="verify"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-verify"
+                hidden
+            >
+                <h2 class="view-heading">实名认证</h2>
+                <div class="narrow">
+                    <section class="panel">
+                        <div class="panel-title">
+                            <h2>填写认证信息</h2>
+                        </div>
+                        <label class="field">
+                            <span>
+                                真实姓名
+                                <em>*</em>
+                            </span>
+                            <input type="text" aria-label="真实姓名" value="" />
+                        </label>
+                        <label class="field">
+                            <span>
+                                身份证号
+                                <em>*</em>
+                            </span>
+                            <input type="text" aria-label="身份证号" value="" />
+                        </label>
+                        <div class="actions">
+                            <a class="btn primary" href="02-account.html#verify"
+                                >提交认证申请</a
+                            >
+                            <a class="btn" href="02-account.html#profile"
+                                >返回个人中心</a
+                            >
+                        </div>
+                    </section>
+                </div>
+            </section>
+            <section
+                id="notifications"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-notifications"
+                hidden
+            >
+                <h2 class="view-heading">消息通知</h2>
+                <section class="panel">
+                    <nav class="tabs" aria-label="分类标签">
+                        <a class="selected" href="02-account.html#notifications"
+                            >全部消息</a
+                        >
+                        <a class="" href="02-account.html#notifications"
+                            >订单消息</a
+                        >
+                        <a class="" href="02-account.html#notifications"
+                            >审核通知</a
+                        >
+                    </nav>
+                    <div class="notice-row">
+                        <div class="row between">
+                            <h3>订单等待接单</h3>
+                            <small>10-09 10:00</small>
+                        </div>
+                        <p class="muted">电钻订单支付成功，押金已冻结。</p>
+                        <a class="" href="08-order-detail.html#pending"
+                            >查看相关记录</a
+                        >
+                    </div>
+                    <div class="notice-row">
+                        <div class="row between">
+                            <h3>认证已通过</h3>
+                            <small>10-09 09:45</small>
+                        </div>
+                        <p class="muted">你已成为认证用户，可发布和租用。</p>
+                        <a class="" href="02-account.html#verify"
+                            >查看相关记录</a
+                        >
+                    </div>
+                    <div class="notice-row">
+                        <div class="row between">
+                            <h3>有新的订单留言</h3>
+                            <small>10-09 10:25</small>
+                        </div>
+                        <p class="muted">陈禾回复了你的交接留言。</p>
+                        <a class="" href="08-order-detail.html#renting"
+                            >查看相关记录</a
+                        >
+                    </div>
+                    <div class="notice-row">
+                        <div class="row between">
+                            <h3>物品审核未通过</h3>
+                            <small>10-08 16:20</small>
+                        </div>
+                        <p class="muted">家用折叠梯：请补充展开状态照片。</p>
+                        <a class="" href="06-publish.html#publish"
+                            >查看相关记录</a
+                        >
+                    </div>
+                </section>
+            </section>
+        </main>
+    </body>
+</html>

@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>物品发布与管理</title>
+        <link rel="stylesheet" href="common.css" />
+        <script src="tabs.js" defer></script>
+        <noscript
+            ><style>
+                .view-panel[hidden] {
+                    display: block !important;
+                }
+            </style></noscript
+        >
+    </head>
+    <body>
+        <header class="top">
+            <div class="top-inner">
+                <a class="brand" href="index.html">
+                    <span class="brand-symbol">邻</span>
+                    <span>邻租</span>
+                </a>
+                <nav class="nav" aria-label="主导航">
+                    <a href="04-items.html" class="">物品广场</a>
+                    <a href="03-community.html" class="">社区</a>
+                    <a href="06-publish.html" class="active">发布 / 我的物品</a>
+                    <a href="07-orders.html" class="">我的订单</a>
+                    <a href="09-wallet.html" class="">钱包</a>
+                    <a href="02-account.html" class="">个人中心</a>
+                </nav>
+                <a href="index.html">原型目录</a>
+            </div>
+        </header>
+        <main class="public-main">
+            <header class="page-head">
+                <div>
+                    <h1>物品发布与管理</h1>
+                </div>
+            </header>
+            <nav class="view-tabs" role="tablist" aria-label="页内功能">
+                <a
+                    id="tab-publish"
+                    class="view-tab"
+                    href="#publish"
+                    role="tab"
+                    aria-controls="publish"
+                    aria-selected="true"
+                    >发布 / 编辑</a
+                >
+                <a
+                    id="tab-mine"
+                    class="view-tab"
+                    href="#mine"
+                    role="tab"
+                    aria-controls="mine"
+                    aria-selected="false"
+                    >我的物品</a
+                >
+            </nav>
+            <section
+                id="publish"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-publish"
+            >
+                <h2 class="view-heading">发布 / 编辑</h2>
+                <div class="two">
+                    <div>
+                        <section class="panel">
+                            <div class="panel-title">
+                                <h2>物品信息</h2>
+                            </div>
+                            <div class="form-grid">
+                                <label class="field">
+                                    <span>
+                                        物品标题
+                                        <em>*</em>
+                                    </span>
+                                    <input
+                                        type="text"
+                                        aria-label="物品标题"
+                                        value=""
+                                    />
+                                </label>
+                                <label class="field">
+                                    <span>分类</span>
+                                    <select aria-label="分类">
+                                        <option>工具</option>
+                                        <option>家电</option>
+                                        <option>户外</option>
+                                        <option>数码</option>
+                                        <option>其他</option>
+                                    </select>
+                                </label>
+                                <label class="field">
+                                    <span>
+                                        日租金（元）
+                                        <em>*</em>
+                                    </span>
+                                    <input
+                                        type="text"
+                                        aria-label="日租金（元）"
+                                        value="20.00"
+                                    />
+                                </label>
+                                <label class="field">
+                                    <span>
+                                        押金（元）
+                                        <em>*</em>
+                                    </span>
+                                    <input
+                                        type="text"
+                                        aria-label="押金（元）"
+                                        value="200.00"
+                                    />
+                                </label>
+                            </div>
+                            <label class="field">
+                                <span>
+                                    成色说明
+                                    <em>*</em>
+                                </span>
+                                <input
+                                    type="text"
+                                    aria-label="成色说明"
+                                    value="九成新，功能正常"
+                                />
+                            </label>
+                            <label class="field">
+                                <span>
+                                    物品描述
+                                    <em>*</em>
+                                </span>
+                                <textarea aria-label="物品描述">
+主机、双电池、充电器及常用钻头齐全。</textarea
+                                >
+                            </label>
+                            <label class="upload">
+                                <strong>＋ 上传物品图片</strong>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                    aria-label="上传物品图片"
+                                />
+                            </label>
+                            <hr class="rule" />
+                            <div class="actions">
+                                <a
+                                    class="btn primary"
+                                    href="06-publish.html#publish"
+                                    >提交审核</a
+                                >
+                                <a class="btn" href="06-publish.html#mine"
+                                    >取消</a
+                                >
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </section>
+            <section
+                id="mine"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-mine"
+                hidden
+            >
+                <h2 class="view-heading">我的物品</h2>
+                <section class="panel">
+                    <nav class="tabs" aria-label="分类标签">
+                        <a class="selected" href="06-publish.html#mine">全部</a>
+                        <a class="" href="06-publish.html#mine">待审核</a>
+                        <a class="" href="06-publish.html#mine">已上架</a>
+                        <a class="" href="06-publish.html#mine">已驳回</a>
+                    </nav>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">物品</th>
+                                    <th scope="col">日租金 / 押金</th>
+                                    <th scope="col">状态</th>
+                                    <th scope="col">说明</th>
+                                    <th scope="col">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>18V 充电式电钻</td>
+                                    <td>¥20 / ¥200</td>
+                                    <td>
+                                        <span class="badge warn">待审核</span>
+                                    </td>
+                                    <td>等待社区管理员审核</td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="06-publish.html#publish"
+                                            >编辑</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>布艺清洗机</td>
+                                    <td>¥40 / ¥300</td>
+                                    <td>
+                                        <span class="badge">已上架</span>
+                                    </td>
+                                    <td>当前有进行中订单</td>
+                                    <td>
+                                        <div class="actions">
+                                            <a
+                                                class=""
+                                                href="06-publish.html#mine"
+                                                >暂停 / 删除</a
+                                            >
+                                            <a
+                                                class=""
+                                                href="07-orders.html#lend"
+                                                >订单</a
+                                            >
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>家用折叠梯</td>
+                                    <td>¥15 / ¥100</td>
+                                    <td>
+                                        <span class="badge error">已驳回</span>
+                                    </td>
+                                    <td>请补充展开状态照片</td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="06-publish.html#publish"
+                                            >修改后重提</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>露营天幕</td>
+                                    <td>¥25 / ¥150</td>
+                                    <td>
+                                        <span class="badge neutral"
+                                            >已暂停</span
+                                        >
+                                    </td>
+                                    <td>恢复后可被下单</td>
+                                    <td>
+                                        <a class="" href="06-publish.html#mine"
+                                            >恢复出租</a
+                                        >
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination">
+                        <span>共 4 条</span>
+                        <span class="page-number">1</span>
+                    </div>
+                </section>
+            </section>
+        </main>
+    </body>
+</html>

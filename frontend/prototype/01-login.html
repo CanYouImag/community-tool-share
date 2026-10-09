@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>登录/注册</title>
+        <link rel="stylesheet" href="common.css" />
+        <script src="tabs.js" defer></script>
+        <noscript
+            ><style>
+                .view-panel[hidden] {
+                    display: block !important;
+                }
+            </style></noscript
+        >
+    </head>
+    <body>
+        <header class="top">
+            <div class="top-inner">
+                <a class="brand" href="index.html">
+                    <span class="brand-symbol">邻</span>
+                    <span>邻租</span>
+                </a>
+                <nav class="nav" aria-label="主导航">
+                    <a href="04-items.html" class="">物品广场</a>
+                    <a href="03-community.html" class="">社区</a>
+                    <a href="06-publish.html" class="">发布 / 我的物品</a>
+                    <a href="07-orders.html" class="">我的订单</a>
+                    <a href="09-wallet.html" class="">钱包</a>
+                    <a href="02-account.html" class="">个人中心</a>
+                </nav>
+                <a href="index.html">原型目录</a>
+            </div>
+        </header>
+        <main class="public-main">
+            <header class="page-head">
+                <div>
+                    <h1>登录/注册</h1>
+                </div>
+            </header>
+            <nav class="view-tabs" role="tablist" aria-label="页内功能">
+                <a
+                    id="tab-login"
+                    class="view-tab"
+                    href="#login"
+                    role="tab"
+                    aria-controls="login"
+                    aria-selected="true"
+                    >账号登录</a
+                >
+                <a
+                    id="tab-register"
+                    class="view-tab"
+                    href="#register"
+                    role="tab"
+                    aria-controls="register"
+                    aria-selected="false"
+                    >注册账号</a
+                >
+            </nav>
+            <section
+                id="login"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-login"
+            >
+                <h2 class="view-heading">账号登录</h2>
+                <div class="narrow">
+                    <section class="panel">
+                        <h2>登录邻租</h2>
+                        <hr class="rule" />
+                        <label class="field">
+                            <span>
+                                用户名
+                                <em>*</em>
+                            </span>
+                            <input
+                                type="text"
+                                aria-label="账号"
+                                value="Starling"
+                            />
+                        </label>
+                        <label class="field">
+                            <span>
+                                密码
+                                <em>*</em>
+                            </span>
+                            <input type="password" aria-label="密码" value="" />
+                            <small class="help"></small>
+                        </label>
+                        <label class="field">
+                            <span>
+                                图形验证码
+                                <em>*</em>
+                            </span>
+                            <div class="captcha">
+                                <input
+                                    aria-label="图形验证码"
+                                    placeholder="输入右侧字符"
+                                />
+                                <output>7K3M</output>
+                            </div>
+                        </label>
+                        <div class="actions">
+                            <a class="btn primary" href="04-items.html#browse"
+                                >登录</a
+                            >
+                            <a class="" href="01-login.html#register"
+                                >注册新账号</a
+                            >
+                        </div>
+                    </section>
+                </div>
+            </section>
+            <section
+                id="register"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-register"
+                hidden
+            >
+                <h2 class="view-heading">注册账号</h2>
+                <div class="narrow">
+                    <section class="panel">
+                        <h2>创建邻租账号</h2>
+                        <hr class="rule" />
+                        <label class="field">
+                            <span>
+                                用户名
+                                <em>*</em>
+                            </span>
+                            <input type="text" aria-label="账号" value="" />
+                        </label>
+                        <label class="field">
+                            <span>
+                                密码
+                                <em>*</em>
+                            </span>
+                            <input type="password" aria-label="密码" value="" />
+                            <small class="help">至少 6 位</small>
+                        </label>
+                        <label class="field">
+                            <span>
+                                确认密码
+                                <em>*</em>
+                            </span>
+                            <input
+                                type="password"
+                                aria-label="确认密码"
+                                value=""
+                            />
+                            <small class="help">两次密码须一致</small>
+                        </label>
+                        <div class="actions">
+                            <a
+                                class="btn primary"
+                                href="02-account.html#profile"
+                                >创建账号</a
+                            >
+                            <a class="" href="01-login.html#login"
+                                >已有账号，去登录</a
+                            >
+                        </div>
+                    </section>
+                </div>
+            </section>
+        </main>
+    </body>
+</html>

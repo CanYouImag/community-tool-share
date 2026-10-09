@@ -1,0 +1,1213 @@
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>平台管理</title>
+        <link rel="stylesheet" href="common.css" />
+        <script src="tabs.js" defer></script>
+        <noscript
+            ><style>
+                .view-panel[hidden] {
+                    display: block !important;
+                }
+            </style></noscript
+        >
+    </head>
+    <body>
+        <header class="top">
+            <div class="top-inner">
+                <a class="brand" href="index.html">
+                    <span class="brand-symbol">邻</span>
+                    <span>邻租</span>
+                </a>
+                <nav class="nav" aria-label="主导航">
+                    <a href="11-community-admin.html" class="">社区管理</a>
+                    <a href="12-mediation.html" class="">社区调解</a>
+                    <a href="13-platform-admin.html" class="active">平台管理</a>
+                    <a href="14-arbitration.html" class="">平台仲裁</a>
+                </nav>
+                <a href="index.html">原型目录</a>
+            </div>
+        </header>
+        <main class="public-main">
+            <header class="page-head">
+                <div>
+                    <h1>平台管理</h1>
+                </div>
+            </header>
+            <nav class="view-tabs" role="tablist" aria-label="页内功能">
+                <a
+                    id="tab-dashboard"
+                    class="view-tab"
+                    href="#dashboard"
+                    role="tab"
+                    aria-controls="dashboard"
+                    aria-selected="true"
+                    >数据看板</a
+                >
+                <a
+                    id="tab-users"
+                    class="view-tab"
+                    href="#users"
+                    role="tab"
+                    aria-controls="users"
+                    aria-selected="false"
+                    >用户</a
+                >
+                <a
+                    id="tab-verify"
+                    class="view-tab"
+                    href="#verify"
+                    role="tab"
+                    aria-controls="verify"
+                    aria-selected="false"
+                    >认证审核</a
+                >
+                <a
+                    id="tab-balance"
+                    class="view-tab"
+                    href="#balance"
+                    role="tab"
+                    aria-controls="balance"
+                    aria-selected="false"
+                    >调整余额</a
+                >
+                <a
+                    id="tab-communities"
+                    class="view-tab"
+                    href="#communities"
+                    role="tab"
+                    aria-controls="communities"
+                    aria-selected="false"
+                    >社区</a
+                >
+                <a
+                    id="tab-community-edit"
+                    class="view-tab"
+                    href="#community-edit"
+                    role="tab"
+                    aria-controls="community-edit"
+                    aria-selected="false"
+                    >编辑社区</a
+                >
+                <a
+                    id="tab-appoint"
+                    class="view-tab"
+                    href="#appoint"
+                    role="tab"
+                    aria-controls="appoint"
+                    aria-selected="false"
+                    >管理员任免</a
+                >
+                <a
+                    id="tab-items"
+                    class="view-tab"
+                    href="#items"
+                    role="tab"
+                    aria-controls="items"
+                    aria-selected="false"
+                    >物品</a
+                >
+                <a
+                    id="tab-settings"
+                    class="view-tab"
+                    href="#settings"
+                    role="tab"
+                    aria-controls="settings"
+                    aria-selected="false"
+                    >平台参数</a
+                >
+                <a
+                    id="tab-dictionary"
+                    class="view-tab"
+                    href="#dictionary"
+                    role="tab"
+                    aria-controls="dictionary"
+                    aria-selected="false"
+                    >字典</a
+                >
+                <a
+                    id="tab-logs"
+                    class="view-tab"
+                    href="#logs"
+                    role="tab"
+                    aria-controls="logs"
+                    aria-selected="false"
+                    >操作日志</a
+                >
+            </nav>
+            <section
+                id="dashboard"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-dashboard"
+            >
+                <h2 class="view-heading">数据看板</h2>
+                <div class="stats">
+                    <div class="stat">
+                        <small>用户总数</small>
+                        <div class="value">298</div>
+                    </div>
+                    <div class="stat">
+                        <small>累计订单</small>
+                        <div class="value">326</div>
+                    </div>
+                    <div class="stat">
+                        <small>累计 GMV</small>
+                        <div class="value">¥26,840</div>
+                    </div>
+                    <div class="stat">
+                        <small>待仲裁</small>
+                        <div class="value">3</div>
+                    </div>
+                </div>
+                <div class="two">
+                    <div>
+                        <section class="panel">
+                            <div class="panel-title">
+                                <h2>近 30 天订单量</h2>
+                            </div>
+                            <div class="chart">
+                                <div
+                                    class="bar"
+                                    style="--height: 33.88235294117647%"
+                                >
+                                    <b>32</b>
+                                    <small>09-10</small>
+                                </div>
+                                <div
+                                    class="bar"
+                                    style="--height: 50.8235294117647%"
+                                >
+                                    <b>48</b>
+                                    <small>09-15</small>
+                                </div>
+                                <div
+                                    class="bar"
+                                    style="--height: 41.29411764705882%"
+                                >
+                                    <b>39</b>
+                                    <small>09-20</small>
+                                </div>
+                                <div
+                                    class="bar"
+                                    style="--height: 68.8235294117647%"
+                                >
+                                    <b>65</b>
+                                    <small>09-25</small>
+                                </div>
+                                <div
+                                    class="bar"
+                                    style="--height: 60.35294117647059%"
+                                >
+                                    <b>57</b>
+                                    <small>09-30</small>
+                                </div>
+                                <div class="bar" style="--height: 90%">
+                                    <b>85</b>
+                                    <small>10-05</small>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <div>
+                        <section class="panel">
+                            <div class="panel-title">
+                                <h2>社区交易排行</h2>
+                            </div>
+                            <div class="table-wrap">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">社区</th>
+                                            <th scope="col">订单量</th>
+                                            <th scope="col">GMV</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>青禾社区</td>
+                                            <td>144</td>
+                                            <td>¥12,300</td>
+                                        </tr>
+                                        <tr>
+                                            <td>梧桐里社区</td>
+                                            <td>108</td>
+                                            <td>¥8,640</td>
+                                        </tr>
+                                        <tr>
+                                            <td>溪岸社区</td>
+                                            <td>74</td>
+                                            <td>¥5,900</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="pagination">
+                                <span>共 3 条</span>
+                                <span class="page-number">1</span>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+                <section class="panel">
+                    <div class="panel-title">
+                        <h2>近 30 天 GMV 趋势</h2>
+                    </div>
+                    <div class="chart">
+                        <div class="bar" style="--height: 25.403225806451616%">
+                            <b>2100</b>
+                            <small>09-10</small>
+                        </div>
+                        <div class="bar" style="--height: 37.5%">
+                            <b>3100</b>
+                            <small>09-15</small>
+                        </div>
+                        <div class="bar" style="--height: 32.66129032258065%">
+                            <b>2700</b>
+                            <small>09-20</small>
+                        </div>
+                        <div class="bar" style="--height: 65.3225806451613%">
+                            <b>5400</b>
+                            <small>09-25</small>
+                        </div>
+                        <div class="bar" style="--height: 73.79032258064517%">
+                            <b>6100</b>
+                            <small>09-30</small>
+                        </div>
+                        <div class="bar" style="--height: 90%">
+                            <b>7440</b>
+                            <small>10-05</small>
+                        </div>
+                    </div>
+                </section>
+            </section>
+            <section
+                id="users"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-users"
+                hidden
+            >
+                <h2 class="view-heading">用户</h2>
+                <section class="panel">
+                    <div class="filters">
+                        <label class="field">
+                            <span>账号 / 昵称</span>
+                            <input
+                                type="text"
+                                aria-label="账号 / 昵称"
+                                value=""
+                            />
+                        </label>
+                        <label class="field">
+                            <span>角色</span>
+                            <select aria-label="角色">
+                                <option>全部</option>
+                                <option>注册用户</option>
+                                <option>认证用户</option>
+                                <option>社区管理员</option>
+                                <option>系统管理员</option>
+                            </select>
+                        </label>
+                        <label class="field">
+                            <span>状态</span>
+                            <select aria-label="状态">
+                                <option>全部</option>
+                                <option>正常</option>
+                                <option>封禁</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">用户</th>
+                                    <th scope="col">角色</th>
+                                    <th scope="col">信用分</th>
+                                    <th scope="col">状态</th>
+                                    <th scope="col">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Starling</td>
+                                    <td>
+                                        <span class="badge">认证用户</span>
+                                    </td>
+                                    <td>86</td>
+                                    <td>
+                                        <span class="badge">正常</span>
+                                    </td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="13-platform-admin.html#users"
+                                            >查看 / 管理</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        周宁
+                                        <small>zhouning</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge blue"
+                                            >社区管理员</span
+                                        >
+                                    </td>
+                                    <td>95</td>
+                                    <td>
+                                        <span class="badge">正常</span>
+                                    </td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="13-platform-admin.html#users"
+                                            >查看 / 管理</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        陆川
+                                        <small>luchuan</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge">认证用户</span>
+                                    </td>
+                                    <td>35</td>
+                                    <td>
+                                        <span class="badge error">已封禁</span>
+                                    </td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="13-platform-admin.html#users"
+                                            >解封</a
+                                        >
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination">
+                        <span>共 3 条</span>
+                        <span class="page-number">1</span>
+                    </div>
+                </section>
+            </section>
+            <section
+                id="verify"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-verify"
+                hidden
+            >
+                <h2 class="view-heading">认证审核</h2>
+                <div class="narrow">
+                    <section class="panel">
+                        <div class="panel-title">
+                            <h2>申请资料</h2>
+                        </div>
+                        <dl class="line-list">
+                            <div>
+                                <dt>账号</dt>
+                                <dd>Starling</dd>
+                            </div>
+                            <div>
+                                <dt>姓名</dt>
+                                <dd>林*</dd>
+                            </div>
+                            <div>
+                                <dt>身份证号</dt>
+                                <dd>110***********1234</dd>
+                            </div>
+                            <div>
+                                <dt>提交时间</dt>
+                                <dd>2026-10-09 09:30</dd>
+                            </div>
+                            <div>
+                                <dt>当前状态</dt>
+                                <dd>
+                                    <span class="badge warn">待审核</span>
+                                </dd>
+                            </div>
+                        </dl>
+                        <hr class="rule" />
+                        <label class="field">
+                            <span>驳回理由</span>
+                            <textarea aria-label="驳回理由"></textarea>
+                        </label>
+                        <div class="actions">
+                            <a
+                                class="btn primary"
+                                href="13-platform-admin.html#verify"
+                                >审核通过</a
+                            >
+                            <a
+                                class="btn danger"
+                                href="13-platform-admin.html#verify"
+                                >驳回申请</a
+                            >
+                        </div>
+                    </section>
+                </div>
+            </section>
+            <section
+                id="balance"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-balance"
+                hidden
+            >
+                <h2 class="view-heading">调整余额</h2>
+                <div class="narrow">
+                    <section class="panel">
+                        <div class="panel-title">
+                            <h2>用户钱包</h2>
+                        </div>
+                        <dl class="line-list">
+                            <div>
+                                <dt>用户</dt>
+                                <dd>Starling</dd>
+                            </div>
+                            <div>
+                                <dt>当前可用余额</dt>
+                                <dd>¥240.00</dd>
+                            </div>
+                            <div>
+                                <dt>冻结金额</dt>
+                                <dd>¥200.00</dd>
+                            </div>
+                        </dl>
+                        <label class="field">
+                            <span>
+                                调整金额（元）
+                                <em>*</em>
+                            </span>
+                            <input
+                                type="text"
+                                aria-label="调整金额（元）"
+                                value="100.00"
+                            />
+                        </label>
+                        <label class="field">
+                            <span>
+                                调整备注
+                                <em>*</em>
+                            </span>
+                            <textarea aria-label="调整备注">
+课程演示测试余额补充</textarea
+                            >
+                        </label>
+                        <div class="info">调整后余额：¥340.00</div>
+                        <div class="actions">
+                            <a
+                                class="btn primary"
+                                href="13-platform-admin.html#balance"
+                                >确认调整余额</a
+                            >
+                            <a class="btn" href="13-platform-admin.html#users"
+                                >取消</a
+                            >
+                        </div>
+                    </section>
+                </div>
+            </section>
+            <section
+                id="communities"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-communities"
+                hidden
+            >
+                <h2 class="view-heading">社区</h2>
+                <section class="panel">
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">社区名称</th>
+                                    <th scope="col">成员数</th>
+                                    <th scope="col">管理员</th>
+                                    <th scope="col">准入方式</th>
+                                    <th scope="col">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>青禾社区</td>
+                                    <td>126</td>
+                                    <td>周宁</td>
+                                    <td>需审核</td>
+                                    <td>
+                                        <div class="actions">
+                                            <a
+                                                class=""
+                                                href="13-platform-admin.html#community-edit"
+                                                >编辑</a
+                                            >
+                                            <a
+                                                class=""
+                                                href="13-platform-admin.html#appoint"
+                                                >管理员任免</a
+                                            >
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>梧桐里社区</td>
+                                    <td>94</td>
+                                    <td>许安</td>
+                                    <td>自动通过</td>
+                                    <td>
+                                        <div class="actions">
+                                            <a
+                                                class=""
+                                                href="13-platform-admin.html#community-edit"
+                                                >编辑</a
+                                            >
+                                            <a
+                                                class=""
+                                                href="13-platform-admin.html#appoint"
+                                                >管理员任免</a
+                                            >
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>溪岸社区</td>
+                                    <td>78</td>
+                                    <td>暂无</td>
+                                    <td>需审核</td>
+                                    <td>
+                                        <div class="actions">
+                                            <a
+                                                class=""
+                                                href="13-platform-admin.html#community-edit"
+                                                >编辑</a
+                                            >
+                                            <a
+                                                class=""
+                                                href="13-platform-admin.html#appoint"
+                                                >任命管理员</a
+                                            >
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination">
+                        <span>共 3 条</span>
+                        <span class="page-number">1</span>
+                    </div>
+                </section>
+            </section>
+            <section
+                id="community-edit"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-community-edit"
+                hidden
+            >
+                <h2 class="view-heading">编辑社区</h2>
+                <div class="two">
+                    <div>
+                        <section class="panel">
+                            <div class="panel-title">
+                                <h2>社区资料</h2>
+                            </div>
+                            <label class="field">
+                                <span>
+                                    社区名称
+                                    <em>*</em>
+                                </span>
+                                <input
+                                    type="text"
+                                    aria-label="社区名称"
+                                    value="青禾社区"
+                                />
+                            </label>
+                            <label class="field">
+                                <span>
+                                    社区简介
+                                    <em>*</em>
+                                </span>
+                                <textarea aria-label="社区简介">
+邻里自提，让闲置工具继续发挥价值。</textarea
+                                >
+                            </label>
+                            <label class="upload">
+                                <strong>＋ 上传社区封面</strong>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                    aria-label="上传社区封面"
+                                />
+                            </label>
+                            <label class="field">
+                                <span>准入规则</span>
+                                <select aria-label="准入规则">
+                                    <option>需管理员审核</option>
+                                    <option>自动通过</option>
+                                </select>
+                            </label>
+                            <div class="actions">
+                                <a
+                                    class="btn primary"
+                                    href="13-platform-admin.html#communities"
+                                    >保存社区</a
+                                >
+                                <a
+                                    class="btn"
+                                    href="13-platform-admin.html#communities"
+                                    >取消</a
+                                >
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </section>
+            <section
+                id="appoint"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-appoint"
+                hidden
+            >
+                <h2 class="view-heading">管理员任免</h2>
+                <div class="narrow">
+                    <section class="panel">
+                        <div class="panel-title">
+                            <h2>青禾社区</h2>
+                        </div>
+                        <dl class="line-list">
+                            <div>
+                                <dt>现任管理员</dt>
+                                <dd>周宁</dd>
+                            </div>
+                            <div>
+                                <dt>角色</dt>
+                                <dd>社区管理员</dd>
+                            </div>
+                        </dl>
+                        <label class="field">
+                            <span>搜索待任命用户</span>
+                            <input
+                                type="text"
+                                aria-label="搜索待任命用户"
+                                value="陈禾"
+                            />
+                        </label>
+                        <dl class="line-list">
+                            <div>
+                                <dt>认证状态</dt>
+                                <dd>
+                                    <span class="badge">已认证</span>
+                                </dd>
+                            </div>
+                            <div>
+                                <dt>其他社区在职管理员</dt>
+                                <dd>否</dd>
+                            </div>
+                        </dl>
+                        <div class="actions">
+                            <a
+                                class="btn primary"
+                                href="13-platform-admin.html#communities"
+                                >确认任命</a
+                            >
+                            <a
+                                class="btn danger"
+                                href="13-platform-admin.html#appoint"
+                                >罢免现任管理员</a
+                            >
+                            <a
+                                class="btn"
+                                href="13-platform-admin.html#communities"
+                                >取消</a
+                            >
+                        </div>
+                    </section>
+                </div>
+            </section>
+            <section
+                id="items"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-items"
+                hidden
+            >
+                <h2 class="view-heading">物品</h2>
+                <section class="panel">
+                    <div class="filters">
+                        <label class="field">
+                            <span>物品名称</span>
+                            <input type="text" aria-label="物品名称" value="" />
+                        </label>
+                        <label class="field">
+                            <span>状态</span>
+                            <select aria-label="状态">
+                                <option>全部</option>
+                                <option>待审核</option>
+                                <option>已上架</option>
+                                <option>已驳回</option>
+                                <option>已暂停</option>
+                                <option>已下架</option>
+                            </select>
+                        </label>
+                        <label class="field">
+                            <span>社区</span>
+                            <select aria-label="社区">
+                                <option>全部社区</option>
+                                <option>青禾社区</option>
+                                <option>梧桐里社区</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">物品</th>
+                                    <th scope="col">出租者 / 社区</th>
+                                    <th scope="col">状态</th>
+                                    <th scope="col">置顶</th>
+                                    <th scope="col">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>18V 充电式电钻</td>
+                                    <td>陈禾 / 青禾社区</td>
+                                    <td>
+                                        <span class="badge warn">待审核</span>
+                                    </td>
+                                    <td>—</td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="13-platform-admin.html#items"
+                                            >审核</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>双人露营帐篷</td>
+                                    <td>周宁 / 青禾社区</td>
+                                    <td>
+                                        <span class="badge">已上架</span>
+                                    </td>
+                                    <td>是</td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="13-platform-admin.html#items"
+                                            >管理操作</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>家用折叠梯</td>
+                                    <td>李青 / 青禾社区</td>
+                                    <td>
+                                        <span class="badge">已上架</span>
+                                    </td>
+                                    <td>否</td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="13-platform-admin.html#items"
+                                            >管理操作</a
+                                        >
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination">
+                        <span>共 3 条</span>
+                        <span class="page-number">1</span>
+                    </div>
+                </section>
+                <div class="actions">
+                    <a class="btn" href="13-platform-admin.html#users"
+                        >导出物品数据</a
+                    >
+                </div>
+            </section>
+            <section
+                id="settings"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-settings"
+                hidden
+            >
+                <h2 class="view-heading">平台参数</h2>
+                <div class="two">
+                    <div>
+                        <section class="panel">
+                            <div class="panel-title">
+                                <h2>交易参数</h2>
+                            </div>
+                            <label class="field">
+                                <span>
+                                    平台佣金比例（%）
+                                    <em>*</em>
+                                </span>
+                                <input
+                                    type="text"
+                                    aria-label="平台佣金比例（%）"
+                                    value="10"
+                                />
+                            </label>
+                        </section>
+                        <section class="panel">
+                            <div class="panel-title">
+                                <h2>默认准入与审核</h2>
+                            </div>
+                            <label class="toggle-row">
+                                <span>
+                                    <strong>社区加入默认自动通过</strong>
+                                </span>
+                                <input
+                                    class="switch"
+                                    type="checkbox"
+                                    aria-label="社区加入默认自动通过"
+                                />
+                            </label>
+                            <label class="toggle-row">
+                                <span>
+                                    <strong>物品发布审核</strong>
+                                </span>
+                                <input
+                                    class="switch"
+                                    type="checkbox"
+                                    aria-label="物品发布审核"
+                                    checked
+                                />
+                            </label>
+                            <div class="actions">
+                                <a
+                                    class="btn primary"
+                                    href="13-platform-admin.html#settings"
+                                    >保存配置</a
+                                >
+                            </div>
+                        </section>
+                    </div>
+                    <div>
+                        <section class="panel">
+                            <div class="panel-title">
+                                <h2>当前规则</h2>
+                            </div>
+                            <dl class="line-list">
+                                <div>
+                                    <dt>默认佣金</dt>
+                                    <dd>10%</dd>
+                                </div>
+                                <div>
+                                    <dt>交易范围</dt>
+                                    <dd>仅同社区</dd>
+                                </div>
+                                <div>
+                                    <dt>取还存证</dt>
+                                    <dd>每阶段至少 1 张</dd>
+                                </div>
+                                <div>
+                                    <dt>默认信用分</dt>
+                                    <dd>80</dd>
+                                </div>
+                                <div>
+                                    <dt>低信用下单限制</dt>
+                                    <dd>低于 40 禁止下单</dd>
+                                </div>
+                                <div>
+                                    <dt>高押金发布门槛</dt>
+                                    <dd>押金 &gt; ¥500 要求信用 ≥ 60</dd>
+                                </div>
+                            </dl>
+                        </section>
+                    </div>
+                </div>
+            </section>
+            <section
+                id="dictionary"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-dictionary"
+                hidden
+            >
+                <h2 class="view-heading">字典</h2>
+                <div class="two equal">
+                    <div>
+                        <section class="panel">
+                            <div class="panel-title">
+                                <h2>物品分类</h2>
+                                <a
+                                    class="btn small"
+                                    href="13-platform-admin.html#dictionary"
+                                    >新增分类</a
+                                >
+                            </div>
+                            <div class="table-wrap">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">名称</th>
+                                            <th scope="col">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>工具</td>
+                                            <td>
+                                                <a
+                                                    class=""
+                                                    href="13-platform-admin.html#dictionary"
+                                                    >编辑</a
+                                                >
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>家电</td>
+                                            <td>
+                                                <a
+                                                    class=""
+                                                    href="13-platform-admin.html#dictionary"
+                                                    >编辑</a
+                                                >
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>户外</td>
+                                            <td>
+                                                <a
+                                                    class=""
+                                                    href="13-platform-admin.html#dictionary"
+                                                    >编辑</a
+                                                >
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>数码</td>
+                                            <td>
+                                                <a
+                                                    class=""
+                                                    href="13-platform-admin.html#dictionary"
+                                                    >编辑</a
+                                                >
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>其他</td>
+                                            <td>
+                                                <a
+                                                    class=""
+                                                    href="13-platform-admin.html#dictionary"
+                                                    >编辑</a
+                                                >
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="pagination">
+                                <span>共 5 条</span>
+                                <span class="page-number">1</span>
+                            </div>
+                        </section>
+                    </div>
+                    <div>
+                        <section class="panel">
+                            <div class="panel-title">
+                                <h2>举报类型</h2>
+                                <a
+                                    class="btn small"
+                                    href="13-platform-admin.html#dictionary"
+                                    >新增类型</a
+                                >
+                            </div>
+                            <div class="table-wrap">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">名称</th>
+                                            <th scope="col">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>信息不实</td>
+                                            <td>
+                                                <a
+                                                    class=""
+                                                    href="13-platform-admin.html#dictionary"
+                                                    >编辑</a
+                                                >
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>违规内容</td>
+                                            <td>
+                                                <a
+                                                    class=""
+                                                    href="13-platform-admin.html#dictionary"
+                                                    >编辑</a
+                                                >
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>恶意评价</td>
+                                            <td>
+                                                <a
+                                                    class=""
+                                                    href="13-platform-admin.html#dictionary"
+                                                    >编辑</a
+                                                >
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>其他</td>
+                                            <td>
+                                                <a
+                                                    class=""
+                                                    href="13-platform-admin.html#dictionary"
+                                                    >编辑</a
+                                                >
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="pagination">
+                                <span>共 4 条</span>
+                                <span class="page-number">1</span>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </section>
+            <section
+                id="logs"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-logs"
+                hidden
+            >
+                <h2 class="view-heading">操作日志</h2>
+                <section class="panel">
+                    <div class="filters">
+                        <label class="field">
+                            <span>操作人</span>
+                            <input type="text" aria-label="操作人" value="" />
+                        </label>
+                        <label class="field">
+                            <span>动作类型</span>
+                            <select aria-label="动作类型">
+                                <option>全部</option>
+                                <option>审核</option>
+                                <option>下架</option>
+                                <option>封禁</option>
+                                <option>仲裁</option>
+                                <option>余额调整</option>
+                            </select>
+                        </label>
+                        <label class="field">
+                            <span>开始日期</span>
+                            <input
+                                type="text"
+                                aria-label="开始日期"
+                                value="2026-10-01"
+                            />
+                        </label>
+                        <label class="field">
+                            <span>结束日期</span>
+                            <input
+                                type="text"
+                                aria-label="结束日期"
+                                value="2026-10-31"
+                            />
+                        </label>
+                    </div>
+                    <div class="filters">
+                        <label class="field">
+                            <span>目标对象</span>
+                            <input
+                                type="text"
+                                aria-label="目标对象"
+                                value="订单号 / 用户账号 / 物品名称"
+                            />
+                        </label>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">时间</th>
+                                    <th scope="col">操作人 / 角色</th>
+                                    <th scope="col">动作</th>
+                                    <th scope="col">对象</th>
+                                    <th scope="col">结果</th>
+                                    <th scope="col">详情</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>10-16 14:30</td>
+                                    <td>系统管理员</td>
+                                    <td>仲裁执行</td>
+                                    <td>JF20261015001</td>
+                                    <td>
+                                        <span class="badge">成功</span>
+                                    </td>
+                                    <td>扣除押金 ¥50</td>
+                                </tr>
+                                <tr>
+                                    <td>10-09 11:00</td>
+                                    <td>系统管理员</td>
+                                    <td>调整余额</td>
+                                    <td>Starling</td>
+                                    <td>
+                                        <span class="badge">成功</span>
+                                    </td>
+                                    <td>可用余额 +¥100</td>
+                                </tr>
+                                <tr>
+                                    <td>10-09 10:45</td>
+                                    <td>周宁 / 社区管理员</td>
+                                    <td>物品审核</td>
+                                    <td>18V 电钻</td>
+                                    <td>
+                                        <span class="badge">通过</span>
+                                    </td>
+                                    <td>所属社区：青禾</td>
+                                </tr>
+                                <tr>
+                                    <td>10-09 09:45</td>
+                                    <td>系统管理员</td>
+                                    <td>认证审核</td>
+                                    <td>Starling</td>
+                                    <td>
+                                        <span class="badge">通过</span>
+                                    </td>
+                                    <td>注册用户 → 认证用户</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination">
+                        <span>共 4 条</span>
+                        <span class="page-number">1</span>
+                    </div>
+                </section>
+            </section>
+        </main>
+    </body>
+</html>

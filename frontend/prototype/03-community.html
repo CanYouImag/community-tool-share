@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>社区</title>
+        <link rel="stylesheet" href="common.css" />
+        <script src="tabs.js" defer></script>
+        <noscript
+            ><style>
+                .view-panel[hidden] {
+                    display: block !important;
+                }
+            </style></noscript
+        >
+    </head>
+    <body>
+        <header class="top">
+            <div class="top-inner">
+                <a class="brand" href="index.html">
+                    <span class="brand-symbol">邻</span>
+                    <span>邻租</span>
+                </a>
+                <nav class="nav" aria-label="主导航">
+                    <a href="04-items.html" class="">物品广场</a>
+                    <a href="03-community.html" class="active">社区</a>
+                    <a href="06-publish.html" class="">发布 / 我的物品</a>
+                    <a href="07-orders.html" class="">我的订单</a>
+                    <a href="09-wallet.html" class="">钱包</a>
+                    <a href="02-account.html" class="">个人中心</a>
+                </nav>
+                <a href="index.html">原型目录</a>
+            </div>
+        </header>
+        <main class="public-main">
+            <header class="page-head">
+                <div>
+                    <h1>社区</h1>
+                </div>
+            </header>
+            <nav class="view-tabs" role="tablist" aria-label="页内功能">
+                <a
+                    id="tab-discover"
+                    class="view-tab"
+                    href="#discover"
+                    role="tab"
+                    aria-controls="discover"
+                    aria-selected="true"
+                    >发现社区</a
+                >
+                <a
+                    id="tab-home"
+                    class="view-tab"
+                    href="#home"
+                    role="tab"
+                    aria-controls="home"
+                    aria-selected="false"
+                    >社区主页</a
+                >
+                <a
+                    id="tab-joined"
+                    class="view-tab"
+                    href="#joined"
+                    role="tab"
+                    aria-controls="joined"
+                    aria-selected="false"
+                    >我的社区</a
+                >
+            </nav>
+            <section
+                id="discover"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-discover"
+            >
+                <h2 class="view-heading">发现社区</h2>
+                <section class="panel">
+                    <div class="filters">
+                        <label class="field">
+                            <span>社区名称</span>
+                            <input
+                                type="text"
+                                aria-label="社区名称"
+                                value="青禾"
+                            />
+                        </label>
+                    </div>
+                </section>
+                <div class="three">
+                    <article class="community-card">
+                        <div class="cover">
+                            <h2>青禾社区</h2>
+                        </div>
+                        <div class="body">
+                            <dl class="line-list">
+                                <div>
+                                    <dt>成员数</dt>
+                                    <dd>126 人</dd>
+                                </div>
+                                <div>
+                                    <dt>在租物品</dt>
+                                    <dd>38 件</dd>
+                                </div>
+                            </dl>
+                            <a class="btn" href="03-community.html#home"
+                                >进入社区</a
+                            >
+                        </div>
+                    </article>
+                    <article class="community-card">
+                        <div class="cover">
+                            <h2>梧桐里社区</h2>
+                        </div>
+                        <div class="body">
+                            <dl class="line-list">
+                                <div>
+                                    <dt>成员数</dt>
+                                    <dd>94 人</dd>
+                                </div>
+                                <div>
+                                    <dt>在租物品</dt>
+                                    <dd>26 件</dd>
+                                </div>
+                            </dl>
+                            <a class="btn" href="03-community.html#home"
+                                >进入社区</a
+                            >
+                        </div>
+                    </article>
+                    <article class="community-card">
+                        <div class="cover">
+                            <h2>溪岸社区</h2>
+                        </div>
+                        <div class="body">
+                            <dl class="line-list">
+                                <div>
+                                    <dt>成员数</dt>
+                                    <dd>78 人</dd>
+                                </div>
+                                <div>
+                                    <dt>在租物品</dt>
+                                    <dd>19 件</dd>
+                                </div>
+                            </dl>
+                            <a class="btn" href="03-community.html#home"
+                                >进入社区</a
+                            >
+                        </div>
+                    </article>
+                </div>
+            </section>
+            <section
+                id="home"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-home"
+                hidden
+            >
+                <h2 class="view-heading">社区主页</h2>
+                <section class="panel">
+                    <div class="row between">
+                        <div>
+                            <h2>让工具在邻里之间流动</h2>
+                            <p class="muted">
+                                社区管理员：周宁 / 成员 126 人 / 在租物品 38 件
+                            </p>
+                        </div>
+                        <a class="btn primary" href="03-community.html#joined"
+                            >申请加入</a
+                        >
+                    </div>
+                </section>
+                <div class="info">社区公告：取物和归还时请核对配件并拍照。</div>
+                <section class="panel">
+                    <div class="panel-title">
+                        <h2>置顶推荐</h2>
+                        <span class="badge">本社区最多置顶 3 件</span>
+                    </div>
+                    <div class="item-grid">
+                        <article class="item-card">
+                            <a class="" href="05-item-detail.html#detail">
+                                <img
+                                    class="art"
+                                    src="assets/item-30556edc.svg"
+                                    alt="18V 充电式电钻示意图"
+                                />
+                            </a>
+                            <div class="body">
+                                <small>工具 / 青禾社区</small>
+                                <h3>
+                                    <a
+                                        class=""
+                                        href="05-item-detail.html#detail"
+                                        >18V 充电式电钻</a
+                                    >
+                                </h3>
+                                <div class="bottom">
+                                    <span class="price">
+                                        ¥20
+                                        <small> / 天</small>
+                                    </span>
+                                    <small>陈禾</small>
+                                </div>
+                            </div>
+                        </article>
+                        <article class="item-card">
+                            <a class="" href="05-item-detail.html#detail">
+                                <img
+                                    class="art"
+                                    src="assets/item-dde811a0.svg"
+                                    alt="双人露营帐篷示意图"
+                                />
+                            </a>
+                            <div class="body">
+                                <small>户外 / 青禾社区</small>
+                                <h3>
+                                    <a
+                                        class=""
+                                        href="05-item-detail.html#detail"
+                                        >双人露营帐篷</a
+                                    >
+                                </h3>
+                                <div class="bottom">
+                                    <span class="price">
+                                        ¥35
+                                        <small> / 天</small>
+                                    </span>
+                                    <small>周宁</small>
+                                </div>
+                            </div>
+                        </article>
+                        <article class="item-card">
+                            <a class="" href="05-item-detail.html#detail">
+                                <img
+                                    class="art"
+                                    src="assets/item-15f4c496.svg"
+                                    alt="便携高清投影仪示意图"
+                                />
+                            </a>
+                            <div class="body">
+                                <small>数码 / 青禾社区</small>
+                                <h3>
+                                    <a
+                                        class=""
+                                        href="05-item-detail.html#detail"
+                                        >便携高清投影仪</a
+                                    >
+                                </h3>
+                                <div class="bottom">
+                                    <span class="price">
+                                        ¥45
+                                        <small> / 天</small>
+                                    </span>
+                                    <small>许安</small>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+                <section class="panel">
+                    <div class="panel-title">
+                        <h2>最新上架</h2>
+                    </div>
+                    <div class="item-grid">
+                        <article class="item-card">
+                            <a class="" href="05-item-detail.html#detail">
+                                <img
+                                    class="art"
+                                    src="assets/item-30556edc.svg"
+                                    alt="18V 充电式电钻示意图"
+                                />
+                            </a>
+                            <div class="body">
+                                <small>工具 / 青禾社区</small>
+                                <h3>
+                                    <a
+                                        class=""
+                                        href="05-item-detail.html#detail"
+                                        >18V 充电式电钻</a
+                                    >
+                                </h3>
+                                <div class="bottom">
+                                    <span class="price">
+                                        ¥20
+                                        <small> / 天</small>
+                                    </span>
+                                    <small>陈禾</small>
+                                </div>
+                            </div>
+                        </article>
+                        <article class="item-card">
+                            <a class="" href="05-item-detail.html#detail">
+                                <img
+                                    class="art"
+                                    src="assets/item-dde811a0.svg"
+                                    alt="双人露营帐篷示意图"
+                                />
+                            </a>
+                            <div class="body">
+                                <small>户外 / 青禾社区</small>
+                                <h3>
+                                    <a
+                                        class=""
+                                        href="05-item-detail.html#detail"
+                                        >双人露营帐篷</a
+                                    >
+                                </h3>
+                                <div class="bottom">
+                                    <span class="price">
+                                        ¥35
+                                        <small> / 天</small>
+                                    </span>
+                                    <small>周宁</small>
+                                </div>
+                            </div>
+                        </article>
+                        <article class="item-card">
+                            <a class="" href="05-item-detail.html#detail">
+                                <img
+                                    class="art"
+                                    src="assets/item-15f4c496.svg"
+                                    alt="便携高清投影仪示意图"
+                                />
+                            </a>
+                            <div class="body">
+                                <small>数码 / 青禾社区</small>
+                                <h3>
+                                    <a
+                                        class=""
+                                        href="05-item-detail.html#detail"
+                                        >便携高清投影仪</a
+                                    >
+                                </h3>
+                                <div class="bottom">
+                                    <span class="price">
+                                        ¥45
+                                        <small> / 天</small>
+                                    </span>
+                                    <small>许安</small>
+                                </div>
+                            </div>
+                        </article>
+                        <article class="item-card">
+                            <a class="" href="05-item-detail.html#detail">
+                                <img
+                                    class="art"
+                                    src="assets/item-206bd1ad.svg"
+                                    alt="家用折叠梯示意图"
+                                />
+                            </a>
+                            <div class="body">
+                                <small>工具 / 青禾社区</small>
+                                <h3>
+                                    <a
+                                        class=""
+                                        href="05-item-detail.html#detail"
+                                        >家用折叠梯</a
+                                    >
+                                </h3>
+                                <div class="bottom">
+                                    <span class="price">
+                                        ¥15
+                                        <small> / 天</small>
+                                    </span>
+                                    <small>李青</small>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+            </section>
+            <section
+                id="joined"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-joined"
+                hidden
+            >
+                <h2 class="view-heading">我的社区</h2>
+                <section class="panel">
+                    <div class="panel-title">
+                        <h2>成员关系</h2>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">社区</th>
+                                    <th scope="col">状态</th>
+                                    <th scope="col">加入／申请时间</th>
+                                    <th scope="col">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>青禾社区</td>
+                                    <td>
+                                        <span class="badge">已加入</span>
+                                    </td>
+                                    <td>2026-10-01</td>
+                                    <td>
+                                        <div class="actions">
+                                            <a
+                                                class=""
+                                                href="03-community.html#home"
+                                                >社区主页</a
+                                            >
+                                            <a
+                                                class=""
+                                                href="03-community.html#joined"
+                                                >退出社区</a
+                                            >
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>梧桐里社区</td>
+                                    <td>
+                                        <span class="badge warn">待审核</span>
+                                    </td>
+                                    <td>2026-10-09</td>
+                                    <td>等待审核</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination">
+                        <span>共 2 条</span>
+                        <span class="page-number">1</span>
+                    </div>
+                </section>
+            </section>
+        </main>
+    </body>
+</html>

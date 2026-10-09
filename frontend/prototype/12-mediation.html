@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>社区调解</title>
+        <link rel="stylesheet" href="common.css" />
+        <script src="tabs.js" defer></script>
+        <noscript
+            ><style>
+                .view-panel[hidden] {
+                    display: block !important;
+                }
+            </style></noscript
+        >
+    </head>
+    <body>
+        <header class="top">
+            <div class="top-inner">
+                <a class="brand" href="index.html">
+                    <span class="brand-symbol">邻</span>
+                    <span>邻租</span>
+                </a>
+                <nav class="nav" aria-label="主导航">
+                    <a href="11-community-admin.html" class="">社区管理</a>
+                    <a href="12-mediation.html" class="active">社区调解</a>
+                    <a href="13-platform-admin.html" class="">平台管理</a>
+                    <a href="14-arbitration.html" class="">平台仲裁</a>
+                </nav>
+                <a href="index.html">原型目录</a>
+            </div>
+        </header>
+        <main class="public-main">
+            <header class="page-head">
+                <div>
+                    <h1>社区调解</h1>
+                </div>
+            </header>
+            <nav class="view-tabs" role="tablist" aria-label="页内功能">
+                <a
+                    id="tab-queue"
+                    class="view-tab"
+                    href="#queue"
+                    role="tab"
+                    aria-controls="queue"
+                    aria-selected="true"
+                    >案件列表</a
+                >
+                <a
+                    id="tab-case"
+                    class="view-tab"
+                    href="#case"
+                    role="tab"
+                    aria-controls="case"
+                    aria-selected="false"
+                    >调解案件</a
+                >
+                <a
+                    id="tab-escalate"
+                    class="view-tab"
+                    href="#escalate"
+                    role="tab"
+                    aria-controls="escalate"
+                    aria-selected="false"
+                    >上报仲裁</a
+                >
+            </nav>
+            <section
+                id="queue"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-queue"
+            >
+                <h2 class="view-heading">案件列表</h2>
+                <section class="panel">
+                    <div class="filters">
+                        <label class="field">
+                            <span>案件编号 / 订单号</span>
+                            <input
+                                type="text"
+                                aria-label="案件编号 / 订单号"
+                                value=""
+                            />
+                        </label>
+                        <label class="field">
+                            <span>处理状态</span>
+                            <select aria-label="处理状态">
+                                <option>全部</option>
+                                <option>调解中</option>
+                                <option>待仲裁</option>
+                                <option>已调解</option>
+                                <option>已裁决</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">纠纷编号</th>
+                                    <th scope="col">关联物品</th>
+                                    <th scope="col">双方</th>
+                                    <th scope="col">提交时间</th>
+                                    <th scope="col">状态</th>
+                                    <th scope="col">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>JF20261015001</td>
+                                    <td>18V 充电式电钻</td>
+                                    <td>陈禾 / Starling</td>
+                                    <td>10-15 09:00</td>
+                                    <td>
+                                        <span class="badge warn">调解中</span>
+                                    </td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="12-mediation.html#case"
+                                            >介入调解</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>JF20261014002</td>
+                                    <td>便携投影仪</td>
+                                    <td>许安 / 李青</td>
+                                    <td>10-14 12:00</td>
+                                    <td>
+                                        <span class="badge blue">待仲裁</span>
+                                    </td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="12-mediation.html#case"
+                                            >查看记录</a
+                                        >
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination">
+                        <span>共 2 条</span>
+                        <span class="page-number">1</span>
+                    </div>
+                </section>
+            </section>
+            <section
+                id="case"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-case"
+                hidden
+            >
+                <h2 class="view-heading">调解案件</h2>
+                <div class="two">
+                    <div>
+                        <section class="panel">
+                            <div class="panel-title">
+                                <h2>案件与订单</h2>
+                            </div>
+                            <div class="order-product">
+                                <img
+                                    class="art"
+                                    src="assets/item-30556edc.svg"
+                                    alt="物品示意图"
+                                />
+                                <div>
+                                    <h3>18V 充电式电钻 / 双电池套装</h3>
+                                    <p class="muted">青禾社区 / 出租者 陈禾</p>
+                                    <small
+                                        >10 月 12 日至 14 日 / 租期 3 天</small
+                                    >
+                                </div>
+                            </div>
+                            <dl class="line-list">
+                                <div>
+                                    <dt>纠纷编号</dt>
+                                    <dd>JF20261015001</dd>
+                                </div>
+                                <div>
+                                    <dt>发起方</dt>
+                                    <dd>陈禾（出租者）</dd>
+                                </div>
+                                <div>
+                                    <dt>相对方</dt>
+                                    <dd>Starling（租客）</dd>
+                                </div>
+                                <div>
+                                    <dt>争议</dt>
+                                    <dd>归还后发现电钻外壳新增破损</dd>
+                                </div>
+                                <div>
+                                    <dt>冻结押金</dt>
+                                    <dd>¥200.00</dd>
+                                </div>
+                            </dl>
+                        </section>
+                        <section class="panel">
+                            <div class="panel-title">
+                                <h2>取还存证对比</h2>
+                            </div>
+                            <div class="two equal">
+                                <div>
+                                    <img
+                                        class="art small"
+                                        src="assets/item-30556edc.svg"
+                                        alt="取物存证示意"
+                                    />
+                                    <small>取物时 / 10-12</small>
+                                </div>
+                                <div>
+                                    <img
+                                        class="art small"
+                                        src="assets/item-30556edc.svg"
+                                        alt="归还存证示意"
+                                    />
+                                    <small>归还时 / 10-14</small>
+                                </div>
+                            </div>
+                        </section>
+                        <section class="panel">
+                            <div class="panel-title">
+                                <h2>订单留言与双方说明</h2>
+                            </div>
+                            <div class="message">
+                                <header>陈禾 / 出租者</header>
+                                归还时外壳出现裂纹，希望确认维修责任。
+                            </div>
+                            <div class="message">
+                                <header>Starling / 租客</header>
+                                请比对取物时照片，确认原有划痕与新增损坏。
+                            </div>
+                        </section>
+                    </div>
+                    <div>
+                        <section class="panel">
+                            <div class="panel-title">
+                                <h2>调解记录与操作</h2>
+                            </div>
+                            <span class="badge warn">调解中</span>
+                            <div class="message">
+                                <header>社区管理员 周宁 / 10-15 11:20</header>
+                                请双方补充近距离照片及交接说明。
+                            </div>
+                            <label class="field">
+                                <span>调解留言</span>
+                                <textarea aria-label="调解留言">
+请说明外壳损坏的具体位置与发现时间。</textarea
+                                >
+                            </label>
+                            <div class="actions">
+                                <a
+                                    class="btn primary"
+                                    href="12-mediation.html#case"
+                                    >发布调解留言</a
+                                >
+                            </div>
+                            <hr class="rule" />
+                            <label class="field">
+                                <span>调解结论</span>
+                                <textarea aria-label="调解结论"></textarea>
+                            </label>
+                            <div class="actions">
+                                <a class="btn" href="12-mediation.html#case"
+                                    >标记调解成功</a
+                                >
+                                <a class="btn" href="12-mediation.html#escalate"
+                                    >上报平台仲裁</a
+                                >
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </section>
+            <section
+                id="escalate"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-escalate"
+                hidden
+            >
+                <h2 class="view-heading">上报仲裁</h2>
+                <div class="two">
+                    <div>
+                        <section class="panel">
+                            <div class="panel-title">
+                                <h2>上报说明</h2>
+                            </div>
+                            <label class="field">
+                                <span>
+                                    调解过程摘要
+                                    <em>*</em>
+                                </span>
+                                <textarea aria-label="调解过程摘要">
+已要求双方补充照片。双方对损坏责任和维修金额仍未达成一致。</textarea
+                                >
+                            </label>
+                            <label class="field">
+                                <span>
+                                    证据清单
+                                    <em>*</em>
+                                </span>
+                                <textarea aria-label="证据清单">
+取物照片、归还照片、双方留言、调解记录。</textarea
+                                >
+                            </label>
+                            <label class="check">
+                                <input type="checkbox" checked />
+                                将上述订单记录和证据一并提交
+                            </label>
+                            <div class="actions">
+                                <a
+                                    class="btn primary"
+                                    href="12-mediation.html#case"
+                                    >确认上报</a
+                                >
+                                <a class="btn" href="12-mediation.html#case"
+                                    >继续调解</a
+                                >
+                            </div>
+                        </section>
+                    </div>
+                    <div>
+                        <section class="panel">
+                            <div class="panel-title">
+                                <h2>案件摘要</h2>
+                            </div>
+                            <dl class="line-list">
+                                <div>
+                                    <dt>纠纷</dt>
+                                    <dd>JF20261015001</dd>
+                                </div>
+                                <div>
+                                    <dt>关联订单</dt>
+                                    <dd>LZ202610090018</dd>
+                                </div>
+                                <div>
+                                    <dt>冻结押金</dt>
+                                    <dd>¥200.00</dd>
+                                </div>
+                                <div>
+                                    <dt>上报后状态</dt>
+                                    <dd>待仲裁</dd>
+                                </div>
+                            </dl>
+                        </section>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </body>
+</html>
