@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>我的订单</title>
+        <link rel="stylesheet" href="common.css" />
+        <script src="tabs.js" defer></script>
+        <noscript
+            ><style>
+                .view-panel[hidden] {
+                    display: block !important;
+                }
+            </style></noscript
+        >
+    </head>
+    <body>
+        <header class="top">
+            <div class="top-inner">
+                <a class="brand" href="index.html">
+                    <span class="brand-symbol">邻</span>
+                    <span>邻租</span>
+                </a>
+                <nav class="nav" aria-label="主导航">
+                    <a href="04-items.html" class="">物品广场</a>
+                    <a href="03-community.html" class="">社区</a>
+                    <a href="06-publish.html" class="">发布 / 我的物品</a>
+                    <a href="07-orders.html" class="active">我的订单</a>
+                    <a href="09-wallet.html" class="">钱包</a>
+                    <a href="02-account.html" class="">个人中心</a>
+                </nav>
+                <a href="index.html">原型目录</a>
+            </div>
+        </header>
+        <main class="public-main">
+            <header class="page-head">
+                <div>
+                    <h1>我的订单</h1>
+                </div>
+            </header>
+            <nav class="view-tabs" role="tablist" aria-label="页内功能">
+                <a
+                    id="tab-borrow"
+                    class="view-tab"
+                    href="#borrow"
+                    role="tab"
+                    aria-controls="borrow"
+                    aria-selected="true"
+                    >我租入的</a
+                >
+                <a
+                    id="tab-lend"
+                    class="view-tab"
+                    href="#lend"
+                    role="tab"
+                    aria-controls="lend"
+                    aria-selected="false"
+                    >我租出的</a
+                >
+            </nav>
+            <section
+                id="borrow"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-borrow"
+            >
+                <h2 class="view-heading">我租入的</h2>
+                <section class="panel">
+                    <div class="filters">
+                        <label class="field">
+                            <span>订单号 / 物品</span>
+                            <input
+                                type="text"
+                                aria-label="订单号 / 物品"
+                                value=""
+                            />
+                        </label>
+                        <label class="field">
+                            <span>订单状态</span>
+                            <select aria-label="订单状态">
+                                <option>全部状态</option>
+                                <option>待确认</option>
+                                <option>待取物</option>
+                                <option>租用中</option>
+                                <option>待归还确认</option>
+                                <option>已完成</option>
+                                <option>已取消</option>
+                                <option>纠纷中</option>
+                                <option>已终结</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">订单 / 物品</th>
+                                    <th scope="col">出租者</th>
+                                    <th scope="col">租期</th>
+                                    <th scope="col">租金 / 押金</th>
+                                    <th scope="col">状态</th>
+                                    <th scope="col">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        LZ202610090018
+                                        <small>18V 充电式电钻</small>
+                                    </td>
+                                    <td>陈禾</td>
+                                    <td>10-12 至 10-14</td>
+                                    <td>¥60 / ¥200</td>
+                                    <td>
+                                        <span class="badge warn">待确认</span>
+                                    </td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="08-order-detail.html#pending"
+                                            >订单详情</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        LZ202610080012
+                                        <small>双人露营帐篷</small>
+                                    </td>
+                                    <td>周宁</td>
+                                    <td>10-10 至 10-12</td>
+                                    <td>¥105 / ¥300</td>
+                                    <td>
+                                        <span class="badge blue">待取物</span>
+                                    </td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="08-order-detail.html#pickup"
+                                            >查看取物码</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        LZ202610050009
+                                        <small>便携投影仪</small>
+                                    </td>
+                                    <td>许安</td>
+                                    <td>10-06 至 10-08</td>
+                                    <td>¥135 / ¥500</td>
+                                    <td>
+                                        <span class="badge error">逾期</span>
+                                    </td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="08-order-detail.html#renting"
+                                            >查看详情</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        LZ202610010003
+                                        <small>家用折叠梯</small>
+                                    </td>
+                                    <td>李青</td>
+                                    <td>10-02 至 10-04</td>
+                                    <td>¥45 / ¥100</td>
+                                    <td>
+                                        <span class="badge">已完成</span>
+                                    </td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="08-order-detail.html#complete"
+                                            >评价</a
+                                        >
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination">
+                        <span>共 4 条</span>
+                        <span class="page-number">1</span>
+                    </div>
+                </section>
+            </section>
+            <section
+                id="lend"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-lend"
+                hidden
+            >
+                <h2 class="view-heading">我租出的</h2>
+                <section class="panel">
+                    <div class="filters">
+                        <label class="field">
+                            <span>订单号 / 物品</span>
+                            <input
+                                type="text"
+                                aria-label="订单号 / 物品"
+                                value=""
+                            />
+                        </label>
+                        <label class="field">
+                            <span>订单状态</span>
+                            <select aria-label="订单状态">
+                                <option>全部状态</option>
+                                <option>待确认</option>
+                                <option>待取物</option>
+                                <option>租用中</option>
+                                <option>待归还确认</option>
+                                <option>已完成</option>
+                                <option>已取消</option>
+                                <option>纠纷中</option>
+                                <option>已终结</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">订单 / 物品</th>
+                                    <th scope="col">租客</th>
+                                    <th scope="col">租期</th>
+                                    <th scope="col">租金 / 押金</th>
+                                    <th scope="col">状态</th>
+                                    <th scope="col">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        LZ202610090018
+                                        <small>18V 充电式电钻</small>
+                                    </td>
+                                    <td>Starling</td>
+                                    <td>10-12 至 10-14</td>
+                                    <td>¥60 / ¥200</td>
+                                    <td>
+                                        <span class="badge warn">待确认</span>
+                                    </td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="08-order-detail.html#pending"
+                                            >处理订单</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        LZ202610080012
+                                        <small>双人露营帐篷</small>
+                                    </td>
+                                    <td>许安</td>
+                                    <td>10-10 至 10-12</td>
+                                    <td>¥105 / ¥300</td>
+                                    <td>
+                                        <span class="badge blue">待取物</span>
+                                    </td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="08-order-detail.html#pickup"
+                                            >核销取物</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        LZ202610050009
+                                        <small>便携投影仪</small>
+                                    </td>
+                                    <td>李青</td>
+                                    <td>10-06 至 10-08</td>
+                                    <td>¥135 / ¥500</td>
+                                    <td>
+                                        <span class="badge error">逾期</span>
+                                    </td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="08-order-detail.html#renting"
+                                            >查看详情</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        LZ202610010003
+                                        <small>家用折叠梯</small>
+                                    </td>
+                                    <td>周宁</td>
+                                    <td>10-02 至 10-04</td>
+                                    <td>¥45 / ¥100</td>
+                                    <td>
+                                        <span class="badge">已完成</span>
+                                    </td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="08-order-detail.html#complete"
+                                            >评价</a
+                                        >
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination">
+                        <span>共 4 条</span>
+                        <span class="page-number">1</span>
+                    </div>
+                </section>
+            </section>
+        </main>
+    </body>
+</html>

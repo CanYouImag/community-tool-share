@@ -1,0 +1,839 @@
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>社区管理</title>
+        <link rel="stylesheet" href="common.css" />
+        <script src="tabs.js" defer></script>
+        <noscript
+            ><style>
+                .view-panel[hidden] {
+                    display: block !important;
+                }
+            </style></noscript
+        >
+    </head>
+    <body>
+        <header class="top">
+            <div class="top-inner">
+                <a class="brand" href="index.html">
+                    <span class="brand-symbol">邻</span>
+                    <span>邻租</span>
+                </a>
+                <nav class="nav" aria-label="主导航">
+                    <a href="11-community-admin.html" class="active"
+                        >社区管理</a
+                    >
+                    <a href="12-mediation.html" class="">社区调解</a>
+                    <a href="13-platform-admin.html" class="">平台管理</a>
+                    <a href="14-arbitration.html" class="">平台仲裁</a>
+                </nav>
+                <a href="index.html">原型目录</a>
+            </div>
+        </header>
+        <main class="public-main">
+            <header class="page-head">
+                <div>
+                    <h1>社区管理</h1>
+                </div>
+            </header>
+            <nav class="view-tabs" role="tablist" aria-label="页内功能">
+                <a
+                    id="tab-dashboard"
+                    class="view-tab"
+                    href="#dashboard"
+                    role="tab"
+                    aria-controls="dashboard"
+                    aria-selected="true"
+                    >工作台</a
+                >
+                <a
+                    id="tab-members"
+                    class="view-tab"
+                    href="#members"
+                    role="tab"
+                    aria-controls="members"
+                    aria-selected="false"
+                    >成员</a
+                >
+                <a
+                    id="tab-join"
+                    class="view-tab"
+                    href="#join"
+                    role="tab"
+                    aria-controls="join"
+                    aria-selected="false"
+                    >加入审核</a
+                >
+                <a
+                    id="tab-items"
+                    class="view-tab"
+                    href="#items"
+                    role="tab"
+                    aria-controls="items"
+                    aria-selected="false"
+                    >物品管理</a
+                >
+                <a
+                    id="tab-review"
+                    class="view-tab"
+                    href="#review"
+                    role="tab"
+                    aria-controls="review"
+                    aria-selected="false"
+                    >物品审核</a
+                >
+                <a
+                    id="tab-announcements"
+                    class="view-tab"
+                    href="#announcements"
+                    role="tab"
+                    aria-controls="announcements"
+                    aria-selected="false"
+                    >公告</a
+                >
+                <a
+                    id="tab-editor"
+                    class="view-tab"
+                    href="#editor"
+                    role="tab"
+                    aria-controls="editor"
+                    aria-selected="false"
+                    >编辑公告</a
+                >
+                <a
+                    id="tab-reports"
+                    class="view-tab"
+                    href="#reports"
+                    role="tab"
+                    aria-controls="reports"
+                    aria-selected="false"
+                    >举报处理</a
+                >
+            </nav>
+            <section
+                id="dashboard"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-dashboard"
+            >
+                <h2 class="view-heading">工作台</h2>
+                <div class="stats">
+                    <div class="stat">
+                        <small>本月订单</small>
+                        <div class="value">104</div>
+                    </div>
+                    <div class="stat">
+                        <small>本月 GMV</small>
+                        <div class="value">¥8,420</div>
+                    </div>
+                    <div class="stat">
+                        <small>待审核物品</small>
+                        <div class="value">3</div>
+                    </div>
+                    <div class="stat">
+                        <small>待调解纠纷</small>
+                        <div class="value">2</div>
+                    </div>
+                </div>
+                <div class="two equal">
+                    <div>
+                        <section class="panel">
+                            <div class="panel-title">
+                                <h2>近四周订单量</h2>
+                            </div>
+                            <div class="chart">
+                                <div class="bar" style="--height: 50.625%">
+                                    <b>18</b>
+                                    <small>第 1 周</small>
+                                </div>
+                                <div class="bar" style="--height: 70.3125%">
+                                    <b>25</b>
+                                    <small>第 2 周</small>
+                                </div>
+                                <div class="bar" style="--height: 81.5625%">
+                                    <b>29</b>
+                                    <small>第 3 周</small>
+                                </div>
+                                <div class="bar" style="--height: 90%">
+                                    <b>32</b>
+                                    <small>第 4 周</small>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <div>
+                        <section class="panel">
+                            <div class="panel-title">
+                                <h2>热门分类</h2>
+                            </div>
+                            <div class="rank">
+                                <span>工具</span>
+                                <span>
+                                    <i style="--width: 90%"></i>
+                                </span>
+                                <small>36 单</small>
+                            </div>
+                            <div class="rank">
+                                <span>户外</span>
+                                <span>
+                                    <i style="--width: 70%"></i>
+                                </span>
+                                <small>28 单</small>
+                            </div>
+                            <div class="rank">
+                                <span>家电</span>
+                                <span>
+                                    <i style="--width: 50%"></i>
+                                </span>
+                                <small>20 单</small>
+                            </div>
+                            <div class="rank">
+                                <span>数码</span>
+                                <span>
+                                    <i style="--width: 35%"></i>
+                                </span>
+                                <small>14 单</small>
+                            </div>
+                            <div class="rank">
+                                <span>其他</span>
+                                <span>
+                                    <i style="--width: 15%"></i>
+                                </span>
+                                <small>6 单</small>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+                <section class="panel">
+                    <div class="panel-title">
+                        <h2>待办事项</h2>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">事项</th>
+                                    <th scope="col">关联对象</th>
+                                    <th scope="col">提交时间</th>
+                                    <th scope="col">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>物品初审</td>
+                                    <td>18V 充电式电钻</td>
+                                    <td>10-09 09:30</td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="11-community-admin.html#review"
+                                            >审核物品</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>加入申请</td>
+                                    <td>许安</td>
+                                    <td>10-09 09:15</td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="11-community-admin.html#join"
+                                            >审核申请</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>订单纠纷</td>
+                                    <td>JF20261015001</td>
+                                    <td>10-15 09:00</td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="12-mediation.html#case"
+                                            >进入调解</a
+                                        >
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination">
+                        <span>共 3 条</span>
+                        <span class="page-number">1</span>
+                    </div>
+                </section>
+            </section>
+            <section
+                id="members"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-members"
+                hidden
+            >
+                <h2 class="view-heading">成员</h2>
+                <section class="panel">
+                    <div class="filters">
+                        <label class="field">
+                            <span>昵称 / 账号</span>
+                            <input
+                                type="text"
+                                aria-label="昵称 / 账号"
+                                value=""
+                            />
+                        </label>
+                        <label class="field">
+                            <span>成员状态</span>
+                            <select aria-label="成员状态">
+                                <option>全部</option>
+                                <option>认证用户</option>
+                                <option>注册用户</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">成员</th>
+                                    <th scope="col">身份</th>
+                                    <th scope="col">信用分</th>
+                                    <th scope="col">加入时间</th>
+                                    <th scope="col">进行中订单</th>
+                                    <th scope="col">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Starling</td>
+                                    <td>
+                                        <span class="badge">认证用户</span>
+                                    </td>
+                                    <td>86</td>
+                                    <td>2026-10-01</td>
+                                    <td>2</td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="11-community-admin.html#members"
+                                            >移出成员</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        陈禾
+                                        <small>chenhe</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge">认证用户</span>
+                                    </td>
+                                    <td>92</td>
+                                    <td>2026-09-30</td>
+                                    <td>1</td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="11-community-admin.html#members"
+                                            >移出成员</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        许安
+                                        <small>xuan</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge neutral"
+                                            >注册用户</span
+                                        >
+                                    </td>
+                                    <td>80</td>
+                                    <td>2026-10-08</td>
+                                    <td>0</td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="11-community-admin.html#members"
+                                            >移出成员</a
+                                        >
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination">
+                        <span>共 3 条</span>
+                        <span class="page-number">1</span>
+                    </div>
+                </section>
+            </section>
+            <section
+                id="join"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-join"
+                hidden
+            >
+                <h2 class="view-heading">加入审核</h2>
+                <section class="panel">
+                    <nav class="tabs" aria-label="分类标签">
+                        <a class="selected" href="11-community-admin.html#join"
+                            >待处理</a
+                        >
+                        <a class="" href="11-community-admin.html#join"
+                            >已处理</a
+                        >
+                    </nav>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">申请人</th>
+                                    <th scope="col">认证状态</th>
+                                    <th scope="col">申请社区</th>
+                                    <th scope="col">申请时间</th>
+                                    <th scope="col">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>许安</td>
+                                    <td>
+                                        <span class="badge">已认证</span>
+                                    </td>
+                                    <td>青禾社区</td>
+                                    <td>2026-10-09 09:15</td>
+                                    <td>
+                                        <div class="actions">
+                                            <a
+                                                class=""
+                                                href="11-community-admin.html#join"
+                                                >通过</a
+                                            >
+                                            <a
+                                                class=""
+                                                href="11-community-admin.html#join"
+                                                >拒绝</a
+                                            >
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>陆川</td>
+                                    <td>
+                                        <span class="badge neutral"
+                                            >未认证</span
+                                        >
+                                    </td>
+                                    <td>青禾社区</td>
+                                    <td>2026-10-09 08:50</td>
+                                    <td>
+                                        <div class="actions">
+                                            <a
+                                                class=""
+                                                href="11-community-admin.html#join"
+                                                >通过</a
+                                            >
+                                            <a
+                                                class=""
+                                                href="11-community-admin.html#join"
+                                                >拒绝</a
+                                            >
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination">
+                        <span>共 2 条</span>
+                        <span class="page-number">1</span>
+                    </div>
+                </section>
+            </section>
+            <section
+                id="items"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-items"
+                hidden
+            >
+                <h2 class="view-heading">物品管理</h2>
+                <section class="panel">
+                    <div class="filters">
+                        <label class="field">
+                            <span>物品名称</span>
+                            <input type="text" aria-label="物品名称" value="" />
+                        </label>
+                        <label class="field">
+                            <span>状态</span>
+                            <select aria-label="状态">
+                                <option>全部</option>
+                                <option>待审核</option>
+                                <option>已上架</option>
+                                <option>已驳回</option>
+                                <option>已暂停</option>
+                                <option>已下架</option>
+                            </select>
+                        </label>
+                        <label class="field">
+                            <span>分类</span>
+                            <select aria-label="分类">
+                                <option>全部</option>
+                                <option>工具</option>
+                                <option>家电</option>
+                                <option>户外</option>
+                                <option>数码</option>
+                                <option>其他</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">物品</th>
+                                    <th scope="col">出租者 / 社区</th>
+                                    <th scope="col">状态</th>
+                                    <th scope="col">置顶</th>
+                                    <th scope="col">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>18V 充电式电钻</td>
+                                    <td>陈禾 / 青禾社区</td>
+                                    <td>
+                                        <span class="badge warn">待审核</span>
+                                    </td>
+                                    <td>—</td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="11-community-admin.html#review"
+                                            >审核</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>双人露营帐篷</td>
+                                    <td>周宁 / 青禾社区</td>
+                                    <td>
+                                        <span class="badge">已上架</span>
+                                    </td>
+                                    <td>是</td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="11-community-admin.html#review"
+                                            >管理操作</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>家用折叠梯</td>
+                                    <td>李青 / 青禾社区</td>
+                                    <td>
+                                        <span class="badge">已上架</span>
+                                    </td>
+                                    <td>否</td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="11-community-admin.html#review"
+                                            >管理操作</a
+                                        >
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination">
+                        <span>共 3 条</span>
+                        <span class="page-number">1</span>
+                    </div>
+                </section>
+            </section>
+            <section
+                id="review"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-review"
+                hidden
+            >
+                <h2 class="view-heading">物品审核</h2>
+                <div class="two">
+                    <div>
+                        <section class="panel">
+                            <div class="panel-title">
+                                <h2>待审核物品</h2>
+                            </div>
+                            <img
+                                class="art large"
+                                src="assets/item-30556edc.svg"
+                                alt="物品示意图"
+                            />
+                            <dl class="line-list">
+                                <div>
+                                    <dt>标题</dt>
+                                    <dd>18V 充电式电钻</dd>
+                                </div>
+                                <div>
+                                    <dt>出租者 / 信用分</dt>
+                                    <dd>陈禾 / 92</dd>
+                                </div>
+                                <div>
+                                    <dt>分类 / 成色</dt>
+                                    <dd>工具 / 九成新</dd>
+                                </div>
+                                <div>
+                                    <dt>日租金 / 押金</dt>
+                                    <dd>¥20.00 / ¥200.00</dd>
+                                </div>
+                                <div>
+                                    <dt>社区</dt>
+                                    <dd>青禾社区</dd>
+                                </div>
+                            </dl>
+                            <p class="muted">
+                                主机、双电池、充电器和常用钻头齐全。
+                            </p>
+                        </section>
+                    </div>
+                    <div>
+                        <section class="panel">
+                            <div class="panel-title">
+                                <h2>初审意见</h2>
+                            </div>
+                            <label class="field">
+                                <span>驳回理由</span>
+                                <textarea aria-label="驳回理由"></textarea>
+                            </label>
+                            <div class="actions">
+                                <a
+                                    class="btn primary"
+                                    href="11-community-admin.html#items"
+                                    >通过并上架</a
+                                >
+                                <a
+                                    class="btn danger"
+                                    href="11-community-admin.html#review"
+                                    >驳回申请</a
+                                >
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </section>
+            <section
+                id="announcements"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-announcements"
+                hidden
+            >
+                <h2 class="view-heading">公告</h2>
+                <section class="panel">
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">公告标题</th>
+                                    <th scope="col">发布人</th>
+                                    <th scope="col">发布时间</th>
+                                    <th scope="col">状态</th>
+                                    <th scope="col">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>取还物品，请完整拍照存证</td>
+                                    <td>周宁</td>
+                                    <td>2026-10-08</td>
+                                    <td>
+                                        <span class="badge">已发布</span>
+                                    </td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="11-community-admin.html#editor"
+                                            >编辑 / 删除</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>周末工具共享活动</td>
+                                    <td>周宁</td>
+                                    <td>2026-10-01</td>
+                                    <td>
+                                        <span class="badge">已发布</span>
+                                    </td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="11-community-admin.html#editor"
+                                            >编辑 / 删除</a
+                                        >
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination">
+                        <span>共 2 条</span>
+                        <span class="page-number">1</span>
+                    </div>
+                </section>
+            </section>
+            <section
+                id="editor"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-editor"
+                hidden
+            >
+                <h2 class="view-heading">编辑公告</h2>
+                <div class="narrow">
+                    <section class="panel">
+                        <div class="panel-title">
+                            <h2>公告内容</h2>
+                        </div>
+                        <label class="field">
+                            <span>
+                                标题
+                                <em>*</em>
+                            </span>
+                            <input
+                                type="text"
+                                aria-label="标题"
+                                value="取还物品，请完整拍照存证"
+                            />
+                        </label>
+                        <label class="field">
+                            <span>
+                                正文
+                                <em>*</em>
+                            </span>
+                            <textarea aria-label="正文">
+请在面交时核对物品与配件，取物及归还均上传至少一张清晰照片。</textarea
+                            >
+                        </label>
+                        <label class="upload">
+                            <strong>＋ 添加公告图片</strong>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                multiple
+                                aria-label="添加公告图片"
+                            />
+                        </label>
+                        <hr class="rule" />
+                        <div class="actions">
+                            <a
+                                class="btn primary"
+                                href="11-community-admin.html#announcements"
+                                >保存并发布</a
+                            >
+                            <a
+                                class="btn danger"
+                                href="11-community-admin.html#editor"
+                                >删除公告</a
+                            >
+                            <a
+                                class="btn"
+                                href="11-community-admin.html#announcements"
+                                >取消</a
+                            >
+                        </div>
+                    </section>
+                </div>
+            </section>
+            <section
+                id="reports"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-reports"
+                hidden
+            >
+                <h2 class="view-heading">举报处理</h2>
+                <div class="two">
+                    <div>
+                        <section class="panel">
+                            <div class="panel-title">
+                                <h2>举报详情</h2>
+                            </div>
+                            <dl class="line-list">
+                                <div>
+                                    <dt>举报编号</dt>
+                                    <dd>JB20261009001</dd>
+                                </div>
+                                <div>
+                                    <dt>举报人</dt>
+                                    <dd>Starling</dd>
+                                </div>
+                                <div>
+                                    <dt>目标</dt>
+                                    <dd>物品：18V 充电式电钻</dd>
+                                </div>
+                                <div>
+                                    <dt>类型</dt>
+                                    <dd>信息不实</dd>
+                                </div>
+                                <div>
+                                    <dt>理由</dt>
+                                    <dd>物品成色与描述不一致</dd>
+                                </div>
+                            </dl>
+                            <img
+                                class="art large"
+                                src="assets/item-30556edc.svg"
+                                alt="举报凭证示意图"
+                            />
+                        </section>
+                    </div>
+                    <div>
+                        <section class="panel">
+                            <div class="panel-title">
+                                <h2>处理意见</h2>
+                            </div>
+                            <label class="field">
+                                <span>处理措施</span>
+                                <select aria-label="处理措施">
+                                    <option>驳回举报</option>
+                                    <option>下架物品</option>
+                                    <option>警告当事人</option>
+                                    <option>移交平台封禁</option>
+                                </select>
+                            </label>
+                            <label class="field">
+                                <span>
+                                    处理说明
+                                    <em>*</em>
+                                </span>
+                                <textarea aria-label="处理说明">
+请结合证据填写处理结果。</textarea
+                                >
+                            </label>
+                            <div class="actions">
+                                <a
+                                    class="btn primary"
+                                    href="11-community-admin.html#reports"
+                                    >保存处理结果</a
+                                >
+                                <a
+                                    class="btn"
+                                    href="11-community-admin.html#reports"
+                                    >上报平台处理</a
+                                >
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </body>
+</html>

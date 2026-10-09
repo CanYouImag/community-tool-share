@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>订单详情与操作</title>
+        <link rel="stylesheet" href="common.css" />
+        <script src="tabs.js" defer></script>
+        <noscript
+            ><style>
+                .view-panel[hidden] {
+                    display: block !important;
+                }
+            </style></noscript
+        >
+    </head>
+    <body>
+        <header class="top">
+            <div class="top-inner">
+                <a class="brand" href="index.html">
+                    <span class="brand-symbol">邻</span>
+                    <span>邻租</span>
+                </a>
+                <nav class="nav" aria-label="主导航">
+                    <a href="04-items.html" class="">物品广场</a>
+                    <a href="03-community.html" class="">社区</a>
+                    <a href="06-publish.html" class="">发布 / 我的物品</a>
+                    <a href="07-orders.html" class="">我的订单</a>
+                    <a href="09-wallet.html" class="">钱包</a>
+                    <a href="02-account.html" class="">个人中心</a>
+                </nav>
+                <a href="index.html">原型目录</a>
+            </div>
+        </header>
+        <main class="public-main">
+            <header class="page-head">
+                <div>
+                    <h1>订单详情与操作</h1>
+                </div>
+            </header>
+            <nav class="view-tabs" role="tablist" aria-label="页内功能">
+                <a
+                    id="tab-pending"
+                    class="view-tab"
+                    href="#pending"
+                    role="tab"
+                    aria-controls="pending"
+                    aria-selected="true"
+                    >待确认</a
+                >
+                <a
+                    id="tab-checkout"
+                    class="view-tab"
+                    href="#checkout"
+                    role="tab"
+                    aria-controls="checkout"
+                    aria-selected="false"
+                    >确认支付</a
+                >
+                <a
+                    id="tab-pickup"
+                    class="view-tab"
+                    href="#pickup"
+                    role="tab"
+                    aria-controls="pickup"
+                    aria-selected="false"
+                    >待取物</a
+                >
+                <a
+                    id="tab-renting"
+                    class="view-tab"
+                    href="#renting"
+                    role="tab"
+                    aria-controls="renting"
+                    aria-selected="false"
+                    >租用中</a
+                >
+                <a
+                    id="tab-return"
+                    class="view-tab"
+                    href="#return"
+                    role="tab"
+                    aria-controls="return"
+                    aria-selected="false"
+                    >归还确认</a
+                >
+                <a
+                    id="tab-complete"
+                    class="view-tab"
+                    href="#complete"
+                    role="tab"
+                    aria-controls="complete"
+                    aria-selected="false"
+                    >完成 / 评价</a
+                >
+            </nav>
+            <section
+                id="pending"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-pending"
+            >
+                <h2 class="view-heading">待确认</h2>
+                <section class="panel">
+                    <h2>待确认 / 租客 / 出租者操作</h2>
+                    <hr class="rule" />
+                    <p>等待出租者接单</p>
+                    <hr class="rule" />
+                    <div class="actions">
+                        <a class="btn primary" href="#pickup"
+                            >出租者：确认接单</a
+                        >
+                        <a class="btn" href="#pending">租客：取消订单</a>
+                    </div>
+                    <details class="inline-note">
+                        <summary>取消 / 拒单确认</summary>
+                        <p>
+                            订单仍在待确认时可取消。确认后退还租金 ¥60，解冻押金
+                            ¥200；接单后不可单方取消。
+                        </p>
+                    </details>
+                </section>
+            </section>
+            <section
+                id="checkout"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-checkout"
+                hidden
+            >
+                <h2 class="view-heading">确认支付</h2>
+                <section class="panel">
+                    <h2>确认租期与费用</h2>
+                    <hr class="rule" />
+                    <label class="field">
+                        <span>开始日期</span>
+                        <input type="date" value="2026-10-12" />
+                    </label>
+                    <label class="field">
+                        <span>结束日期</span>
+                        <input type="date" value="2026-10-14" />
+                    </label>
+                    <dl class="line-list">
+                        <div>
+                            <dt>租金（3 天）</dt>
+                            <dd>¥60.00</dd>
+                        </div>
+                        <div>
+                            <dt>押金</dt>
+                            <dd>¥200.00</dd>
+                        </div>
+                        <div>
+                            <dt>可用余额</dt>
+                            <dd>¥500.00</dd>
+                        </div>
+                    </dl>
+                    <div class="actions">
+                        <a class="btn primary" href="#pending"
+                            >确认支付 ¥260.00</a
+                        >
+                    </div>
+                </section>
+            </section>
+            <section
+                id="pickup"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-pickup"
+                hidden
+            >
+                <h2 class="view-heading">待取物</h2>
+                <section class="panel">
+                    <h2>取物核销</h2>
+                    <hr class="rule" />
+                    <div class="two equal">
+                        <div>
+                            <h3>租客出示取物码</h3>
+                            <div class="code">826 419</div>
+                        </div>
+                        <div>
+                            <label class="field">
+                                <span>出租者输入取物码</span>
+                                <input type="text" value="826419" />
+                            </label>
+                            <label class="field">
+                                <span>取物存证（至少 1 张）</span>
+                                <input type="file" accept="image/*" multiple />
+                            </label>
+                            <div class="actions">
+                                <a class="btn primary" href="#renting"
+                                    >核销并完成交接</a
+                                >
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </section>
+            <section
+                id="renting"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-renting"
+                hidden
+            >
+                <h2 class="view-heading">租用中</h2>
+                <section class="panel">
+                    <h2>租用中</h2>
+                    <hr class="rule" />
+                    <p>
+                        请于 2026 年 10 月 14 日归还物品，归还时上传清晰照片。
+                    </p>
+                    <hr class="rule" />
+                    <div class="actions">
+                        <a class="btn primary" href="#return">发起归还</a>
+                        <a class="btn" href="10-dispute.html#new">发起纠纷</a>
+                    </div>
+                    <details class="inline-note">
+                        <summary>逾期时的提示</summary>
+                        <p>
+                            到期前 1 天提醒。逾期按 1.5 倍日租金逐日累计；超 3
+                            天加强纠纷入口提示。实际计天口径待确认。
+                        </p>
+                    </details>
+                </section>
+            </section>
+            <section
+                id="return"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-return"
+                hidden
+            >
+                <h2 class="view-heading">归还确认</h2>
+                <section class="panel">
+                    <h2>归还与核验</h2>
+                    <hr class="rule" />
+                    <div class="two equal">
+                        <div>
+                            <h3>租客提交归还</h3>
+                            <label class="field">
+                                <span>归还存证（至少 1 张）</span>
+                                <input type="file" accept="image/*" multiple />
+                            </label>
+                        </div>
+                        <div>
+                            <h3>出租者确认归还</h3>
+                            <hr class="rule" />
+                            <div class="actions">
+                                <a class="btn primary" href="#complete"
+                                    >确认归还并结算</a
+                                >
+                                <a class="btn" href="10-dispute.html#new"
+                                    >发现损坏</a
+                                >
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </section>
+            <section
+                id="complete"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-complete"
+                hidden
+            >
+                <h2 class="view-heading">完成 / 评价</h2>
+                <section class="panel">
+                    <h2>订单已完成</h2>
+                    <hr class="rule" />
+                    <p>
+                        租客押金 ¥200 已解冻；出租收入 ¥54，平台佣金 ¥6（10%）。
+                    </p>
+                    <hr class="rule" />
+                    <label class="field">
+                        <span>本次交易评分</span>
+                        <select>
+                            <option>5 星</option>
+                            <option>4 星</option>
+                            <option>3 星</option>
+                            <option>2 星</option>
+                            <option>1 星</option>
+                        </select>
+                    </label>
+                    <label class="field">
+                        <span>评价内容</span>
+                        <textarea>配件齐全，交接顺利。</textarea>
+                    </label>
+                    <div class="actions">
+                        <a class="btn primary" href="#complete">提交评价</a>
+                        <a class="btn" href="09-wallet.html">查看钱包</a>
+                    </div>
+                </section>
+            </section>
+            <div class="two">
+                <div>
+                    <section class="panel">
+                        <div class="panel-title">
+                            <h2>订单信息</h2>
+                        </div>
+                        <div class="order-product">
+                            <img
+                                class="art"
+                                src="assets/item-30556edc.svg"
+                                alt="物品示意图"
+                            />
+                            <div>
+                                <h3>18V 充电式电钻 / 双电池套装</h3>
+                                <p class="muted">青禾社区 / 出租者 陈禾</p>
+                                <small>10 月 12 日至 14 日 / 租期 3 天</small>
+                            </div>
+                        </div>
+                        <hr class="rule" />
+                        <dl class="line-list">
+                            <div>
+                                <dt>租客</dt>
+                                <dd>Starling</dd>
+                            </div>
+                            <div>
+                                <dt>出租者</dt>
+                                <dd>陈禾</dd>
+                            </div>
+                            <div>
+                                <dt>租期</dt>
+                                <dd>2026-10-12 至 2026-10-14</dd>
+                            </div>
+                            <div>
+                                <dt>社区</dt>
+                                <dd>青禾社区</dd>
+                            </div>
+                            <div>
+                                <dt>创建时间</dt>
+                                <dd>2026-10-09 10:00</dd>
+                            </div>
+                        </dl>
+                    </section>
+                </div>
+                <div>
+                    <section class="panel">
+                        <div class="panel-title">
+                            <h2>费用明细</h2>
+                        </div>
+                        <dl class="line-list">
+                            <div>
+                                <dt>日租金</dt>
+                                <dd>¥20.00</dd>
+                            </div>
+                            <div>
+                                <dt>租期</dt>
+                                <dd>3 天</dd>
+                            </div>
+                            <div>
+                                <dt>租金</dt>
+                                <dd>¥60.00</dd>
+                            </div>
+                            <div>
+                                <dt>订单押金</dt>
+                                <dd>¥200.00</dd>
+                            </div>
+                        </dl>
+                        <div class="total">
+                            <span>合计支付</span>
+                            <span class="price">¥260.00</span>
+                        </div>
+                        <dl class="line-list"></dl>
+                        <a class="" href="09-wallet.html#wallet"
+                            >查看资金流水</a
+                        >
+                    </section>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>

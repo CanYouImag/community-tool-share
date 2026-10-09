@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>纠纷与举报</title>
+        <link rel="stylesheet" href="common.css" />
+        <script src="tabs.js" defer></script>
+        <noscript
+            ><style>
+                .view-panel[hidden] {
+                    display: block !important;
+                }
+            </style></noscript
+        >
+    </head>
+    <body>
+        <header class="top">
+            <div class="top-inner">
+                <a class="brand" href="index.html">
+                    <span class="brand-symbol">邻</span>
+                    <span>邻租</span>
+                </a>
+                <nav class="nav" aria-label="主导航">
+                    <a href="04-items.html" class="">物品广场</a>
+                    <a href="03-community.html" class="">社区</a>
+                    <a href="06-publish.html" class="">发布 / 我的物品</a>
+                    <a href="07-orders.html" class="">我的订单</a>
+                    <a href="09-wallet.html" class="">钱包</a>
+                    <a href="02-account.html" class="">个人中心</a>
+                </nav>
+                <a href="index.html">原型目录</a>
+            </div>
+        </header>
+        <main class="public-main">
+            <header class="page-head">
+                <div>
+                    <h1>纠纷与举报</h1>
+                </div>
+            </header>
+            <nav class="view-tabs" role="tablist" aria-label="页内功能">
+                <a
+                    id="tab-new"
+                    class="view-tab"
+                    href="#new"
+                    role="tab"
+                    aria-controls="new"
+                    aria-selected="true"
+                    >发起纠纷</a
+                >
+                <a
+                    id="tab-progress"
+                    class="view-tab"
+                    href="#progress"
+                    role="tab"
+                    aria-controls="progress"
+                    aria-selected="false"
+                    >处理进度</a
+                >
+                <a
+                    id="tab-award"
+                    class="view-tab"
+                    href="#award"
+                    role="tab"
+                    aria-controls="award"
+                    aria-selected="false"
+                    >裁决书</a
+                >
+                <a
+                    id="tab-report"
+                    class="view-tab"
+                    href="#report"
+                    role="tab"
+                    aria-controls="report"
+                    aria-selected="false"
+                    >举报内容</a
+                >
+            </nav>
+            <section
+                id="new"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-new"
+            >
+                <h2 class="view-heading">发起纠纷</h2>
+                <div class="two">
+                    <div>
+                        <section class="panel">
+                            <div class="panel-title">
+                                <h2>说明纠纷情况</h2>
+                            </div>
+                            <div class="order-product">
+                                <img
+                                    class="art"
+                                    src="assets/item-30556edc.svg"
+                                    alt="物品示意图"
+                                />
+                                <div>
+                                    <h3>18V 充电式电钻 / 双电池套装</h3>
+                                    <p class="muted">青禾社区 / 出租者 陈禾</p>
+                                    <small
+                                        >10 月 12 日至 14 日 / 租期 3 天</small
+                                    >
+                                </div>
+                            </div>
+                            <hr class="rule" />
+                            <label class="field">
+                                <span>
+                                    纠纷理由
+                                    <em>*</em>
+                                </span>
+                                <textarea aria-label="纠纷理由">
+归还时发现电钻外壳损坏，双方对责任存在分歧。</textarea
+                                >
+                            </label>
+                            <label class="upload">
+                                <strong>＋ 补充凭证</strong>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                    aria-label="补充凭证"
+                                />
+                            </label>
+                            <label class="check">
+                                <input type="checkbox" checked />
+                                引用本订单的取物／归还存证和留言记录
+                            </label>
+                            <div class="actions">
+                                <a
+                                    class="btn primary"
+                                    href="10-dispute.html#progress"
+                                    >提交纠纷</a
+                                >
+                                <a
+                                    class="btn"
+                                    href="08-order-detail.html#renting"
+                                    >返回订单</a
+                                >
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </section>
+            <section
+                id="progress"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-progress"
+                hidden
+            >
+                <h2 class="view-heading">处理进度</h2>
+                <section class="panel">
+                    <div class="row between">
+                        <div>
+                            <small>纠纷编号 JF20261015001</small>
+                            <h2>归还物品损坏争议</h2>
+                        </div>
+                        <span class="badge warn">调解中</span>
+                    </div>
+                    <div class="info">纠纷处理中，资金已冻结。</div>
+                </section>
+                <div class="two">
+                    <div>
+                        <section class="panel">
+                            <div class="panel-title">
+                                <h2>纠纷与证据</h2>
+                            </div>
+                            <div class="order-product">
+                                <img
+                                    class="art"
+                                    src="assets/item-30556edc.svg"
+                                    alt="物品示意图"
+                                />
+                                <div>
+                                    <h3>18V 充电式电钻 / 双电池套装</h3>
+                                    <p class="muted">青禾社区 / 出租者 陈禾</p>
+                                    <small
+                                        >10 月 12 日至 14 日 / 租期 3 天</small
+                                    >
+                                </div>
+                            </div>
+                            <dl class="line-list">
+                                <div>
+                                    <dt>发起人</dt>
+                                    <dd>陈禾</dd>
+                                </div>
+                                <div>
+                                    <dt>纠纷理由</dt>
+                                    <dd>归还物品外壳出现破损</dd>
+                                </div>
+                                <div>
+                                    <dt>涉及押金</dt>
+                                    <dd>¥200.00</dd>
+                                </div>
+                            </dl>
+                            <div class="thumbs">
+                                <img
+                                    class="art small"
+                                    src="assets/item-30556edc.svg"
+                                    alt="取物存证示意"
+                                />
+                                <img
+                                    class="art small"
+                                    src="assets/item-30556edc.svg"
+                                    alt="归还存证示意"
+                                />
+                            </div>
+                            <label class="upload">
+                                <strong>＋ 补充证据</strong>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                    aria-label="补充证据"
+                                />
+                            </label>
+                        </section>
+                    </div>
+                    <div>
+                        <section class="panel">
+                            <div class="panel-title">
+                                <h2>处理记录</h2>
+                            </div>
+                            <div class="timeline">
+                                <p>
+                                    10-15 09:00 / 纠纷已提交
+                                    <small>陈禾提交理由与归还照片。</small>
+                                </p>
+                                <p>
+                                    10-15 11:20 / 周宁介入调解
+                                    <small>请双方确认交接时的外壳状态。</small>
+                                </p>
+                            </div>
+                            <div class="message">
+                                <header>社区管理员 周宁</header>
+                                已查看取还照片，请补充近距离照片与交接说明。
+                            </div>
+                            <div class="actions">
+                                <a class="btn" href="10-dispute.html#award"
+                                    >查看仲裁结果</a
+                                >
+                                <a class="btn" href="07-orders.html#borrow"
+                                    >返回订单</a
+                                >
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </section>
+            <section
+                id="award"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-award"
+                hidden
+            >
+                <h2 class="view-heading">裁决书</h2>
+                <div class="narrow">
+                    <section class="panel">
+                        <article class="receipt">
+                            <small>邻租平台 / 裁决编号 ZC20261016001</small>
+                            <h2>订单纠纷裁决书</h2>
+                            <dl class="line-list">
+                                <div>
+                                    <dt>关联订单</dt>
+                                    <dd>LZ202610090018</dd>
+                                </div>
+                                <div>
+                                    <dt>申请人 / 相对方</dt>
+                                    <dd>陈禾 / Starling</dd>
+                                </div>
+                                <div>
+                                    <dt>原押金金额</dt>
+                                    <dd>¥200.00</dd>
+                                </div>
+                                <div>
+                                    <dt>裁决类型</dt>
+                                    <dd>部分扣除</dd>
+                                </div>
+                                <div>
+                                    <dt>赔付出租者</dt>
+                                    <dd>¥50.00</dd>
+                                </div>
+                                <div>
+                                    <dt>退回租客押金</dt>
+                                    <dd>¥150.00</dd>
+                                </div>
+                                <div>
+                                    <dt>租金减免</dt>
+                                    <dd>¥0.00</dd>
+                                </div>
+                            </dl>
+                            <p>
+                                <strong>裁决理由</strong>
+                                <br />
+                                根据取还存证及双方说明，认定归还时新增损坏，维修补偿金额为
+                                ¥50.00。
+                            </p>
+                            <div class="decision">
+                                <strong>执行结果：资金划转已完成</strong>
+                                <p>
+                                    押金已按上述方案处理。纠纷状态为“已裁决”，订单状态为“已终结”。
+                                </p>
+                                <small
+                                    >裁决时间：2026-10-16 14:30 /
+                                    裁决人：系统管理员</small
+                                >
+                            </div>
+                        </article>
+                    </section>
+                    <div class="actions">
+                        <a class="btn primary" href="09-wallet.html#wallet"
+                            >查看资金流水</a
+                        >
+                        <a class="btn" href="07-orders.html#borrow"
+                            >返回订单列表</a
+                        >
+                    </div>
+                </div>
+            </section>
+            <section
+                id="report"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-report"
+                hidden
+            >
+                <h2 class="view-heading">举报内容</h2>
+                <div class="narrow">
+                    <section class="panel">
+                        <div class="panel-title">
+                            <h2>填写举报信息</h2>
+                        </div>
+                        <label class="field">
+                            <span>举报对象</span>
+                            <select aria-label="举报对象">
+                                <option>物品：18V 充电式电钻</option>
+                                <option>用户：陈禾</option>
+                                <option>评价：物品评价</option>
+                            </select>
+                        </label>
+                        <label class="field">
+                            <span>举报类型</span>
+                            <select aria-label="举报类型">
+                                <option>信息不实</option>
+                                <option>违规内容</option>
+                                <option>恶意评价</option>
+                                <option>其他</option>
+                            </select>
+                        </label>
+                        <label class="field">
+                            <span>
+                                举报说明
+                                <em>*</em>
+                            </span>
+                            <textarea aria-label="举报说明">
+请具体描述问题，以便管理员核实。</textarea
+                            >
+                        </label>
+                        <label class="upload">
+                            <strong>＋ 上传举报证据</strong>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                multiple
+                                aria-label="上传举报证据"
+                            />
+                        </label>
+                        <div class="actions">
+                            <a class="btn primary" href="10-dispute.html#report"
+                                >提交举报</a
+                            >
+                            <a class="btn" href="05-item-detail.html#detail"
+                                >取消</a
+                            >
+                        </div>
+                    </section>
+                </div>
+            </section>
+        </main>
+    </body>
+</html>

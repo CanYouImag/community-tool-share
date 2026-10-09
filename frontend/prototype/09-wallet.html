@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>钱包</title>
+        <link rel="stylesheet" href="common.css" />
+        <script src="tabs.js" defer></script>
+        <noscript
+            ><style>
+                .view-panel[hidden] {
+                    display: block !important;
+                }
+            </style></noscript
+        >
+    </head>
+    <body>
+        <header class="top">
+            <div class="top-inner">
+                <a class="brand" href="index.html">
+                    <span class="brand-symbol">邻</span>
+                    <span>邻租</span>
+                </a>
+                <nav class="nav" aria-label="主导航">
+                    <a href="04-items.html" class="">物品广场</a>
+                    <a href="03-community.html" class="">社区</a>
+                    <a href="06-publish.html" class="">发布 / 我的物品</a>
+                    <a href="07-orders.html" class="">我的订单</a>
+                    <a href="09-wallet.html" class="active">钱包</a>
+                    <a href="02-account.html" class="">个人中心</a>
+                </nav>
+                <a href="index.html">原型目录</a>
+            </div>
+        </header>
+        <main class="public-main">
+            <header class="page-head">
+                <div>
+                    <h1>钱包</h1>
+                </div>
+            </header>
+            <section id="wallet" class="view-panel">
+                <div class="stats">
+                    <div class="stat">
+                        <small>可用余额</small>
+                        <div class="value">¥240.00</div>
+                    </div>
+                    <div class="stat">
+                        <small>冻结金额</small>
+                        <div class="value">¥200.00</div>
+                    </div>
+                    <div class="stat">
+                        <small>累计收入</small>
+                        <div class="value">¥0.00</div>
+                    </div>
+                    <div class="stat">
+                        <small>本次租金支出</small>
+                        <div class="value">¥60.00</div>
+                    </div>
+                </div>
+                <section class="panel">
+                    <div class="panel-title">
+                        <h2>资金流水</h2>
+                    </div>
+                    <div class="filters">
+                        <label class="field">
+                            <span>流水类型</span>
+                            <select aria-label="流水类型">
+                                <option>全部</option>
+                                <option>收入</option>
+                                <option>支出</option>
+                                <option>冻结</option>
+                                <option>解冻</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">时间</th>
+                                    <th scope="col">类型</th>
+                                    <th scope="col">金额</th>
+                                    <th scope="col">关联订单 / 备注</th>
+                                    <th scope="col">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>2026-10-09 10:00</td>
+                                    <td>冻结押金</td>
+                                    <td>¥200.00</td>
+                                    <td>LZ202610090018</td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="08-order-detail.html#pending"
+                                            >订单详情</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2026-10-09 10:00</td>
+                                    <td>支付租金</td>
+                                    <td>− ¥60.00</td>
+                                    <td>LZ202610090018</td>
+                                    <td>
+                                        <a
+                                            class=""
+                                            href="08-order-detail.html#pending"
+                                            >订单详情</a
+                                        >
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2026-10-09 09:00</td>
+                                    <td>管理员调整</td>
+                                    <td>+ ¥500.00</td>
+                                    <td>初始化测试余额</td>
+                                    <td>—</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination">
+                        <span>共 3 条</span>
+                        <span class="page-number">1</span>
+                    </div>
+                </section>
+            </section>
+        </main>
+    </body>
+</html>

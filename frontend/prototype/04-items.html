@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>物品广场</title>
+        <link rel="stylesheet" href="common.css" />
+        <script src="tabs.js" defer></script>
+        <noscript
+            ><style>
+                .view-panel[hidden] {
+                    display: block !important;
+                }
+            </style></noscript
+        >
+    </head>
+    <body>
+        <header class="top">
+            <div class="top-inner">
+                <a class="brand" href="index.html">
+                    <span class="brand-symbol">邻</span>
+                    <span>邻租</span>
+                </a>
+                <nav class="nav" aria-label="主导航">
+                    <a href="04-items.html" class="active">物品广场</a>
+                    <a href="03-community.html" class="">社区</a>
+                    <a href="06-publish.html" class="">发布 / 我的物品</a>
+                    <a href="07-orders.html" class="">我的订单</a>
+                    <a href="09-wallet.html" class="">钱包</a>
+                    <a href="02-account.html" class="">个人中心</a>
+                </nav>
+                <a href="index.html">原型目录</a>
+            </div>
+        </header>
+        <main class="public-main">
+            <header class="page-head">
+                <div>
+                    <h1>物品广场</h1>
+                </div>
+            </header>
+            <nav class="view-tabs" role="tablist" aria-label="页内功能">
+                <a
+                    id="tab-browse"
+                    class="view-tab"
+                    href="#browse"
+                    role="tab"
+                    aria-controls="browse"
+                    aria-selected="true"
+                    >浏览物品</a
+                >
+                <a
+                    id="tab-favorites"
+                    class="view-tab"
+                    href="#favorites"
+                    role="tab"
+                    aria-controls="favorites"
+                    aria-selected="false"
+                    >我的收藏</a
+                >
+            </nav>
+            <section
+                id="browse"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-browse"
+            >
+                <h2 class="view-heading">浏览物品</h2>
+                <section class="panel">
+                    <div class="filters">
+                        <label class="field">
+                            <span>关键词</span>
+                            <input
+                                type="text"
+                                aria-label="关键词"
+                                value="电钻 / 帐篷 / 投影仪"
+                            />
+                        </label>
+                        <label class="field">
+                            <span>所属社区</span>
+                            <select aria-label="所属社区">
+                                <option>青禾社区</option>
+                                <option>全部社区</option>
+                                <option>梧桐里社区</option>
+                            </select>
+                        </label>
+                        <label class="field">
+                            <span>分类</span>
+                            <select aria-label="分类">
+                                <option>全部分类</option>
+                                <option>工具</option>
+                                <option>家电</option>
+                                <option>户外</option>
+                                <option>数码</option>
+                                <option>其他</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="filters">
+                        <label class="field">
+                            <span>最低日租金（元）</span>
+                            <input
+                                type="text"
+                                aria-label="最低日租金（元）"
+                                value="0"
+                            />
+                        </label>
+                        <label class="field">
+                            <span>最高日租金（元）</span>
+                            <input
+                                type="text"
+                                aria-label="最高日租金（元）"
+                                value="100"
+                            />
+                        </label>
+                    </div>
+                    <div class="actions">
+                        <a class="btn primary" href="04-items.html#browse"
+                            >搜索</a
+                        >
+                        <a class="btn" href="04-items.html#browse">清除筛选</a>
+                        <a class="" href="03-community.html#discover"
+                            >查看全部社区</a
+                        >
+                    </div>
+                </section>
+                <nav class="tabs" aria-label="分类标签">
+                    <a class="selected" href="04-items.html#browse">最新上架</a>
+                    <a class="" href="04-items.html#browse">价格从低到高</a>
+                    <a class="" href="04-items.html#browse">价格从高到低</a>
+                    <a class="" href="04-items.html#browse">评分优先</a>
+                </nav>
+                <div class="item-grid">
+                    <article class="item-card">
+                        <a class="" href="05-item-detail.html#detail">
+                            <img
+                                class="art"
+                                src="assets/item-30556edc.svg"
+                                alt="18V 充电式电钻示意图"
+                            />
+                        </a>
+                        <div class="body">
+                            <small>工具 / 青禾社区</small>
+                            <h3>
+                                <a class="" href="05-item-detail.html#detail"
+                                    >18V 充电式电钻</a
+                                >
+                            </h3>
+                            <div class="bottom">
+                                <span class="price">
+                                    ¥20
+                                    <small> / 天</small>
+                                </span>
+                                <small>陈禾</small>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="item-card">
+                        <a class="" href="05-item-detail.html#detail">
+                            <img
+                                class="art"
+                                src="assets/item-dde811a0.svg"
+                                alt="双人露营帐篷示意图"
+                            />
+                        </a>
+                        <div class="body">
+                            <small>户外 / 青禾社区</small>
+                            <h3>
+                                <a class="" href="05-item-detail.html#detail"
+                                    >双人露营帐篷</a
+                                >
+                            </h3>
+                            <div class="bottom">
+                                <span class="price">
+                                    ¥35
+                                    <small> / 天</small>
+                                </span>
+                                <small>周宁</small>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="item-card">
+                        <a class="" href="05-item-detail.html#detail">
+                            <img
+                                class="art"
+                                src="assets/item-15f4c496.svg"
+                                alt="便携高清投影仪示意图"
+                            />
+                        </a>
+                        <div class="body">
+                            <small>数码 / 青禾社区</small>
+                            <h3>
+                                <a class="" href="05-item-detail.html#detail"
+                                    >便携高清投影仪</a
+                                >
+                            </h3>
+                            <div class="bottom">
+                                <span class="price">
+                                    ¥45
+                                    <small> / 天</small>
+                                </span>
+                                <small>许安</small>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="item-card">
+                        <a class="" href="05-item-detail.html#detail">
+                            <img
+                                class="art"
+                                src="assets/item-206bd1ad.svg"
+                                alt="家用折叠梯示意图"
+                            />
+                        </a>
+                        <div class="body">
+                            <small>工具 / 青禾社区</small>
+                            <h3>
+                                <a class="" href="05-item-detail.html#detail"
+                                    >家用折叠梯</a
+                                >
+                            </h3>
+                            <div class="bottom">
+                                <span class="price">
+                                    ¥15
+                                    <small> / 天</small>
+                                </span>
+                                <small>李青</small>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="item-card">
+                        <a class="" href="05-item-detail.html#detail">
+                            <img
+                                class="art"
+                                src="assets/item-cce1a346.svg"
+                                alt="布艺清洗机示意图"
+                            />
+                        </a>
+                        <div class="body">
+                            <small>家电 / 青禾社区</small>
+                            <h3>
+                                <a class="" href="05-item-detail.html#detail"
+                                    >布艺清洗机</a
+                                >
+                            </h3>
+                            <div class="bottom">
+                                <span class="price">
+                                    ¥40
+                                    <small> / 天</small>
+                                </span>
+                                <small>Starling</small>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="item-card">
+                        <a class="" href="05-item-detail.html#detail">
+                            <img
+                                class="art"
+                                src="assets/item-dde811a0.svg"
+                                alt="周末露营天幕示意图"
+                            />
+                        </a>
+                        <div class="body">
+                            <small>户外 / 青禾社区</small>
+                            <h3>
+                                <a class="" href="05-item-detail.html#detail"
+                                    >周末露营天幕</a
+                                >
+                            </h3>
+                            <div class="bottom">
+                                <span class="price">
+                                    ¥25
+                                    <small> / 天</small>
+                                </span>
+                                <small>陆川</small>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </section>
+            <section
+                id="favorites"
+                class="view-panel"
+                role="tabpanel"
+                aria-labelledby="tab-favorites"
+                hidden
+            >
+                <h2 class="view-heading">我的收藏</h2>
+                <div class="item-grid">
+                    <article class="item-card">
+                        <a class="" href="05-item-detail.html#detail">
+                            <img
+                                class="art"
+                                src="assets/item-30556edc.svg"
+                                alt="18V 充电式电钻示意图"
+                            />
+                        </a>
+                        <div class="body">
+                            <small>工具 / 青禾社区</small>
+                            <h3>
+                                <a class="" href="05-item-detail.html#detail"
+                                    >18V 充电式电钻</a
+                                >
+                            </h3>
+                            <div class="bottom">
+                                <span class="price">
+                                    ¥20
+                                    <small> / 天</small>
+                                </span>
+                                <small>陈禾</small>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="item-card">
+                        <a class="" href="05-item-detail.html#detail">
+                            <img
+                                class="art"
+                                src="assets/item-dde811a0.svg"
+                                alt="双人露营帐篷示意图"
+                            />
+                        </a>
+                        <div class="body">
+                            <small>户外 / 青禾社区</small>
+                            <h3>
+                                <a class="" href="05-item-detail.html#detail"
+                                    >双人露营帐篷</a
+                                >
+                            </h3>
+                            <div class="bottom">
+                                <span class="price">
+                                    ¥35
+                                    <small> / 天</small>
+                                </span>
+                                <small>周宁</small>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="item-card">
+                        <a class="" href="05-item-detail.html#detail">
+                            <img
+                                class="art"
+                                src="assets/item-15f4c496.svg"
+                                alt="便携高清投影仪示意图"
+                            />
+                        </a>
+                        <div class="body">
+                            <small>数码 / 青禾社区</small>
+                            <h3>
+                                <a class="" href="05-item-detail.html#detail"
+                                    >便携高清投影仪</a
+                                >
+                            </h3>
+                            <div class="bottom">
+                                <span class="price">
+                                    ¥45
+                                    <small> / 天</small>
+                                </span>
+                                <small>许安</small>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="item-card">
+                        <a class="" href="05-item-detail.html#detail">
+                            <img
+                                class="art"
+                                src="assets/item-206bd1ad.svg"
+                                alt="家用折叠梯示意图"
+                            />
+                        </a>
+                        <div class="body">
+                            <small>工具 / 青禾社区</small>
+                            <h3>
+                                <a class="" href="05-item-detail.html#detail"
+                                    >家用折叠梯</a
+                                >
+                            </h3>
+                            <div class="bottom">
+                                <span class="price">
+                                    ¥15
+                                    <small> / 天</small>
+                                </span>
+                                <small>李青</small>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                <div class="actions">
+                    <a class="btn" href="04-items.html#browse">取消收藏</a>
+                    <a class="btn" href="04-items.html#browse">发现更多物品</a>
+                </div>
+            </section>
+        </main>
+    </body>
+</html>
