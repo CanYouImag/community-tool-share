@@ -141,7 +141,7 @@ export const orders = [
     dailyPrice: 20,
     rent: 60,
     deposit: 200,
-    status: 'PENDING',
+    status: 'PENDING_PAYMENT',
     createdAt: '2026-10-09 10:00'
   },
   {
@@ -157,7 +157,7 @@ export const orders = [
     dailyPrice: 35,
     rent: 105,
     deposit: 300,
-    status: 'TO_PICKUP',
+    status: 'PENDING_PICKUP',
     pickupCode: '826 419',
     createdAt: '2026-10-08 09:00'
   },
@@ -206,7 +206,7 @@ export const lendOrders = [
     endDate: '2026-10-14',
     rent: 60,
     deposit: 200,
-    status: 'PENDING'
+    status: 'PENDING_ACCEPT'
   },
   {
     id: 'LZ202610080012',
@@ -217,7 +217,7 @@ export const lendOrders = [
     endDate: '2026-10-12',
     rent: 105,
     deposit: 300,
-    status: 'TO_PICKUP'
+    status: 'PENDING_PICKUP'
   },
   {
     id: 'LZ202610050009',
@@ -228,7 +228,7 @@ export const lendOrders = [
     endDate: '2026-10-08',
     rent: 135,
     deposit: 500,
-    status: 'OVERDUE'
+    status: 'PENDING_INSPECT'
   },
   {
     id: 'LZ202610010003',
@@ -243,10 +243,10 @@ export const lendOrders = [
   }
 ]
 
-// 钱包
+// 钱包（字段对齐 WalletDO：balance + freezeBalance）
 export const wallet = {
   balance: 240.0,
-  frozen: 200.0,
+  freezeBalance: 200.0,
   totalIncome: 0.0,
   recentRentSpent: 60.0
 }
@@ -297,7 +297,7 @@ export const deposits = [
   }
 ]
 
-// 纠纷单
+// 纠纷单（两级机制：社区调解 → 平台仲裁）
 export const dispute = {
   id: 'JF20261015001',
   orderId: 'LZ202610090018',
@@ -309,6 +309,21 @@ export const dispute = {
   deposit: 200.0,
   status: 'MEDIATING',
   initiator: '陈禾',
+  // 当前处理阶段：mediation（社区调解）/ arbitration（平台仲裁）
+  stage: 'mediation',
+  // 社区调解信息
+  mediation: {
+    mediator: '周宁',
+    mediatorRole: '青禾社区管理员',
+    status: 'MEDIATING',
+    conclusion: null,
+    timeline: [
+      { time: '10-15 09:00', actor: '系统', text: '纠纷已提交', detail: '陈禾提交理由与归还照片，押金 ¥200.00 已冻结。' },
+      { time: '10-15 11:20', actor: '周宁', text: '介入调解', detail: '请双方确认交接时的外壳状态，并补充近距离照片。' }
+    ]
+  },
+  // 平台仲裁信息（调解不成立后升级）
+  arbitration: null,
   timeline: [
     { time: '10-15 09:00', actor: '系统', text: '纠纷已提交', detail: '陈禾提交理由与归还照片。' },
     { time: '10-15 11:20', actor: '周宁', text: '介入调解', detail: '请双方确认交接时的外壳状态。' }

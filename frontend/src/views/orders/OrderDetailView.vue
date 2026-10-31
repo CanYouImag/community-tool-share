@@ -11,13 +11,14 @@ const order = ref(null)
 const messages = ref([])
 const newMessage = ref('')
 
-// 六阶段 Tab（与原型一致）
+// 七阶段 Tab（对齐设计文档订单状态机，文案保留原型）
 const stages = [
   { id: 'pending', label: '待确认' },
   { id: 'checkout', label: '确认支付' },
   { id: 'pickup', label: '待取物' },
   { id: 'renting', label: '租用中' },
   { id: 'return', label: '归还确认' },
+  { id: 'inspect', label: '待验收' },
   { id: 'complete', label: '完成 / 评价' }
 ]
 const activeStage = ref('pending')
@@ -212,11 +213,35 @@ watch(
             <h3>出租者确认归还</h3>
             <hr class="rule" />
             <div class="actions">
-              <a class="btn primary" @click="setStage('complete')">确认归还并结算</a>
+              <a class="btn primary" @click="setStage('inspect')">确认归还并验收</a>
               <a class="btn" @click="router.push({ name: 'dispute', hash: '#new' })">发现损坏</a>
             </div>
           </div>
         </div>
+      </section>
+    </section>
+
+    <!-- 待验收 -->
+    <section v-show="activeStage === 'inspect'" class="view-panel">
+      <h2 class="view-heading">待验收</h2>
+      <section class="panel">
+        <h2>出租者验收物品</h2>
+        <hr class="rule" />
+        <p>
+          出租者请核对归还物品的完好情况。验收正常将结算并解冻押金；发现异常可发起纠纷。
+        </p>
+        <hr class="rule" />
+        <div class="actions">
+          <a class="btn primary" @click="setStage('complete')">验收正常，结算完成</a>
+          <a class="btn" @click="router.push({ name: 'dispute', hash: '#new' })">验收异常，发起纠纷</a>
+        </div>
+        <details class="inline-note">
+          <summary>验收说明</summary>
+          <p>
+            验收正常 → 订单完成，租客押金解冻、出租收入到账（扣除 10% 平台佣金）；验收异常
+            → 订单转「纠纷中」，押金继续冻结，进入社区调解 / 平台仲裁流程。
+          </p>
+        </details>
       </section>
     </section>
 

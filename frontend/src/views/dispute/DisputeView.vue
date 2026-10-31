@@ -140,6 +140,14 @@ onMounted(() => {
           <StatusBadge :status="dispute?.status" />
         </div>
         <div class="info">纠纷处理中，资金已冻结。</div>
+        <div class="steps">
+          <span class="step active">社区调解</span>
+          <span class="step">平台仲裁</span>
+        </div>
+        <p class="muted">
+          当前由「{{ dispute?.mediation?.mediatorRole }} {{ dispute?.mediation?.mediator }}」介入社区调解，
+          调解不成立可升级至平台仲裁。
+        </p>
       </section>
       <div class="two">
         <div>

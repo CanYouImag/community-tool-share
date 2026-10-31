@@ -34,11 +34,16 @@ function switchTab(tab) {
 function goDetail(order, action) {
   // 不同状态跳转对应订单阶段锚点（Mock 阶段统一到详情页）
   const hash = {
-    PENDING: 'pending',
-    TO_PICKUP: 'pickup',
+    PENDING_PAYMENT: 'pending',
+    PENDING_ACCEPT: 'checkout',
+    PENDING_PICKUP: 'pickup',
+    IN_USE: 'renting',
+    PENDING_RETURN: 'return',
+    PENDING_INSPECT: 'inspect',
     OVERDUE: 'renting',
     COMPLETED: 'complete',
-    RENTING: 'renting'
+    DISPUTED: 'renting',
+    CLOSED: 'complete'
   }[order.status] || 'pending'
   router.push({ name: 'order-detail', params: { id: order.id }, hash: `#${hash}` })
 }
@@ -47,11 +52,16 @@ function goDetail(order, action) {
 function actionText(order) {
   const role = activeTab.value
   const map = {
-    PENDING: role === 'borrow' ? '订单详情' : '处理订单',
-    TO_PICKUP: role === 'borrow' ? '查看取物码' : '核销取物',
+    PENDING_PAYMENT: role === 'borrow' ? '订单详情' : '处理订单',
+    PENDING_ACCEPT: role === 'borrow' ? '确认支付' : '等待租客支付',
+    PENDING_PICKUP: role === 'borrow' ? '查看取物码' : '核销取物',
+    IN_USE: '查看详情',
+    PENDING_RETURN: role === 'borrow' ? '发起归还' : '等待归还',
+    PENDING_INSPECT: role === 'borrow' ? '等待验收' : '验收物品',
     OVERDUE: '查看详情',
-    RENTING: '查看详情',
-    COMPLETED: '评价'
+    COMPLETED: '评价',
+    DISPUTED: '查看纠纷',
+    CLOSED: '查看详情'
   }
   return map[order.status] || '订单详情'
 }

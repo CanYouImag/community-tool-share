@@ -59,6 +59,26 @@ async function enterCommunity(c) {
   joinState.value = m ? (m.status === 'JOINED' ? 'JOINED' : 'APPLIED') : ''
 }
 
+// 切换到社区主页：若尚未选择社区，默认加载用户已加入的第一个社区
+async function openHomeTab() {
+  activeTab.value = 'home'
+  if (currentCommunity.value) return
+  const joined = memberships.value.find((m) => m.status === 'JOINED')
+  if (joined) {
+    const c = allCommunities.value.find((x) => x.id === joined.id)
+    if (c) await enterCommunity(c)
+  }
+}
+
+// 统一 Tab 切换入口：社区主页需先确保已选择社区
+function switchTab(id) {
+  if (id === 'home') {
+    openHomeTab()
+  } else {
+    activeTab.value = id
+  }
+}
+
 async function applyJoin(c) {
   await joinCommunity(c.id)
   joinState.value = 'APPLIED'
@@ -99,7 +119,7 @@ onMounted(() => {
         :href="`#${t.id}`"
         role="tab"
         :aria-selected="activeTab === t.id"
-        @click.prevent="activeTab = t.id"
+        @click.prevent="switchTab(t.id)"
       >
         {{ t.label }}
       </a>

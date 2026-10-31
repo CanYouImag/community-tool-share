@@ -67,7 +67,7 @@ onMounted(load)
       </div>
       <div class="stat">
         <small>冻结金额</small>
-        <div class="value">{{ formatAmount(wallet?.frozen) }}</div>
+        <div class="value">{{ formatAmount(wallet?.freezeBalance) }}</div>
       </div>
       <div class="stat">
         <small>累计收入</small>

@@ -9,22 +9,26 @@ const props = defineProps({
 })
 
 const mapping = {
-  PENDING: { label: '待确认', cls: 'warn' },
-  PAID: { label: '确认支付', cls: 'blue' },
-  TO_PICKUP: { label: '待取物', cls: 'blue' },
-  RENTING: { label: '租用中', cls: 'neutral' },
-  OVERDUE: { label: '逾期', cls: 'error' },
-  TO_RETURN: { label: '待归还确认', cls: 'warn' },
+  PENDING_PAYMENT: { label: '待确认', cls: 'warn' },
+  PENDING_ACCEPT: { label: '确认支付', cls: 'blue' },
+  PENDING_PICKUP: { label: '待取物', cls: 'blue' },
+  IN_USE: { label: '租用中', cls: 'neutral' },
+  PENDING_RETURN: { label: '待归还确认', cls: 'warn' },
+  PENDING_INSPECT: { label: '待验收', cls: 'warn' },
   COMPLETED: { label: '已完成', cls: '' },
   CANCELLED: { label: '已取消', cls: 'neutral' },
-  DISPUTING: { label: '纠纷中', cls: 'error' },
+  DISPUTED: { label: '纠纷中', cls: 'error' },
+  OVERDUE: { label: '逾期', cls: 'error' },
   CLOSED: { label: '已终结', cls: 'neutral' },
   MEDIATING: { label: '调解中', cls: 'warn' },
   PENDING_ARBITRATION: { label: '待仲裁', cls: 'error' },
   RESOLVED: { label: '已调解', cls: '' },
   ARBITRATED: { label: '已裁决', cls: 'blue' },
   JOINED: { label: '已加入', cls: '' },
-  MEMBER_PENDING: { label: '待审核', cls: 'warn' }
+  MEMBER_PENDING: { label: '待审核', cls: 'warn' },
+  MEMBER_REJECTED: { label: '已拒绝', cls: 'neutral' },
+  APPLY_PASSED: { label: '已通过', cls: '' },
+  APPLY_REJECTED: { label: '已拒绝', cls: 'neutral' }
 }
 
 const display = computed(() => {

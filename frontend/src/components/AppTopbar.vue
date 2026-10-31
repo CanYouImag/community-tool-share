@@ -38,7 +38,6 @@ function isActive(item) {
         </router-link>
         <router-link to="/community" class="">个人中心</router-link>
       </nav>
-      <a href="#/" class="">原型目录</a>
     </div>
   </header>
 </template>
