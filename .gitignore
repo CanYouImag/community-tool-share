@@ -34,3 +34,6 @@ venv/
 # ===== 操作系统 =====
 .DS_Store
 Thumbs.db
+
+# ===== 工具工作数据（不提交）=====
+.workbuddy/

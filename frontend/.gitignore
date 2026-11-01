@@ -1,0 +1,16 @@
+# 依赖
+node_modules
+dist
+dist-ssr
+*.local
+
+# 日志
+logs
+*.log
+npm-debug.log*
+
+# 编辑器
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
