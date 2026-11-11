@@ -8,6 +8,16 @@ const delay = (data, ms = 200) =>
 const handlers = [
   {
     method: 'GET',
+    pattern: /^\/v1\/items$/,
+    handler: () => ({
+        records: db.items,
+        total: db.items.length,
+        page: 1,
+        size: 10
+    })
+  },
+  {
+    method: 'GET',
     pattern: /^\/communities$/,
     handler: () => db.communities
   },
