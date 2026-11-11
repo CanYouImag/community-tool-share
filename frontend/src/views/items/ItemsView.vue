@@ -1,9 +1,12 @@
 <script setup>
+import { getCommunities } from '@/api/modules/community';
 import { getItems } from '@/api/modules/item';
 import EmptyState from '@/components/EmptyState.vue';
 import ItemCard from '@/components/ItemCard.vue';
+import Pagination from '@/components/Pagination.vue';
 import { useUserStore } from '@/store/user';
 import { ITEM_CATEGORY } from '@/utils/constants';
+import { ITEM_SORT_OPTIONS, parsePriceRange } from '@/utils/itemFilters';
 import { onMounted, ref } from 'vue';
 
 const user = useUserStore();
@@ -13,33 +16,100 @@ const loading = ref(true);
 const error = ref('');
 const keyword = ref('');
 const category = ref('');
+const minPrice = ref('');
+const maxPrice = ref('');
+const filterError = ref('');
+const sort = ref('latest');
 const activeTab = ref('browse');
+const communities = ref([]);
+const communityLoading = ref(false);
+const communityError = ref('');
+const communitySelection = ref(user.isLoggedIn ? 'joined' : 'all');
+const page = ref(1);
+const pageSize = ref(6);
+const appliedQuery = ref(null);
+const lastRequest = ref(null);
+
+async function loadCommunities() {
+  if (communityLoading.value) return;
+  communityLoading.value = true;
+  communityError.value = '';
+  try {
+    communities.value = await getCommunities();
+  } catch (err) {
+    communityError.value = err.message || '社区列表加载失败';
+  } finally {
+    communityLoading.value = false;
+  }
+}
+
+function buildQuery() {
+  return {
+    keyword: keyword.value.trim(),
+    category: category.value,
+    favoritesOnly: activeTab.value === 'favorites',
+    sort: sort.value,
+    communityScope: communitySelection.value === 'joined' ? 'joined' : 'all',
+    communityId: ['joined', 'all'].includes(communitySelection.value)
+      ? undefined
+      : communitySelection.value,
+    size: pageSize.value,
+    ...parsePriceRange(minPrice.value, maxPrice.value),
+  };
+}
+
+function clearFilters() {
+  keyword.value = '';
+  category.value = '';
+  minPrice.value = '';
+  maxPrice.value = '';
+  sort.value = 'latest';
+  filterError.value = '';
+  communitySelection.value = user.isLoggedIn && activeTab.value === 'browse' ? 'joined' : 'all';
+}
 
 function switchTab(tab) {
   if (loading.value || activeTab.value === tab) return;
 
   activeTab.value = tab;
-  keyword.value = '';
-  category.value = '';
-  loadItems();
+  clearFilters();
+  searchItems();
 }
 
 function searchItems() {
   if (loading.value) return;
-  loadItems();
+  filterError.value = '';
+  try {
+    loadItems(buildQuery(), 1);
+  } catch (err) {
+    filterError.value = err.message;
+  }
 }
 
 function resetFilters() {
   if (loading.value) return;
-  keyword.value = '';
-  category.value = '';
-  loadItems();
+  clearFilters();
+  searchItems();
 }
 
-async function loadItems() {
+function changePage(nextPage) {
+  if (loading.value || !appliedQuery.value) return;
+  // 翻页使用已提交的条件，不把尚未点击搜索的输入混入请求。
+  loadItems(appliedQuery.value, nextPage);
+}
+
+function reloadItems() {
+  if (loading.value || !lastRequest.value) return;
+  loadItems(lastRequest.value.query, lastRequest.value.page);
+}
+
+async function loadItems(query, targetPage = 1) {
   if (activeTab.value === 'favorites' && !user.isLoggedIn) {
     items.value = [];
     total.value = 0;
+    page.value = 1;
+    appliedQuery.value = null;
+    lastRequest.value = null;
     error.value = '';
     loading.value = false;
     return;
@@ -47,15 +117,14 @@ async function loadItems() {
 
   loading.value = true;
   error.value = '';
+  lastRequest.value = { query, page: targetPage };
 
   try {
-    const data = await getItems({
-      keyword: keyword.value.trim(),
-      category: category.value,
-      favoritesOnly: activeTab.value === 'favorites',
-    });
+    const data = await getItems({ ...query, page: targetPage });
     items.value = data.records;
     total.value = data.total;
+    page.value = data.page;
+    appliedQuery.value = query;
   } catch (err) {
     error.value = err.message || '物品加载失败，请稍后重试';
   } finally {
@@ -63,7 +132,10 @@ async function loadItems() {
   }
 }
 
-onMounted(loadItems);
+onMounted(() => {
+  loadCommunities();
+  loadItems(buildQuery());
+});
 </script>
 
 <template>
@@ -112,11 +184,26 @@ onMounted(loadItems);
     >
       <div class="filters">
         <label class="field">
+          <span>社区范围</span>
+          <select
+            v-model="communitySelection"
+            :disabled="loading || communityLoading"
+            @change="searchItems"
+          >
+            <option v-if="user.isLoggedIn" value="joined">已加入社区（未加入时展示全部）</option>
+            <option value="all">全部社区</option>
+            <option v-for="community in communities" :key="community.id" :value="community.id">
+              {{ community.name }}
+            </option>
+          </select>
+        </label>
+
+        <label class="field">
           <span>关键词</span>
           <input
             v-model="keyword"
             type="search"
-            placeholder="搜索电钻、帐篷等物品"
+            placeholder="搜索物品标题或描述"
             :disabled="loading"
           />
         </label>
@@ -130,7 +217,62 @@ onMounted(loadItems);
             </option>
           </select>
         </label>
+
+        <label class="field">
+          <span>最低日租金（元）</span>
+          <input
+            v-model="minPrice"
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="不限"
+            :disabled="loading"
+            :aria-invalid="Boolean(filterError)"
+            :aria-describedby="filterError ? 'price-filter-error' : undefined"
+          />
+        </label>
+
+        <label class="field">
+          <span>最高日租金（元）</span>
+          <input
+            v-model="maxPrice"
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="不限"
+            :disabled="loading"
+            :aria-invalid="Boolean(filterError)"
+            :aria-describedby="filterError ? 'price-filter-error' : undefined"
+          />
+        </label>
       </div>
+
+      <label class="field">
+        <span>排序方式</span>
+        <select v-model="sort" :disabled="loading" @change="searchItems">
+          <option v-for="option in ITEM_SORT_OPTIONS" :key="option.value" :value="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </label>
+
+      <label class="field">
+        <span>每页数量</span>
+        <select v-model.number="pageSize" :disabled="loading" @change="searchItems">
+          <option :value="3">3 件</option>
+          <option :value="6">6 件</option>
+          <option :value="12">12 件</option>
+        </select>
+      </label>
+
+      <div v-if="communityError" role="alert">
+        <p>{{ communityError }}，仍可使用默认范围或全部社区浏览。</p>
+        <button class="btn" type="button" :disabled="communityLoading" @click="loadCommunities">
+          重新加载社区
+        </button>
+      </div>
+
+      <p v-if="filterError" id="price-filter-error" role="alert">{{ filterError }}</p>
 
       <div class="actions">
         <button class="btn primary" type="submit" :disabled="loading">搜索</button>
@@ -145,7 +287,7 @@ onMounted(loadItems);
 
       <div v-else-if="error" role="alert">
         <p>{{ error }}</p>
-        <button class="btn" type="button" @click="loadItems">重新加载</button>
+        <button class="btn" type="button" @click="reloadItems">重新加载</button>
       </div>
 
       <template v-else>
@@ -164,6 +306,15 @@ onMounted(loadItems);
         <div v-else class="item-grid">
           <ItemCard v-for="item in items" :key="item.id" :item="item" />
         </div>
+
+        <Pagination
+          v-if="total > 0"
+          :total="total"
+          :page="page"
+          :page-size="appliedQuery.size"
+          :disabled="loading"
+          @change="changePage"
+        />
       </template>
     </section>
   </main>

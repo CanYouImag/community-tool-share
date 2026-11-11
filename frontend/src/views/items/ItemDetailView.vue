@@ -1,7 +1,8 @@
 <script setup>
 import { favoriteItem, getItem, unfavoriteItem } from '@/api/modules/item';
+import ItemAvailabilityCalendar from '@/components/ItemAvailabilityCalendar.vue';
 import { useUserStore } from '@/store/user';
-import { formatMoney } from '@/utils/format';
+import { formatDate, formatMoney, formatRating } from '@/utils/format';
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
@@ -158,6 +159,16 @@ watch(
 
         <dl class="line-list">
           <div>
+            <dt>累计完成租用</dt>
+            <dd>
+              {{ Number.isInteger(item.rentalCount) ? `${item.rentalCount} 次` : '暂无统计' }}
+            </dd>
+          </div>
+          <div>
+            <dt>物品评分</dt>
+            <dd>{{ formatRating(item.rating) }}</dd>
+          </div>
+          <div>
             <dt>押金</dt>
             <dd>{{ formatMoney(item.deposit) }}</dd>
           </div>
@@ -200,6 +211,26 @@ watch(
         <p v-if="favoriteError" role="alert">
           {{ favoriteError }}
         </p>
+      </section>
+    </div>
+
+    <div v-if="item && !loading && !error" class="two">
+      <ItemAvailabilityCalendar :key="item.id" :ranges="item.blockedRanges ?? null" />
+
+      <section class="panel" aria-labelledby="item-reviews-heading">
+        <div class="panel-title">
+          <h2 id="item-reviews-heading">租用评价</h2>
+          <small>共 {{ item.reviews?.length || 0 }} 条</small>
+        </div>
+        <p v-if="!item.reviews?.length" class="muted">暂无租用评价。</p>
+        <article v-for="review in item.reviews" :key="review.id" class="rental-review">
+          <div class="review-heading">
+            <strong>{{ review.authorName }}</strong>
+            <span>{{ formatRating(review.rating) }}</span>
+          </div>
+          <time class="muted" :datetime="review.createdAt">{{ formatDate(review.createdAt) }}</time>
+          <p>{{ review.comment }}</p>
+        </article>
       </section>
     </div>
   </main>
@@ -249,6 +280,28 @@ watch(
 }
 
 .item-copy p {
+  margin-top: 8px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.rental-review {
+  padding-block: 16px;
+  border-bottom: 1px solid var(--color-rule);
+}
+
+.rental-review:last-child {
+  border-bottom: 0;
+}
+
+.review-heading {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.rental-review p {
   margin-top: 8px;
   white-space: pre-wrap;
   overflow-wrap: anywhere;

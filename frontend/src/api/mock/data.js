@@ -1,5 +1,6 @@
 // 假数据：字段命名与需求 4.4 节核心实体对齐
 // 接口就绪后本文件整体废弃，由真实后端接管
+import { localDateKey, shiftDate } from '../../utils/itemCalendar';
 
 const asset = (name) => `/assets/${name}`;
 
@@ -45,6 +46,7 @@ export const myMemberships = [
 export const items = [
   {
     id: 'i_1001',
+    createdAt: '2026-10-10T09:00:00+08:00',
     title: '18V 充电式电钻',
     category: '工具',
     communityId: 'c_1001',
@@ -57,6 +59,7 @@ export const items = [
   },
   {
     id: 'i_1002',
+    createdAt: '2026-10-09T09:00:00+08:00',
     title: '双人露营帐篷',
     category: '户外',
     communityId: 'c_1001',
@@ -69,6 +72,7 @@ export const items = [
   },
   {
     id: 'i_1003',
+    createdAt: '2026-10-08T09:00:00+08:00',
     title: '便携高清投影仪',
     category: '数码',
     communityId: 'c_1001',
@@ -81,6 +85,7 @@ export const items = [
   },
   {
     id: 'i_1004',
+    createdAt: '2026-10-07T09:00:00+08:00',
     title: '家用折叠梯',
     category: '工具',
     communityId: 'c_1001',
@@ -93,6 +98,7 @@ export const items = [
   },
   {
     id: 'i_1005',
+    createdAt: '2026-10-06T09:00:00+08:00',
     title: '布艺清洗机',
     category: '家电',
     communityId: 'c_1001',
@@ -107,10 +113,11 @@ export const items = [
   },
   {
     id: 'i_1006',
+    createdAt: '2026-10-05T09:00:00+08:00',
     title: '周末露营天幕',
     category: '户外',
-    communityId: 'c_1001',
-    communityName: '青禾社区',
+    communityId: 'c_1002',
+    communityName: '梧桐里社区',
     dailyPrice: 25,
     deposit: 150,
     owner: '陆川',
@@ -123,9 +130,9 @@ export const items = [
 export const communityHome = {
   c_1001: {
     top: ['i_1001', 'i_1002', 'i_1003'],
-    latest: ['i_1001', 'i_1002', 'i_1003', 'i_1004'],
+    latest: ['i_1001', 'i_1002', 'i_1003', 'i_1004', 'i_1005'],
   },
-  c_1002: { top: ['i_1005'], latest: ['i_1005', 'i_1006'] },
+  c_1002: { top: ['i_1006'], latest: ['i_1006'] },
   c_1003: { top: [], latest: [] },
 };
 
@@ -246,6 +253,94 @@ export const lendOrders = [
     rent: 45,
     deposit: 100,
     status: 'COMPLETED',
+  },
+];
+
+// 详情页的补充租赁记录：包含其他用户的历史成交与预约，不改变当前用户的订单列表。
+const today = localDateKey();
+export const itemRentalHistory = [
+  {
+    id: 'history_1',
+    itemId: 'i_1001',
+    status: 'COMPLETED',
+    startDate: '2026-10-20',
+    endDate: '2026-10-22',
+  },
+  {
+    id: 'history_2',
+    itemId: 'i_1001',
+    status: 'COMPLETED',
+    startDate: '2026-10-25',
+    endDate: '2026-10-26',
+  },
+  {
+    id: 'history_3',
+    itemId: 'i_1002',
+    status: 'COMPLETED',
+    startDate: '2026-10-20',
+    endDate: '2026-10-22',
+  },
+  {
+    id: 'history_4',
+    itemId: 'i_1005',
+    status: 'COMPLETED',
+    startDate: '2026-10-20',
+    endDate: '2026-10-22',
+  },
+  {
+    id: 'booking_1',
+    itemId: 'i_1001',
+    status: 'PENDING_PICKUP',
+    startDate: shiftDate(today, 3),
+    endDate: shiftDate(today, 5),
+  },
+];
+
+export const itemReviews = [
+  {
+    id: 'review_1',
+    orderId: 'history_1',
+    itemId: 'i_1001',
+    authorName: '周*',
+    rating: 5,
+    comment: '配件齐全，交接时说明清楚，家具安装很顺利。',
+    createdAt: '2026-10-23T10:00:00+08:00',
+  },
+  {
+    id: 'review_2',
+    orderId: 'history_2',
+    itemId: 'i_1001',
+    authorName: '许*',
+    rating: 4,
+    comment: '电钻工作正常，电池续航够用。\n收纳箱有些使用痕迹，不影响使用。',
+    createdAt: '2026-10-27T09:00:00+08:00',
+  },
+  {
+    id: 'review_3',
+    orderId: 'history_3',
+    itemId: 'i_1002',
+    authorName: '李*',
+    rating: 5,
+    comment: '帐篷干净，配件清点方便，搭建很顺利。',
+    createdAt: '2026-10-23T12:00:00+08:00',
+  },
+  {
+    id: 'review_4',
+    orderId: 'LZ202610010003',
+    itemId: 'i_1004',
+    authorName: '邻居*',
+    rating: 4,
+    comment: '梯子使用方便，折叠后容易搬运。',
+    createdAt: '2026-10-05T09:00:00+08:00',
+  },
+  {
+    id: 'review_5',
+    orderId: 'history_4',
+    itemId: 'i_1005',
+    authorName: '陈*',
+    rating: 5,
+    comment: '沙发清洗效果不错，出租者也说明了清洗后的晾干方法。',
+    createdAt: '2026-10-23T15:00:00+08:00',
   },
 ];
 

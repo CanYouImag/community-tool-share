@@ -1,5 +1,5 @@
 <script setup>
-import { formatAmount } from '@/utils/format';
+import { formatRating } from '@/utils/format';
 
 defineProps({
   item: { type: Object, required: true },
@@ -18,6 +18,7 @@ defineProps({
           item.title
         }}</router-link>
       </h3>
+      <p class="muted">物品评分：{{ formatRating(item.rating) }}</p>
       <div class="bottom">
         <span class="price">
           ¥{{ item.dailyPrice }}

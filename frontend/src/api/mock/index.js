@@ -1,7 +1,9 @@
 // Mock 路由分发：根据 method + url 返回假数据
 import { useUserStore } from '../../store/user';
 import { ITEM_CATEGORY } from '../../utils/constants';
+import { paginateItems, parsePriceRange, sortItems } from '../../utils/itemFilters';
 import * as db from './data';
+import { getItemRentalDetails } from './itemDetails';
 
 const favoritesByUser = new Map();
 
@@ -150,21 +152,56 @@ const handlers = [
       }
 
       const favoriteItemIds = user.isLoggedIn ? favoritesByUser.get(user.id) : undefined;
+      const { minPrice, maxPrice } = parsePriceRange(params.minPrice, params.maxPrice);
+      const communityScope =
+        params.communityScope ?? (user.isLoggedIn && !favoritesOnly ? 'joined' : 'all');
+      const communityId = params.communityId || '';
+
+      if (!['joined', 'all'].includes(communityScope)) {
+        throw new Error('社区范围无效');
+      }
+      if (communityId && !db.communities.some((community) => community.id === communityId)) {
+        throw new Error('所选社区不存在');
+      }
+
+      const joinedCommunityIds = user.isLoggedIn
+        ? db.myMemberships.filter((membership) => membership.status === 'JOINED').map((m) => m.id)
+        : [];
 
       const records = db.items.filter((item) => {
-        const matchesKeyword = !keyword || item.title.toLowerCase().includes(keyword);
+        const matchesKeyword =
+          !keyword ||
+          [item.title, item.description].some((text) =>
+            String(text || '')
+              .toLowerCase()
+              .includes(keyword),
+          );
         const matchesCategory = !category || item.category === category;
         const matchesFavorite = !favoritesOnly || favoriteItemIds?.has(item.id);
+        const matchesPrice =
+          (minPrice === undefined || item.dailyPrice >= minPrice) &&
+          (maxPrice === undefined || item.dailyPrice <= maxPrice);
+        const matchesCommunity = communityId
+          ? item.communityId === communityId
+          : communityScope === 'all' ||
+            joinedCommunityIds.length === 0 ||
+            joinedCommunityIds.includes(item.communityId);
         const isAvailable = (item.status ?? 'AVAILABLE') === 'AVAILABLE';
-        return isAvailable && matchesKeyword && matchesCategory && matchesFavorite;
+        return (
+          isAvailable &&
+          matchesKeyword &&
+          matchesCategory &&
+          matchesFavorite &&
+          matchesPrice &&
+          matchesCommunity
+        );
       });
 
-      return {
-        records,
-        total: records.length,
-        page: 1,
-        size: 10,
-      };
+      const ratedRecords = records.map((item) => ({
+        ...item,
+        rating: getItemRentalDetails(item.id).rating,
+      }));
+      return paginateItems(sortItems(ratedRecords, params.sort), params.page, params.size);
     },
   },
   {
@@ -209,7 +246,7 @@ const handlers = [
 
       // 只有明确结束的订单才不会阻止删除
       const finishedStatuses = ['COMPLETED', 'CANCELLED', 'CLOSED'];
-      const hasActiveOrder = [...db.orders, ...db.lendOrders].some(
+      const hasActiveOrder = [...db.orders, ...db.lendOrders, ...db.itemRentalHistory].some(
         (order) => order.itemId === id && !finishedStatuses.includes(order.status),
       );
 
@@ -338,6 +375,7 @@ const handlers = [
 
       return {
         ...item,
+        ...getItemRentalDetails(id),
         favorited: Boolean(user.isLoggedIn && favoritesByUser.get(user.id)?.has(id)),
       };
     },
@@ -357,7 +395,8 @@ const handlers = [
       const resolve = (ids) =>
         ids
           .map((id) => db.items.find((item) => item.id === id))
-          .filter((item) => item && (item.status ?? 'AVAILABLE') === 'AVAILABLE');
+          .filter((item) => item && (item.status ?? 'AVAILABLE') === 'AVAILABLE')
+          .map((item) => ({ ...item, rating: getItemRentalDetails(item.id).rating }));
       return { ...community, top: resolve(home.top), latest: resolve(home.latest) };
     },
   },
