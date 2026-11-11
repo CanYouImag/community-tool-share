@@ -9,12 +9,26 @@ const handlers = [
   {
     method: 'GET',
     pattern: /^\/v1\/items$/,
-    handler: () => ({
-        records: db.items,
-        total: db.items.length,
+    handler: (params) => {
+      const keyword = (params.keyword || '').trim().toLowerCase();
+      const category = params.category || '';
+
+      const records = db.items.filter((item) => {
+        const matchesKeyword =
+          !keyword || item.title.toLowerCase().includes(keyword);
+        const matchesCategory =
+          !category || item.category === category;
+
+        return matchesKeyword && matchesCategory;
+      });
+
+      return {
+        records,
+        total: records.length,
         page: 1,
         size: 10
-    })
+      };
+    }
   },
   {
     method: 'GET',
