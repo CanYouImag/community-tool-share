@@ -1,16 +1,16 @@
 import { defineStore } from 'pinia';
+import { computed } from 'vue';
+import { useAuthStore } from './auth';
 
-// 当前登录用户状态（Mock 阶段预设为认证用户 Starling）
-export const useUserStore = defineStore('user', {
-  state: () => ({
-    id: 'u_1001',
-    name: 'Starling',
-    role: 'CERTIFIED', // GUEST / REGISTERED / CERTIFIED / COMMUNITY_ADMIN / PLATFORM_ADMIN
-    credit: 88,
-    communities: ['c_1001', 'c_1002'], // 已加入 / 待审核社区
-  }),
-  getters: {
-    isLoggedIn: (state) => state.role !== 'GUEST',
-    isCertified: (state) => ['CERTIFIED', 'COMMUNITY_ADMIN', 'PLATFORM_ADMIN'].includes(state.role),
-  },
+// 物品模块沿用此接口，身份统一来自真实登录状态，不再维护预设用户。
+export const useUserStore = defineStore('user', () => {
+  const auth = useAuthStore();
+  const isLoggedIn = computed(() => auth.isLoggedIn && auth.user?.id != null);
+  const id = computed(() => (isLoggedIn.value ? auth.user.id : null));
+  const name = computed(() => (isLoggedIn.value ? auth.displayName : '游客'));
+  const role = computed(() => (isLoggedIn.value ? auth.user.role : 'GUEST'));
+  const credit = computed(() => (isLoggedIn.value ? (auth.user.creditScore ?? 0) : 0));
+  const isCertified = computed(() => isLoggedIn.value && auth.isCertified);
+
+  return { id, name, role, credit, isLoggedIn, isCertified };
 });

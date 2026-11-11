@@ -38,9 +38,10 @@ JWT_SECRET=linzu-demo-secret-key-change-me-32bytes
 $env:DB_PASSWORD="你的密码"
 ```
 
-3. 启动：
+3. 进入 `backend` 目录启动（与上面的数据库环境变量设置使用同一个终端）：
 
 ```powershell
+cd backend
 mvn spring-boot:run
 ```
 
@@ -93,22 +94,25 @@ Authorization: Bearer <token>
 
 ## 与前端联调
 
-前端 `request.js` 的 `baseURL` 是 `/api`。当前 `vite.config.js` 没有配置代理，因此本地开发时需要加：
+前端 `request.js` 的 `baseURL` 是 `/api`，`vite.config.js` 已配置开发代理，默认转发到 `http://localhost:8080`。
 
-```js
-server: {
-  port: 5173,
-  host: true,
-  proxy: {
-    '/api': {
-      target: 'http://localhost:8080',
-      changeOrigin: true
-    }
-  }
-}
+如果 8080 被其他程序占用，可以在后端终端设置端口后重新启动：
+
+```powershell
+$env:SERVER_PORT = "8081"
+mvn spring-boot:run
 ```
 
-或在部署时用 Nginx 把 `/api` 转发到后端。后端已配置 `localhost` / `127.0.0.1` 的 CORS。
+在另一个终端进入 `frontend` 目录，设置相同的目标端口，再启动前端：
+
+```powershell
+$env:VITE_API_TARGET = "http://localhost:8081"
+npm.cmd run dev
+```
+
+上述环境变量只对各自当前终端生效。使用 8081 时，Swagger 地址也改为 `http://localhost:8081/swagger-ui.html`。部署时可用 Nginx 把 `/api` 转发到后端。后端已配置 `localhost` / `127.0.0.1` 的 CORS。
+
+前端默认仍开启物品、社区等模块的 Mock；登录和个人资料请求访问真实后端。能登录不代表订单创建、支付等流程已完成联调。
 
 ## 数据库脚本
 

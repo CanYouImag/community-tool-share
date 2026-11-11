@@ -13,10 +13,7 @@ const editLoading = ref(false);
 const editLoadError = ref('');
 const user = useUserStore();
 const submitting = ref(false);
-
-// 提交时暂时阻止跳转
-onBeforeRouteLeave(() => !submitting.value);
-onBeforeRouteUpdate(() => !submitting.value);
+const submissionComplete = ref(false);
 
 const form = reactive({
   title: '',
@@ -54,11 +51,15 @@ async function loadJoinedCommunities() {
     );
 
     if (!selectionExists && !isEdit.value) {
+      const previousCommunity = form.communityId;
       form.communityId = joinedCommunities.value[0]?.id || '';
+      // 自动选择默认社区不算用户修改，其他已填写字段仍然保留。
+      if (baseline.value?.fields.communityId === previousCommunity) {
+        baseline.value.fields.communityId = form.communityId;
+      }
     }
   } catch (err) {
     joinedCommunities.value = [];
-    form.communityId = '';
     communityError.value = err.message || '社区加载失败，请重试';
   } finally {
     communityLoading.value = false;
@@ -68,6 +69,57 @@ async function loadJoinedCommunities() {
 onMounted(loadJoinedCommunities);
 
 const images = ref([]);
+const baseline = ref(null);
+
+function formSnapshot() {
+  return {
+    fields: { ...form, dailyPrice: String(form.dailyPrice), deposit: String(form.deposit) },
+    images: images.value.map((image) => image.url),
+  };
+}
+
+function markSaved() {
+  baseline.value = formSnapshot();
+}
+
+const hasUnsavedChanges = computed(
+  () =>
+    !submissionComplete.value &&
+    !editLoading.value &&
+    !editLoadError.value &&
+    baseline.value !== null &&
+    JSON.stringify(formSnapshot()) !== JSON.stringify(baseline.value),
+);
+
+function confirmLeave() {
+  if (submitting.value) return false;
+  return (
+    !hasUnsavedChanges.value || window.confirm('填写的内容尚未提交，离开后将丢失。确定离开吗？')
+  );
+}
+
+onBeforeRouteLeave(confirmLeave);
+onBeforeRouteUpdate((to, from) => {
+  if (submitting.value) return false;
+  return to.params.id === from.params.id || confirmLeave();
+});
+
+function confirmBeforeUnload(event) {
+  if (!hasUnsavedChanges.value && !submitting.value) return;
+  event.preventDefault();
+  event.returnValue = '';
+}
+
+watch(
+  () => hasUnsavedChanges.value || submitting.value,
+  (needsConfirmation) => {
+    if (needsConfirmation) window.addEventListener('beforeunload', confirmBeforeUnload);
+    else window.removeEventListener('beforeunload', confirmBeforeUnload);
+  },
+  { flush: 'sync' },
+);
+onBeforeUnmount(() => window.removeEventListener('beforeunload', confirmBeforeUnload));
+
 const allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp'];
 const maxImageSize = 5 * 1024 * 1024;
 
@@ -191,7 +243,13 @@ function readImage(file) {
 }
 
 async function submitItem() {
-  if (submitting.value || editLoading.value || editLoadError.value || !checkForm()) {
+  if (
+    submitting.value ||
+    submissionComplete.value ||
+    editLoading.value ||
+    editLoadError.value ||
+    !checkForm()
+  ) {
     return;
   }
 
@@ -225,10 +283,15 @@ async function submitItem() {
       await createItem(payload);
     }
 
+    submissionComplete.value = true;
+    markSaved();
+    message.value = '提交成功，可在“我的物品”查看审核状态。';
     submitting.value = false;
     await router.push('/my-items');
   } catch (err) {
-    error.value = err.message || '提交失败，请重试';
+    error.value = submissionComplete.value
+      ? '已提交成功，但页面跳转失败。请点击“我的物品”查看。'
+      : err.message || '提交失败，请重试';
   } finally {
     submitting.value = false;
   }
@@ -243,6 +306,7 @@ watch(
     });
 
     releaseImages();
+    submissionComplete.value = false;
     error.value = '';
     message.value = '';
     editLoadError.value = '';
@@ -257,6 +321,7 @@ watch(
       condition: '',
       description: '',
     });
+    markSaved();
 
     if (!id || !user.isLoggedIn || !user.isCertified) {
       editLoading.value = false;
@@ -282,6 +347,7 @@ watch(
         file: null,
         url,
       }));
+      markSaved();
     } catch (err) {
       if (!cancelled) {
         editLoadError.value = err.message || '物品加载失败';
@@ -344,7 +410,7 @@ watch(
             error = '';
           "
         >
-          <fieldset class="publish-fields" :disabled="submitting">
+          <fieldset class="publish-fields" :disabled="submitting || submissionComplete">
             <div class="panel-title">
               <h2>物品信息</h2>
             </div>
@@ -487,12 +553,25 @@ watch(
 
             <p v-if="error" role="alert">{{ error }}</p>
             <p v-if="message" role="status">{{ message }}</p>
+            <p v-if="hasUnsavedChanges && !submitting" class="help">有尚未提交的修改。</p>
 
             <hr class="rule" />
 
             <div class="actions">
-              <button class="btn primary" type="submit" :disabled="submitting || communityLoading">
-                {{ submitting ? '正在提交…' : isEdit ? '保存并重新提交审核' : '提交审核' }}
+              <button
+                class="btn primary"
+                type="submit"
+                :disabled="submitting || submissionComplete || communityLoading"
+              >
+                {{
+                  submissionComplete
+                    ? '已提交审核'
+                    : submitting
+                      ? '正在提交…'
+                      : isEdit
+                        ? '保存并重新提交审核'
+                        : '提交审核'
+                }}
               </button>
               <router-link class="btn" to="/items"> 取消 </router-link>
             </div>

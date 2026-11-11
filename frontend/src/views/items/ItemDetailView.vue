@@ -3,10 +3,12 @@ import { favoriteItem, getItem, unfavoriteItem } from '@/api/modules/item';
 import ItemAvailabilityCalendar from '@/components/ItemAvailabilityCalendar.vue';
 import { useUserStore } from '@/store/user';
 import { formatDate, formatMoney, formatRating } from '@/utils/format';
+import { pickItemListQuery } from '@/utils/itemListRoute';
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
+const returnToList = computed(() => ({ name: 'items', query: pickItemListQuery(route.query) }));
 const user = useUserStore();
 const item = ref(null);
 const loading = ref(true);
@@ -99,7 +101,7 @@ watch(
       <div>
         <h1>物品详情</h1>
       </div>
-      <router-link class="btn" to="/items"> 返回物品广场 </router-link>
+      <router-link class="btn" :to="returnToList"> 返回物品广场 </router-link>
     </header>
 
     <section v-if="loading" class="panel" role="status">正在加载物品…</section>

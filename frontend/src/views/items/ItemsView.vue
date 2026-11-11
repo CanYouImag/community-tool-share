@@ -7,9 +7,13 @@ import Pagination from '@/components/Pagination.vue';
 import { useUserStore } from '@/store/user';
 import { ITEM_CATEGORY } from '@/utils/constants';
 import { ITEM_SORT_OPTIONS, parsePriceRange } from '@/utils/itemFilters';
-import { onMounted, ref } from 'vue';
+import { itemListQuery, readItemListQuery } from '@/utils/itemListRoute';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
 const user = useUserStore();
+const route = useRoute();
+const router = useRouter();
 const items = ref([]);
 const total = ref(0);
 const loading = ref(true);
@@ -29,6 +33,44 @@ const page = ref(1);
 const pageSize = ref(6);
 const appliedQuery = ref(null);
 const lastRequest = ref(null);
+const appliedLocationQuery = computed(() =>
+  appliedQuery.value ? itemListQuery(appliedQuery.value, page.value) : {},
+);
+let requestVersion = 0;
+let successfulQueryKey = '';
+
+function restoreFields(query) {
+  keyword.value = query.keyword;
+  category.value = query.category;
+  minPrice.value = query.minPrice ?? '';
+  maxPrice.value = query.maxPrice ?? '';
+  sort.value = query.sort;
+  activeTab.value = query.favoritesOnly ? 'favorites' : 'browse';
+  communitySelection.value = query.communityId || query.communityScope;
+  pageSize.value = query.size;
+  filterError.value = '';
+}
+
+async function navigateToQuery(query, targetPage) {
+  const destination = { name: 'items', query: itemListQuery(query, targetPage) };
+  try {
+    if (router.resolve(destination).fullPath === route.fullPath) {
+      restoreFields(query);
+      await loadItems(query, targetPage);
+    } else {
+      await router.push(destination);
+    }
+  } catch (err) {
+    error.value = err.message || '页面跳转失败，请重试';
+  }
+}
+
+async function normalizeLocation(query, currentPage) {
+  const destination = { name: 'items', query: itemListQuery(query, currentPage) };
+  if (router.resolve(destination).fullPath !== route.fullPath) {
+    await router.replace(destination);
+  }
+}
 
 async function loadCommunities() {
   if (communityLoading.value) return;
@@ -80,7 +122,7 @@ function searchItems() {
   if (loading.value) return;
   filterError.value = '';
   try {
-    loadItems(buildQuery(), 1);
+    navigateToQuery(buildQuery(), 1);
   } catch (err) {
     filterError.value = err.message;
   }
@@ -95,7 +137,7 @@ function resetFilters() {
 function changePage(nextPage) {
   if (loading.value || !appliedQuery.value) return;
   // 翻页使用已提交的条件，不把尚未点击搜索的输入混入请求。
-  loadItems(appliedQuery.value, nextPage);
+  navigateToQuery(appliedQuery.value, nextPage);
 }
 
 function reloadItems() {
@@ -104,7 +146,8 @@ function reloadItems() {
 }
 
 async function loadItems(query, targetPage = 1) {
-  if (activeTab.value === 'favorites' && !user.isLoggedIn) {
+  const version = ++requestVersion;
+  if (query.favoritesOnly && !user.isLoggedIn) {
     items.value = [];
     total.value = 0;
     page.value = 1;
@@ -112,6 +155,8 @@ async function loadItems(query, targetPage = 1) {
     lastRequest.value = null;
     error.value = '';
     loading.value = false;
+    successfulQueryKey = JSON.stringify(itemListQuery(query, 1));
+    await normalizeLocation(query, 1);
     return;
   }
 
@@ -121,20 +166,45 @@ async function loadItems(query, targetPage = 1) {
 
   try {
     const data = await getItems({ ...query, page: targetPage });
+    if (version !== requestVersion || route.name !== 'items') return;
     items.value = data.records;
     total.value = data.total;
     page.value = data.page;
     appliedQuery.value = query;
+    successfulQueryKey = JSON.stringify(itemListQuery(query, data.page));
+    await normalizeLocation(query, data.page);
   } catch (err) {
-    error.value = err.message || '物品加载失败，请稍后重试';
+    if (version === requestVersion) {
+      successfulQueryKey = '';
+      error.value = err.message || '物品加载失败，请稍后重试';
+    }
   } finally {
-    loading.value = false;
+    if (version === requestVersion) loading.value = false;
   }
 }
 
-onMounted(() => {
-  loadCommunities();
-  loadItems(buildQuery());
+watch(
+  () => route.fullPath,
+  () => {
+    if (route.name !== 'items') return;
+    const restored = readItemListQuery(route.query, user.isLoggedIn);
+    restoreFields(restored.query);
+    const key = JSON.stringify(itemListQuery(restored.query, restored.page));
+    // 回到已有结果，或服务端修正网址时，取消旧请求并复用当前数据。
+    if (key === successfulQueryKey && !error.value) {
+      requestVersion++;
+      loading.value = false;
+      lastRequest.value = { query: restored.query, page: restored.page };
+      return;
+    }
+    loadItems(restored.query, restored.page);
+  },
+  { immediate: true },
+);
+
+onMounted(loadCommunities);
+onBeforeUnmount(() => {
+  requestVersion++;
 });
 </script>
 
@@ -304,7 +374,12 @@ onMounted(() => {
         />
 
         <div v-else class="item-grid">
-          <ItemCard v-for="item in items" :key="item.id" :item="item" />
+          <ItemCard
+            v-for="item in items"
+            :key="item.id"
+            :item="item"
+            :list-query="appliedLocationQuery"
+          />
         </div>
 
         <Pagination

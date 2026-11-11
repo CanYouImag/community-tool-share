@@ -1,12 +1,5 @@
 // 登录 / 注册 / 个人中心路由。
-// 按当前约定，暂不修改 router/index.js；需要启用时在 routes 数组里展开：
-//
-// import { authRoutes } from './auth.routes'
-// const routes = [
-//   ...authRoutes,
-//   { path: '/', redirect: '/community' },
-//   ...
-// ]
+// 已在 router/index.js 注册，requiresAuth 由全局守卫统一检查。
 export const authRoutes = [
   {
     path: '/login',

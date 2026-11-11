@@ -14,6 +14,12 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5173,
       host: true,
+      proxy: {
+        '/api': {
+          target: env.VITE_API_TARGET || 'http://localhost:8080',
+          changeOrigin: true,
+        },
+      },
     },
     define: {
       __USE_MOCK__: JSON.stringify(env.VITE_USE_MOCK !== 'false'),

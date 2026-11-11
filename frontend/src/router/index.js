@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import { authRoutes } from './auth.routes';
+import { useAuthStore } from '../store/auth';
 
 const routes = [
   ...authRoutes,
@@ -47,31 +48,37 @@ const routes = [
     path: '/orders',
     name: 'orders',
     component: () => import('@/views/orders/OrdersView.vue'),
-    meta: { title: '我的订单' },
+    meta: { title: '我的订单', requiresAuth: true },
   },
   {
     path: '/order-detail/:id',
     name: 'order-detail',
     component: () => import('@/views/orders/OrderDetailView.vue'),
-    meta: { title: '订单详情与操作' },
+    meta: { title: '订单详情与操作', requiresAuth: true },
   },
   {
     path: '/wallet',
     name: 'wallet',
     component: () => import('@/views/wallet/WalletView.vue'),
-    meta: { title: '钱包' },
+    meta: { title: '钱包', requiresAuth: true },
   },
   {
     path: '/dispute',
     name: 'dispute',
     component: () => import('@/views/dispute/DisputeView.vue'),
-    meta: { title: '纠纷与举报' },
+    meta: { title: '纠纷与举报', requiresAuth: true },
   },
 ];
 
 const router = createRouter({
   history: createWebHashHistory(),
   routes,
+});
+
+router.beforeEach((to) => {
+  if (to.meta.requiresAuth && !useAuthStore().isLoggedIn) {
+    return { name: 'login', query: { redirect: to.fullPath } };
+  }
 });
 
 router.afterEach((to) => {

@@ -1,7 +1,25 @@
 <script setup>
-import { useRoute } from 'vue-router';
+import { ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useAuthStore } from '@/store/auth';
 
 const route = useRoute();
+const router = useRouter();
+const auth = useAuthStore();
+const loggingOut = ref(false);
+
+async function logout() {
+  if (loggingOut.value) return;
+  loggingOut.value = true;
+  try {
+    // 先经过页面离开检查；取消放弃草稿时不退出账号。
+    const failure = await router.push({ name: 'login' });
+    if (failure && route.name !== 'login') return;
+    await auth.logout();
+  } finally {
+    loggingOut.value = false;
+  }
+}
 
 // 顶部导航项，active 由路由匹配决定
 const navItems = [
@@ -49,7 +67,13 @@ function isActive(item) {
         <router-link to="/wallet" class="" :class="{ active: isActive(navItems[2]) }">
           钱包
         </router-link>
-        <router-link to="/account" active-class="active"> 个人中心 </router-link>
+        <template v-if="auth.isLoggedIn">
+          <router-link to="/account" active-class="active"> 个人中心 </router-link>
+          <button class="btn small" type="button" :disabled="loggingOut" @click="logout">
+            {{ loggingOut ? '正在退出…' : '退出登录' }}
+          </button>
+        </template>
+        <router-link v-else to="/login" active-class="active"> 登录 / 注册 </router-link>
       </nav>
     </div>
   </header>
