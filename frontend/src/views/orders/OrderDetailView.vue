@@ -1,15 +1,15 @@
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { getOrder, getOrderMessages, postOrderMessage } from '@/api/modules/order'
-import { formatMoney } from '@/utils/format'
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { getOrder, getOrderMessages, postOrderMessage } from '@/api/modules/order';
+import { formatMoney } from '@/utils/format';
 
-const route = useRoute()
-const router = useRouter()
+const route = useRoute();
+const router = useRouter();
 
-const order = ref(null)
-const messages = ref([])
-const newMessage = ref('')
+const order = ref(null);
+const messages = ref([]);
+const newMessage = ref('');
 
 // 七阶段 Tab（对齐设计文档订单状态机，文案保留原型）
 const stages = [
@@ -19,51 +19,51 @@ const stages = [
   { id: 'renting', label: '租用中' },
   { id: 'return', label: '归还确认' },
   { id: 'inspect', label: '待验收' },
-  { id: 'complete', label: '完成 / 评价' }
-]
-const activeStage = ref('pending')
+  { id: 'complete', label: '完成 / 评价' },
+];
+const activeStage = ref('pending');
 
-const orderTotal = computed(() => (order.value ? order.value.rent + order.value.deposit : 0))
+const orderTotal = computed(() => (order.value ? order.value.rent + order.value.deposit : 0));
 
 async function load() {
-  order.value = await getOrder(route.params.id)
-  messages.value = await getOrderMessages(route.params.id)
+  order.value = await getOrder(route.params.id);
+  messages.value = await getOrderMessages(route.params.id);
 }
 
 async function sendMessage() {
-  const content = newMessage.value.trim()
-  if (!content) return
-  await postOrderMessage(route.params.id, content)
+  const content = newMessage.value.trim();
+  if (!content) return;
+  await postOrderMessage(route.params.id, content);
   messages.value.push({
     id: `m_${Date.now()}`,
     from: 'Starling',
     mine: true,
     time: '刚刚',
-    content
-  })
-  newMessage.value = ''
+    content,
+  });
+  newMessage.value = '';
 }
 
 // 阶段操作按钮（演示用：点击后切换阶段）
 function setStage(id) {
-  activeStage.value = id
+  activeStage.value = id;
 }
 
 // 根据路由 hash 定位初始阶段
 function initStageFromHash() {
-  const h = route.hash.replace('#', '')
-  if (stages.some((s) => s.id === h)) activeStage.value = h
+  const h = route.hash.replace('#', '');
+  if (stages.some((s) => s.id === h)) activeStage.value = h;
 }
 
 onMounted(() => {
-  initStageFromHash()
-  load()
-})
+  initStageFromHash();
+  load();
+});
 
 watch(
   () => route.hash,
-  () => initStageFromHash()
-)
+  () => initStageFromHash(),
+);
 </script>
 
 <template>
@@ -103,8 +103,9 @@ watch(
         <details class="inline-note">
           <summary>取消 / 拒单确认</summary>
           <p>
-            订单仍在待确认时可取消。确认后退还租金 ¥{{ order?.rent }}，解冻押金
-            ¥{{ order?.deposit }}；接单后不可单方取消。
+            订单仍在待确认时可取消。确认后退还租金 ¥{{ order?.rent }}，解冻押金 ¥{{
+              order?.deposit
+            }}；接单后不可单方取消。
           </p>
         </details>
       </section>
@@ -188,9 +189,7 @@ watch(
         </div>
         <details class="inline-note">
           <summary>逾期时的提示</summary>
-          <p>
-            到期前 1 天提醒。逾期按 1.5 倍日租金逐日累计；超 3 天加强纠纷入口提示。
-          </p>
+          <p>到期前 1 天提醒。逾期按 1.5 倍日租金逐日累计；超 3 天加强纠纷入口提示。</p>
         </details>
       </section>
     </section>
@@ -227,19 +226,19 @@ watch(
       <section class="panel">
         <h2>出租者验收物品</h2>
         <hr class="rule" />
-        <p>
-          出租者请核对归还物品的完好情况。验收正常将结算并解冻押金；发现异常可发起纠纷。
-        </p>
+        <p>出租者请核对归还物品的完好情况。验收正常将结算并解冻押金；发现异常可发起纠纷。</p>
         <hr class="rule" />
         <div class="actions">
           <a class="btn primary" @click="setStage('complete')">验收正常，结算完成</a>
-          <a class="btn" @click="router.push({ name: 'dispute', hash: '#new' })">验收异常，发起纠纷</a>
+          <a class="btn" @click="router.push({ name: 'dispute', hash: '#new' })"
+            >验收异常，发起纠纷</a
+          >
         </div>
         <details class="inline-note">
           <summary>验收说明</summary>
           <p>
-            验收正常 → 订单完成，租客押金解冻、出租收入到账（扣除 10% 平台佣金）；验收异常
-            → 订单转「纠纷中」，押金继续冻结，进入社区调解 / 平台仲裁流程。
+            验收正常 → 订单完成，租客押金解冻、出租收入到账（扣除 10% 平台佣金）；验收异常 →
+            订单转「纠纷中」，押金继续冻结，进入社区调解 / 平台仲裁流程。
           </p>
         </details>
       </section>
@@ -252,7 +251,9 @@ watch(
         <h2>订单已完成</h2>
         <hr class="rule" />
         <p>
-          租客押金 ¥{{ order?.deposit }} 已解冻；出租收入 ¥{{ ((order?.rent || 0) * 0.9).toFixed(0) }}，平台佣金 ¥{{ ((order?.rent || 0) * 0.1).toFixed(0) }}（10%）。
+          租客押金 ¥{{ order?.deposit }} 已解冻；出租收入 ¥{{
+            ((order?.rent || 0) * 0.9).toFixed(0)
+          }}，平台佣金 ¥{{ ((order?.rent || 0) * 0.1).toFixed(0) }}（10%）。
         </p>
         <hr class="rule" />
         <label class="field">
@@ -288,16 +289,34 @@ watch(
             <div>
               <h3>{{ order?.itemTitle }} / 双电池套装</h3>
               <p class="muted">{{ order?.communityName }} / 出租者 {{ order?.lender }}</p>
-              <small>{{ order?.startDate?.slice(5) }} 日至 {{ order?.endDate?.slice(5) }} 日 / 租期 {{ order?.days }} 天</small>
+              <small
+                >{{ order?.startDate?.slice(5) }} 日至 {{ order?.endDate?.slice(5) }} 日 / 租期
+                {{ order?.days }} 天</small
+              >
             </div>
           </div>
           <hr class="rule" />
           <dl class="line-list">
-            <div><dt>租客</dt><dd>{{ order?.borrower }}</dd></div>
-            <div><dt>出租者</dt><dd>{{ order?.lender }}</dd></div>
-            <div><dt>租期</dt><dd>{{ order?.startDate }} 至 {{ order?.endDate }}</dd></div>
-            <div><dt>社区</dt><dd>{{ order?.communityName }}</dd></div>
-            <div><dt>创建时间</dt><dd>{{ order?.createdAt }}</dd></div>
+            <div>
+              <dt>租客</dt>
+              <dd>{{ order?.borrower }}</dd>
+            </div>
+            <div>
+              <dt>出租者</dt>
+              <dd>{{ order?.lender }}</dd>
+            </div>
+            <div>
+              <dt>租期</dt>
+              <dd>{{ order?.startDate }} 至 {{ order?.endDate }}</dd>
+            </div>
+            <div>
+              <dt>社区</dt>
+              <dd>{{ order?.communityName }}</dd>
+            </div>
+            <div>
+              <dt>创建时间</dt>
+              <dd>{{ order?.createdAt }}</dd>
+            </div>
           </dl>
         </section>
       </div>
@@ -307,10 +326,22 @@ watch(
             <h2>费用明细</h2>
           </div>
           <dl class="line-list">
-            <div><dt>日租金</dt><dd>{{ formatMoney(order?.dailyPrice) }}</dd></div>
-            <div><dt>租期</dt><dd>{{ order?.days }} 天</dd></div>
-            <div><dt>租金</dt><dd>{{ formatMoney(order?.rent) }}</dd></div>
-            <div><dt>订单押金</dt><dd>{{ formatMoney(order?.deposit) }}</dd></div>
+            <div>
+              <dt>日租金</dt>
+              <dd>{{ formatMoney(order?.dailyPrice) }}</dd>
+            </div>
+            <div>
+              <dt>租期</dt>
+              <dd>{{ order?.days }} 天</dd>
+            </div>
+            <div>
+              <dt>租金</dt>
+              <dd>{{ formatMoney(order?.rent) }}</dd>
+            </div>
+            <div>
+              <dt>订单押金</dt>
+              <dd>{{ formatMoney(order?.deposit) }}</dd>
+            </div>
           </dl>
           <div class="total">
             <span>合计支付</span>

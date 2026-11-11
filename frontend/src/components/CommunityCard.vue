@@ -1,10 +1,10 @@
 <script setup>
 defineProps({
   community: { type: Object, required: true },
-  joinable: { type: Boolean, default: true }
-})
+  joinable: { type: Boolean, default: true },
+});
 
-const emit = defineEmits(['enter', 'join'])
+const emit = defineEmits(['enter', 'join']);
 </script>
 
 <template>

@@ -1,0 +1,15 @@
+{
+  "name": "community-tool-share-tooling",
+  "private": true,
+  "scripts": {
+    "format": "prettier . --write --ignore-unknown",
+    "format:check": "prettier . --check --ignore-unknown"
+  },
+  "devDependencies": {
+    "@prettier/plugin-xml": "3.4.2",
+    "prettier": "3.9.10",
+    "prettier-plugin-java": "2.11.0",
+    "prettier-plugin-sh": "0.20.2",
+    "prettier-plugin-sql": "0.20.0"
+  }
+}

@@ -7,5 +7,5 @@ public enum WalletTransactionType {
     INCOME,
     COMMISSION,
     WITHDRAW,
-    REFUND
+    REFUND,
 }

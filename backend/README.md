@@ -63,21 +63,21 @@ http://localhost:8080/swagger-ui.html
 
 ## 已实现接口
 
-| 方法 | 路径 | 说明 |
-|---|---|---|
-| POST | `/api/v1/auth/register` | 注册 |
-| POST | `/api/v1/auth/login` | 登录 |
-| GET | `/api/v1/auth/me` | 当前用户 |
-| POST | `/api/v1/auth/logout` | 退出登录（前端清除 token） |
-| GET | `/api/v1/users/me` | 个人资料 |
-| PUT | `/api/v1/users/me` | 修改资料 |
-| PUT | `/api/v1/users/me/password` | 修改密码 |
-| POST | `/api/v1/users/me/real-name` | 提交实名认证 |
-| PUT | `/api/v1/users/me/avatar` | 修改头像 |
-| GET | `/api/v1/wallet` | 钱包 |
-| GET | `/api/v1/wallet/transactions` | 资金流水 |
-| POST | `/api/v1/wallet/freeze` | 冻结余额 |
-| POST | `/api/v1/wallet/unfreeze` | 解冻余额 |
+| 方法 | 路径                          | 说明                       |
+| ---- | ----------------------------- | -------------------------- |
+| POST | `/api/v1/auth/register`       | 注册                       |
+| POST | `/api/v1/auth/login`          | 登录                       |
+| GET  | `/api/v1/auth/me`             | 当前用户                   |
+| POST | `/api/v1/auth/logout`         | 退出登录（前端清除 token） |
+| GET  | `/api/v1/users/me`            | 个人资料                   |
+| PUT  | `/api/v1/users/me`            | 修改资料                   |
+| PUT  | `/api/v1/users/me/password`   | 修改密码                   |
+| POST | `/api/v1/users/me/real-name`  | 提交实名认证               |
+| PUT  | `/api/v1/users/me/avatar`     | 修改头像                   |
+| GET  | `/api/v1/wallet`              | 钱包                       |
+| GET  | `/api/v1/wallet/transactions` | 资金流水                   |
+| POST | `/api/v1/wallet/freeze`       | 冻结余额                   |
+| POST | `/api/v1/wallet/unfreeze`     | 解冻余额                   |
 
 统一返回体：
 

@@ -1,10 +1,10 @@
 <script setup>
 defineProps({
   text: { type: String, default: '暂无数据' },
-  actionText: { type: String, default: '' }
-})
+  actionText: { type: String, default: '' },
+});
 
-const emit = defineEmits(['action'])
+const emit = defineEmits(['action']);
 </script>
 
 <template>

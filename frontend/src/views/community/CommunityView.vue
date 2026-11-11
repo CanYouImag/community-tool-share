@@ -1,106 +1,106 @@
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
-import CommunityCard from '@/components/CommunityCard.vue'
-import ItemCard from '@/components/ItemCard.vue'
-import StatusBadge from '@/components/StatusBadge.vue'
-import EmptyState from '@/components/EmptyState.vue'
-import Pagination from '@/components/Pagination.vue'
+import { ref, reactive, computed, onMounted } from 'vue';
+import CommunityCard from '@/components/CommunityCard.vue';
+import ItemCard from '@/components/ItemCard.vue';
+import StatusBadge from '@/components/StatusBadge.vue';
+import EmptyState from '@/components/EmptyState.vue';
+import Pagination from '@/components/Pagination.vue';
 import {
   getCommunities,
   getCommunityHome,
   getMyMemberships,
-  joinCommunity
-} from '@/api/modules/community'
-import { MEMBER_STATUS } from '@/utils/constants'
+  joinCommunity,
+} from '@/api/modules/community';
+import { MEMBER_STATUS } from '@/utils/constants';
 
 // 页内 Tab
 const tabs = [
   { id: 'discover', label: '发现社区' },
   { id: 'home', label: '社区主页' },
-  { id: 'joined', label: '我的社区' }
-]
-const activeTab = ref('discover')
+  { id: 'joined', label: '我的社区' },
+];
+const activeTab = ref('discover');
 
 // 发现社区
-const keyword = ref('')
-const allCommunities = ref([])
+const keyword = ref('');
+const allCommunities = ref([]);
 const filteredCommunities = computed(() => {
-  if (!keyword.value.trim()) return allCommunities.value
-  return allCommunities.value.filter((c) => c.name.includes(keyword.value.trim()))
-})
+  if (!keyword.value.trim()) return allCommunities.value;
+  return allCommunities.value.filter((c) => c.name.includes(keyword.value.trim()));
+});
 
 // 社区主页
-const currentCommunity = ref(null)
-const homeData = reactive({ top: [], latest: [] })
-const joinState = ref('') // '' | 'APPLIED' | 'JOINED'
+const currentCommunity = ref(null);
+const homeData = reactive({ top: [], latest: [] });
+const joinState = ref(''); // '' | 'APPLIED' | 'JOINED'
 
 // 我的社区
-const memberships = ref([])
+const memberships = ref([]);
 
 async function loadCommunities() {
-  allCommunities.value = await getCommunities()
+  allCommunities.value = await getCommunities();
 }
 
 async function loadMemberships() {
-  memberships.value = await getMyMemberships()
+  memberships.value = await getMyMemberships();
 }
 
 async function enterCommunity(c) {
-  currentCommunity.value = c
-  homeData.top = []
-  homeData.latest = []
-  activeTab.value = 'home'
-  const home = await getCommunityHome(c.id)
-  currentCommunity.value = home
-  homeData.top = home.top || []
-  homeData.latest = home.latest || []
+  currentCommunity.value = c;
+  homeData.top = [];
+  homeData.latest = [];
+  activeTab.value = 'home';
+  const home = await getCommunityHome(c.id);
+  currentCommunity.value = home;
+  homeData.top = home.top || [];
+  homeData.latest = home.latest || [];
   // 判定当前用户在该社区的关系
-  const m = memberships.value.find((x) => x.id === c.id)
-  joinState.value = m ? (m.status === 'JOINED' ? 'JOINED' : 'APPLIED') : ''
+  const m = memberships.value.find((x) => x.id === c.id);
+  joinState.value = m ? (m.status === 'JOINED' ? 'JOINED' : 'APPLIED') : '';
 }
 
 // 切换到社区主页：若尚未选择社区，默认加载用户已加入的第一个社区
 async function openHomeTab() {
-  activeTab.value = 'home'
-  if (currentCommunity.value) return
-  const joined = memberships.value.find((m) => m.status === 'JOINED')
+  activeTab.value = 'home';
+  if (currentCommunity.value) return;
+  const joined = memberships.value.find((m) => m.status === 'JOINED');
   if (joined) {
-    const c = allCommunities.value.find((x) => x.id === joined.id)
-    if (c) await enterCommunity(c)
+    const c = allCommunities.value.find((x) => x.id === joined.id);
+    if (c) await enterCommunity(c);
   }
 }
 
 // 统一 Tab 切换入口：社区主页需先确保已选择社区
 function switchTab(id) {
   if (id === 'home') {
-    openHomeTab()
+    openHomeTab();
   } else {
-    activeTab.value = id
+    activeTab.value = id;
   }
 }
 
 async function applyJoin(c) {
-  await joinCommunity(c.id)
-  joinState.value = 'APPLIED'
+  await joinCommunity(c.id);
+  joinState.value = 'APPLIED';
   // 同步到我的社区列表
   if (!memberships.value.find((m) => m.id === c.id)) {
     memberships.value.push({
       id: c.id,
       name: c.name,
       status: 'PENDING',
-      time: new Date().toISOString().slice(0, 10)
-    })
+      time: new Date().toISOString().slice(0, 10),
+    });
   }
 }
 
 function memberBadge(status) {
-  return status === 'JOINED' ? MEMBER_STATUS.JOINED : MEMBER_STATUS.PENDING
+  return status === 'JOINED' ? MEMBER_STATUS.JOINED : MEMBER_STATUS.PENDING;
 }
 
 onMounted(() => {
-  loadCommunities()
-  loadMemberships()
-})
+  loadCommunities();
+  loadMemberships();
+});
 </script>
 
 <template>
@@ -132,7 +132,12 @@ onMounted(() => {
         <div class="filters">
           <label class="field">
             <span>社区名称</span>
-            <input v-model="keyword" type="text" aria-label="社区名称" placeholder="输入社区名称搜索" />
+            <input
+              v-model="keyword"
+              type="text"
+              aria-label="社区名称"
+              placeholder="输入社区名称搜索"
+            />
           </label>
         </div>
       </section>
@@ -163,20 +168,14 @@ onMounted(() => {
             <div>
               <h2>{{ currentCommunity.intro || currentCommunity.name }}</h2>
               <p class="muted">
-                社区管理员：{{ currentCommunity.admin }} / 成员
-                {{ currentCommunity.members }} 人 / 在租物品
-                {{ currentCommunity.onRent }} 件
+                社区管理员：{{ currentCommunity.admin }} / 成员 {{ currentCommunity.members }} 人 /
+                在租物品 {{ currentCommunity.onRent }} 件
               </p>
             </div>
-            <a
-              v-if="!joinState"
-              class="btn primary"
-              @click="applyJoin(currentCommunity)"
+            <a v-if="!joinState" class="btn primary" @click="applyJoin(currentCommunity)"
               >申请加入</a
             >
-            <span v-else-if="joinState === 'APPLIED'" class="badge warn"
-              >待审核</span
-            >
+            <span v-else-if="joinState === 'APPLIED'" class="badge warn">待审核</span>
             <span v-else class="badge">已加入</span>
           </div>
         </section>
@@ -204,7 +203,12 @@ onMounted(() => {
           </div>
         </section>
       </template>
-      <EmptyState v-else text="请先选择一个社区" action-text="去发现社区" @action="activeTab = 'discover'" />
+      <EmptyState
+        v-else
+        text="请先选择一个社区"
+        action-text="去发现社区"
+        @action="activeTab = 'discover'"
+      />
     </section>
 
     <!-- 我的社区 -->
@@ -228,14 +232,17 @@ onMounted(() => {
               <tr v-for="m in memberships" :key="m.id">
                 <td>{{ m.name }}</td>
                 <td>
-                  <StatusBadge
-                    :status="m.status === 'JOINED' ? 'JOINED' : 'MEMBER_PENDING'"
-                  />
+                  <StatusBadge :status="m.status === 'JOINED' ? 'JOINED' : 'MEMBER_PENDING'" />
                 </td>
                 <td>{{ m.time }}</td>
                 <td>
                   <div class="actions">
-                    <a v-if="m.status === 'JOINED'" class="" @click="enterCommunity(allCommunities.find((c) => c.id === m.id))">社区主页</a>
+                    <a
+                      v-if="m.status === 'JOINED'"
+                      class=""
+                      @click="enterCommunity(allCommunities.find((c) => c.id === m.id))"
+                      >社区主页</a
+                    >
                     <template v-if="m.status === 'JOINED'">
                       <a class="">退出社区</a>
                     </template>

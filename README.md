@@ -19,4 +19,3 @@ community-tool-share/
 │  └─ init.sql
 └─ scripts/
 ```
-

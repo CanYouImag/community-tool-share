@@ -1,10 +1,9 @@
 package com.linzu.common.api;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 /**
  * 统一分页返回：{ records, total, page, size }

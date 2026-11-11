@@ -1,56 +1,57 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import StatusBadge from '@/components/StatusBadge.vue'
-import Pagination from '@/components/Pagination.vue'
-import EmptyState from '@/components/EmptyState.vue'
-import { getOrders } from '@/api/modules/order'
-import { ORDER_STATUS_FILTER } from '@/utils/constants'
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import StatusBadge from '@/components/StatusBadge.vue';
+import Pagination from '@/components/Pagination.vue';
+import EmptyState from '@/components/EmptyState.vue';
+import { getOrders } from '@/api/modules/order';
+import { ORDER_STATUS_FILTER } from '@/utils/constants';
 
-const router = useRouter()
+const router = useRouter();
 
-const activeTab = ref('borrow') // borrow | lend
-const keyword = ref('')
-const status = ref('')
-const list = ref([])
-const total = ref(0)
+const activeTab = ref('borrow'); // borrow | lend
+const keyword = ref('');
+const status = ref('');
+const list = ref([]);
+const total = ref(0);
 
 async function load() {
-  const role = activeTab.value
+  const role = activeTab.value;
   const res = await getOrders({
     role,
     keyword: keyword.value,
-    status: status.value
-  })
-  list.value = res.list
-  total.value = res.total
+    status: status.value,
+  });
+  list.value = res.list;
+  total.value = res.total;
 }
 
 function switchTab(tab) {
-  activeTab.value = tab
-  load()
+  activeTab.value = tab;
+  load();
 }
 
 function goDetail(order, action) {
   // 不同状态跳转对应订单阶段锚点（Mock 阶段统一到详情页）
-  const hash = {
-    PENDING_PAYMENT: 'pending',
-    PENDING_ACCEPT: 'checkout',
-    PENDING_PICKUP: 'pickup',
-    IN_USE: 'renting',
-    PENDING_RETURN: 'return',
-    PENDING_INSPECT: 'inspect',
-    OVERDUE: 'renting',
-    COMPLETED: 'complete',
-    DISPUTED: 'renting',
-    CLOSED: 'complete'
-  }[order.status] || 'pending'
-  router.push({ name: 'order-detail', params: { id: order.id }, hash: `#${hash}` })
+  const hash =
+    {
+      PENDING_PAYMENT: 'pending',
+      PENDING_ACCEPT: 'checkout',
+      PENDING_PICKUP: 'pickup',
+      IN_USE: 'renting',
+      PENDING_RETURN: 'return',
+      PENDING_INSPECT: 'inspect',
+      OVERDUE: 'renting',
+      COMPLETED: 'complete',
+      DISPUTED: 'renting',
+      CLOSED: 'complete',
+    }[order.status] || 'pending';
+  router.push({ name: 'order-detail', params: { id: order.id }, hash: `#${hash}` });
 }
 
 // 操作文案：区分租入/租出视角
 function actionText(order) {
-  const role = activeTab.value
+  const role = activeTab.value;
   const map = {
     PENDING_PAYMENT: role === 'borrow' ? '订单详情' : '处理订单',
     PENDING_ACCEPT: role === 'borrow' ? '确认支付' : '等待租客支付',
@@ -61,12 +62,12 @@ function actionText(order) {
     OVERDUE: '查看详情',
     COMPLETED: '评价',
     DISPUTED: '查看纠纷',
-    CLOSED: '查看详情'
-  }
-  return map[order.status] || '订单详情'
+    CLOSED: '查看详情',
+  };
+  return map[order.status] || '订单详情';
 }
 
-onMounted(load)
+onMounted(load);
 </script>
 
 <template>
@@ -114,7 +115,15 @@ onMounted(load)
           </label>
           <div class="actions">
             <a class="btn primary" @click="load">搜索</a>
-            <a class="btn" @click="keyword = ''; status = ''; load()">清除筛选</a>
+            <a
+              class="btn"
+              @click="
+                keyword = '';
+                status = '';
+                load();
+              "
+              >清除筛选</a
+            >
           </div>
         </div>
 

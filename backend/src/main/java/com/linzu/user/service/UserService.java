@@ -97,7 +97,10 @@ public class UserService {
     public UserProfileResponse submitRealName(Long userId, RealNameRequest request) {
         User user = requireUser(userId);
         UserRealName realName = findRealName(userId);
-        if (realName != null && (VERIFIED.equals(realName.getStatus()) || PENDING.equals(realName.getStatus()))) {
+        if (
+            realName != null &&
+            (VERIFIED.equals(realName.getStatus()) || PENDING.equals(realName.getStatus()))
+        ) {
             throw new BusinessException(ErrorCode.REAL_NAME_EXISTS);
         }
 
@@ -136,7 +139,7 @@ public class UserService {
 
     private UserRealName findRealName(Long userId) {
         return userRealNameMapper.selectOne(
-                Wrappers.<UserRealName>lambdaQuery().eq(UserRealName::getUserId, userId)
+            Wrappers.<UserRealName>lambdaQuery().eq(UserRealName::getUserId, userId)
         );
     }
 
@@ -145,19 +148,19 @@ public class UserService {
         String realNameValue = realName == null ? null : realName.getRealName();
         String idCardMasked = realName == null ? null : maskIdCard(realName.getIdCardNo());
         return new UserProfileResponse(
-                user.getId(),
-                user.getUsername(),
-                user.getPhone(),
-                user.getNickname(),
-                user.getAvatarUrl(),
-                user.getBio(),
-                user.getRole(),
-                user.getStatus(),
-                user.getCreditScore(),
-                realNameStatus,
-                realNameValue,
-                idCardMasked,
-                user.getCreatedAt()
+            user.getId(),
+            user.getUsername(),
+            user.getPhone(),
+            user.getNickname(),
+            user.getAvatarUrl(),
+            user.getBio(),
+            user.getRole(),
+            user.getStatus(),
+            user.getCreditScore(),
+            realNameStatus,
+            realNameValue,
+            idCardMasked,
+            user.getCreatedAt()
         );
     }
 
