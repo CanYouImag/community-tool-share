@@ -3,20 +3,34 @@ import { useUserStore } from '../../store/user';
 import { ITEM_CATEGORY } from '../../utils/constants';
 import * as db from './data';
 
-const favoriteItemIds = new Set();
+const favoritesByUser = new Map();
 
 function setMockFavorite(id, favorited) {
+  const user = useUserStore();
+
+  if (!user.isLoggedIn) {
+    throw new Error('请先登录后再收藏物品');
+  }
+
   const item = db.items.find((item) => item.id === id);
 
   if (!item) {
     throw new Error('物品不存在');
   }
 
+  if (favorited && (item.status ?? 'AVAILABLE') !== 'AVAILABLE') {
+    throw new Error('物品尚未上架，暂不能收藏');
+  }
+
+  const favoriteItemIds = favoritesByUser.get(user.id) || new Set();
+
   if (favorited) {
     favoriteItemIds.add(id);
   } else {
     favoriteItemIds.delete(id);
   }
+
+  favoritesByUser.set(user.id, favoriteItemIds);
 
   return { favorited: favoriteItemIds.has(id) };
 }
@@ -129,11 +143,18 @@ const handlers = [
       const keyword = (params.keyword || '').trim().toLowerCase();
       const category = params.category || '';
       const favoritesOnly = params.favoritesOnly === true || params.favoritesOnly === 'true';
+      const user = useUserStore();
+
+      if (favoritesOnly && !user.isLoggedIn) {
+        throw new Error('请先登录后查看收藏');
+      }
+
+      const favoriteItemIds = user.isLoggedIn ? favoritesByUser.get(user.id) : undefined;
 
       const records = db.items.filter((item) => {
         const matchesKeyword = !keyword || item.title.toLowerCase().includes(keyword);
         const matchesCategory = !category || item.category === category;
-        const matchesFavorite = !favoritesOnly || favoriteItemIds.has(item.id);
+        const matchesFavorite = !favoritesOnly || favoriteItemIds?.has(item.id);
         const isAvailable = (item.status ?? 'AVAILABLE') === 'AVAILABLE';
         return isAvailable && matchesKeyword && matchesCategory && matchesFavorite;
       });
@@ -197,7 +218,7 @@ const handlers = [
       }
 
       db.items.splice(index, 1);
-      favoriteItemIds.delete(id);
+      favoritesByUser.forEach((ids) => ids.delete(id));
 
       return { id, deleted: true };
     },
@@ -313,9 +334,11 @@ const handlers = [
       if (!item || (item.status ?? 'AVAILABLE') !== 'AVAILABLE') {
         throw new Error('物品不存在或尚未上架');
       }
+      const user = useUserStore();
+
       return {
         ...item,
-        favorited: favoriteItemIds.has(id),
+        favorited: Boolean(user.isLoggedIn && favoritesByUser.get(user.id)?.has(id)),
       };
     },
   },

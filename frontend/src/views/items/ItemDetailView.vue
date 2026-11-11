@@ -1,10 +1,12 @@
 <script setup>
 import { favoriteItem, getItem, unfavoriteItem } from '@/api/modules/item';
+import { useUserStore } from '@/store/user';
 import { formatMoney } from '@/utils/format';
 import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
+const user = useUserStore();
 const item = ref(null);
 const loading = ref(true);
 const error = ref('');
@@ -13,6 +15,11 @@ const favoriteError = ref('');
 
 async function toggleFavorite() {
   if (!item.value || favoriteSaving.value) return;
+
+  if (!user.isLoggedIn) {
+    favoriteError.value = '请先登录后再收藏物品';
+    return;
+  }
 
   const target = item.value;
   favoriteSaving.value = true;
@@ -118,7 +125,8 @@ watch(
           </div>
         </dl>
 
-        <div class="actions">
+        <p v-if="!user.isLoggedIn" role="status">登录后即可收藏此物品。</p>
+        <div v-else class="actions">
           <button
             class="btn"
             type="button"

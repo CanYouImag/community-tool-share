@@ -2,9 +2,11 @@
 import { getItems } from '@/api/modules/item';
 import EmptyState from '@/components/EmptyState.vue';
 import ItemCard from '@/components/ItemCard.vue';
+import { useUserStore } from '@/store/user';
 import { ITEM_CATEGORY } from '@/utils/constants';
 import { onMounted, ref } from 'vue';
 
+const user = useUserStore();
 const items = ref([]);
 const total = ref(0);
 const loading = ref(true);
@@ -35,6 +37,14 @@ function resetFilters() {
 }
 
 async function loadItems() {
+  if (activeTab.value === 'favorites' && !user.isLoggedIn) {
+    items.value = [];
+    total.value = 0;
+    error.value = '';
+    loading.value = false;
+    return;
+  }
+
   loading.value = true;
   error.value = '';
 
@@ -89,7 +99,17 @@ onMounted(loadItems);
       </button>
     </div>
 
-    <form class="panel" @submit.prevent="searchItems">
+    <section v-if="activeTab === 'favorites' && !user.isLoggedIn" class="panel" role="alert">
+      <h2>请先登录</h2>
+      <p>登录后即可收藏物品并查看自己的收藏。</p>
+      <button class="btn" type="button" @click="switchTab('browse')">返回浏览物品</button>
+    </section>
+
+    <form
+      v-if="activeTab !== 'favorites' || user.isLoggedIn"
+      class="panel"
+      @submit.prevent="searchItems"
+    >
       <div class="filters">
         <label class="field">
           <span>关键词</span>
@@ -120,7 +140,7 @@ onMounted(loadItems);
       </div>
     </form>
 
-    <section class="panel">
+    <section v-if="activeTab !== 'favorites' || user.isLoggedIn" class="panel">
       <p v-if="loading" role="status">正在加载物品…</p>
 
       <div v-else-if="error" role="alert">
