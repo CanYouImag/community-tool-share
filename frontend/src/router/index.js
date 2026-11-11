@@ -38,6 +38,12 @@ const routes = [
     meta: { title: '发布物品' },
   },
   {
+    path: '/publish/:id/edit',
+    name: 'edit-item',
+    component: () => import('@/views/items/PublishView.vue'),
+    meta: { title: '编辑物品' },
+  },
+  {
     path: '/orders',
     name: 'orders',
     component: () => import('@/views/orders/OrdersView.vue'),

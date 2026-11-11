@@ -118,6 +118,16 @@ onMounted(loadMyItems);
                 />
               </td>
               <td>
+                <router-link
+                  v-if="
+                    !savingId &&
+                    ['PENDING_REVIEW', 'AVAILABLE', 'REJECTED', 'PAUSED'].includes(item.status)
+                  "
+                  class="btn small"
+                  :to="{ name: 'edit-item', params: { id: item.id } }"
+                >
+                  编辑
+                </router-link>
                 <button
                   v-if="['AVAILABLE', 'PAUSED'].includes(item.status)"
                   class="btn small"
@@ -133,7 +143,14 @@ onMounted(loadMyItems);
                         : '恢复出租'
                   }}
                 </button>
-                <span v-else class="muted">—</span>
+                <span
+                  v-if="
+                    !['PENDING_REVIEW', 'AVAILABLE', 'REJECTED', 'PAUSED'].includes(item.status)
+                  "
+                  class="muted"
+                >
+                  —
+                </span>
               </td>
             </tr>
           </tbody>

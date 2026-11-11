@@ -35,7 +35,10 @@ function isActive(item) {
         <router-link
           to="/publish"
           :class="{
-            active: route.path === '/publish' || route.path === '/my-items',
+            active:
+              route.path === '/publish' ||
+              route.path.startsWith('/publish/') ||
+              route.path === '/my-items',
           }"
         >
           发布 / 我的物品

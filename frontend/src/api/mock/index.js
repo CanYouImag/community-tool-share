@@ -23,6 +23,81 @@ function setMockFavorite(id, favorited) {
 
 const delay = (data, ms = 200) => new Promise((resolve) => setTimeout(() => resolve(data), ms));
 
+function validateItemInput(params, existingImages = []) {
+  const user = useUserStore();
+
+  if (!user.isCertified) {
+    throw new Error('请先完成实名认证');
+  }
+
+  const membership = db.myMemberships.find(
+    (entry) => entry.id === params.communityId && entry.status === 'JOINED',
+  );
+  const community = db.communities.find((entry) => entry.id === params.communityId);
+
+  if (!membership || !community) {
+    throw new Error('只能向已加入的社区发布物品');
+  }
+
+  const title = String(params.title || '').trim();
+  const condition = String(params.condition || '').trim();
+  const description = String(params.description || '').trim();
+
+  if (!title || !condition || !description) {
+    throw new Error('请填写标题、成色说明和物品描述');
+  }
+
+  if (!ITEM_CATEGORY.includes(params.category)) {
+    throw new Error('物品分类无效');
+  }
+
+  const moneyPattern = /^\d+(?:\.\d{1,2})?$/;
+  const dailyPrice = Number(params.dailyPrice);
+  const deposit = Number(params.deposit);
+
+  if (
+    !moneyPattern.test(String(params.dailyPrice)) ||
+    !moneyPattern.test(String(params.deposit)) ||
+    !Number.isFinite(dailyPrice) ||
+    !Number.isFinite(deposit) ||
+    dailyPrice <= 0 ||
+    deposit < 0
+  ) {
+    throw new Error('租金必须大于零，押金不能为负，金额最多两位小数');
+  }
+
+  if (deposit > 500 && user.credit < 60) {
+    throw new Error('信用分不足，无法发布高押金物品');
+  }
+
+  const pictures = params.images;
+
+  if (
+    !Array.isArray(pictures) ||
+    pictures.length === 0 ||
+    pictures.some(
+      (image) =>
+        typeof image !== 'string' ||
+        (!existingImages.includes(image) && !/^data:image\/(?:jpeg|png|webp);base64,/.test(image)),
+    )
+  ) {
+    throw new Error('请至少保留或上传一张有效图片');
+  }
+
+  return {
+    title,
+    category: params.category,
+    condition,
+    description,
+    dailyPrice,
+    deposit,
+    communityId: community.id,
+    communityName: community.name,
+    image: pictures[0],
+    images: [...pictures],
+  };
+}
+
 // 按 url 匹配处理器
 const handlers = [
   {
@@ -76,79 +151,14 @@ const handlers = [
     pattern: /^\/v1\/items$/,
     handler: (params) => {
       const user = useUserStore();
-
-      if (!user.isCertified) {
-        throw new Error('请先完成实名认证');
-      }
-
-      const membership = db.myMemberships.find(
-        (entry) => entry.id === params.communityId && entry.status === 'JOINED',
-      );
-      const community = db.communities.find((entry) => entry.id === params.communityId);
-
-      if (!membership || !community) {
-        throw new Error('只能向已加入的社区发布物品');
-      }
-
-      const title = String(params.title || '').trim();
-      const condition = String(params.condition || '').trim();
-      const description = String(params.description || '').trim();
-
-      if (!title || !condition || !description) {
-        throw new Error('请填写标题、成色说明和物品描述');
-      }
-
-      if (!ITEM_CATEGORY.includes(params.category)) {
-        throw new Error('物品分类无效');
-      }
-
-      const moneyPattern = /^\d+(?:\.\d{1,2})?$/;
-      const dailyPrice = Number(params.dailyPrice);
-      const deposit = Number(params.deposit);
-
-      if (
-        !moneyPattern.test(String(params.dailyPrice)) ||
-        !moneyPattern.test(String(params.deposit)) ||
-        !Number.isFinite(dailyPrice) ||
-        !Number.isFinite(deposit) ||
-        dailyPrice <= 0 ||
-        deposit < 0
-      ) {
-        throw new Error('租金必须大于零，押金不能为负，金额最多两位小数');
-      }
-
-      if (deposit > 500 && user.credit < 60) {
-        throw new Error('信用分不足，无法发布高押金物品');
-      }
-
-      const pictures = params.images;
-
-      if (
-        !Array.isArray(pictures) ||
-        pictures.length === 0 ||
-        pictures.some(
-          (image) =>
-            typeof image !== 'string' || !/^data:image\/(?:jpeg|png|webp);base64,/.test(image),
-        )
-      ) {
-        throw new Error('请至少上传一张有效图片');
-      }
+      const fields = validateItemInput(params);
 
       const item = {
+        ...fields,
         id: `i_${crypto.randomUUID()}`,
-        title,
-        category: params.category,
-        condition,
-        description,
-        dailyPrice,
-        deposit,
-        communityId: community.id,
-        communityName: community.name,
         ownerId: user.id,
         owner: user.name,
         ownerCredit: user.credit,
-        image: pictures[0],
-        images: [...pictures],
         status: 'PENDING_REVIEW',
         createdAt: new Date().toISOString(),
       };
@@ -156,6 +166,66 @@ const handlers = [
       db.items.unshift(item);
 
       return { id: item.id, status: item.status };
+    },
+  },
+  {
+    method: 'PUT',
+    pattern: /^\/v1\/items\/([^/]+)$/,
+    handler: (params, matches) => {
+      const user = useUserStore();
+      const id = decodeURIComponent(matches[1]);
+      const item = db.items.find((item) => item.id === id);
+
+      if (!user.isCertified) {
+        throw new Error('请先完成实名认证');
+      }
+
+      if (!item || item.ownerId !== user.id) {
+        throw new Error('物品不存在或无权操作');
+      }
+
+      const editableStatuses = ['PENDING_REVIEW', 'AVAILABLE', 'REJECTED', 'PAUSED'];
+
+      if (!editableStatuses.includes(item.status ?? 'AVAILABLE')) {
+        throw new Error('当前状态不允许编辑');
+      }
+
+      const existingImages = item.images || (item.image ? [item.image] : []);
+      const fields = validateItemInput(params, existingImages);
+
+      // 全部校验通过后才修改原记录
+      Object.assign(item, fields, {
+        status: 'PENDING_REVIEW',
+        updatedAt: new Date().toISOString(),
+      });
+
+      return { id: item.id, status: item.status };
+    },
+  },
+  {
+    method: 'GET',
+    pattern: /^\/v1\/items\/mine\/([^/]+)$/,
+    handler: (_params, matches) => {
+      const user = useUserStore();
+      const id = decodeURIComponent(matches[1]);
+      const item = db.items.find((item) => item.id === id);
+
+      if (!user.isCertified) {
+        throw new Error('请先完成实名认证');
+      }
+
+      if (!item || item.ownerId !== user.id) {
+        throw new Error('物品不存在或无权操作');
+      }
+
+      if (item.status === 'REMOVED') {
+        throw new Error('违规下架的物品不能编辑');
+      }
+
+      return {
+        ...item,
+        images: [...(item.images || (item.image ? [item.image] : []))],
+      };
     },
   },
   {

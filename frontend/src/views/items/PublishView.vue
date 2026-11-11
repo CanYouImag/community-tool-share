@@ -1,17 +1,22 @@
 <script setup>
 import { getMyMemberships } from '@/api/modules/community';
-import { createItem } from '@/api/modules/item';
+import { createItem, getMyItem, updateItem } from '@/api/modules/item';
 import { useUserStore } from '@/store/user';
 import { ITEM_CATEGORY } from '@/utils/constants';
-import { onBeforeUnmount, onMounted, reactive, ref } from 'vue';
-import { onBeforeRouteLeave, useRouter } from 'vue-router';
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
+import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 
 const router = useRouter();
+const route = useRoute();
+const isEdit = computed(() => Boolean(route.params.id));
+const editLoading = ref(false);
+const editLoadError = ref('');
 const user = useUserStore();
 const submitting = ref(false);
 
 // 提交时暂时阻止跳转
 onBeforeRouteLeave(() => !submitting.value);
+onBeforeRouteUpdate(() => !submitting.value);
 
 const form = reactive({
   title: '',
@@ -42,7 +47,7 @@ async function loadJoinedCommunities() {
       (community) => community.id === form.communityId,
     );
 
-    if (!selectionExists) {
+    if (!selectionExists && !isEdit.value) {
       form.communityId = joinedCommunities.value[0]?.id || '';
     }
   } catch (err) {
@@ -82,6 +87,7 @@ function selectImages(event) {
 
   images.value.push(
     ...files.map((file) => ({
+      key: crypto.randomUUID(),
       file,
       url: URL.createObjectURL(file),
     })),
@@ -91,7 +97,7 @@ function selectImages(event) {
 function removeImage(index) {
   const [removed] = images.value.splice(index, 1);
 
-  if (removed) {
+  if (removed?.file) {
     URL.revokeObjectURL(removed.url);
   }
 
@@ -99,11 +105,16 @@ function removeImage(index) {
   message.value = '';
 }
 
-onBeforeUnmount(() => {
+function releaseImages() {
   images.value.forEach((image) => {
-    URL.revokeObjectURL(image.url);
+    if (image.file) {
+      URL.revokeObjectURL(image.url);
+    }
   });
-});
+  images.value = [];
+}
+
+onBeforeUnmount(releaseImages);
 
 function checkForm() {
   error.value = '';
@@ -169,11 +180,14 @@ function readImage(file) {
 }
 
 async function submitItem() {
-  if (submitting.value || !checkForm()) return;
+  if (submitting.value || editLoading.value || editLoadError.value || !checkForm()) {
+    return;
+  }
 
   submitting.value = true;
 
-  // 在异步读取图片前保存本次提交的数据
+  const editingId = isEdit.value ? String(route.params.id) : null;
+
   const payload = {
     title: form.title.trim(),
     category: form.category,
@@ -183,13 +197,23 @@ async function submitItem() {
     condition: form.condition.trim(),
     description: form.description.trim(),
   };
-  const files = images.value.map((image) => image.file);
+
+  const pictureSnapshot = images.value.map((image) => ({
+    file: image.file,
+    url: image.url,
+  }));
 
   try {
-    payload.images = await Promise.all(files.map(readImage));
-    await createItem(payload);
+    payload.images = await Promise.all(
+      pictureSnapshot.map((image) => (image.file ? readImage(image.file) : image.url)),
+    );
 
-    // 放行随后跳转到“我的物品”的导航
+    if (editingId) {
+      await updateItem(editingId, payload);
+    } else {
+      await createItem(payload);
+    }
+
     submitting.value = false;
     await router.push('/my-items');
   } catch (err) {
@@ -198,14 +222,78 @@ async function submitItem() {
     submitting.value = false;
   }
 }
+
+watch(
+  () => route.params.id,
+  async (id, _oldId, onCleanup) => {
+    let cancelled = false;
+    onCleanup(() => {
+      cancelled = true;
+    });
+
+    releaseImages();
+    error.value = '';
+    message.value = '';
+    editLoadError.value = '';
+    editLoading.value = Boolean(id);
+
+    Object.assign(form, {
+      title: '',
+      category: '',
+      communityId: joinedCommunities.value[0]?.id || '',
+      dailyPrice: '',
+      deposit: '',
+      condition: '',
+      description: '',
+    });
+
+    if (!id) return;
+
+    try {
+      const item = await getMyItem(id);
+      if (cancelled) return;
+
+      Object.assign(form, {
+        title: item.title,
+        category: item.category,
+        communityId: item.communityId,
+        dailyPrice: item.dailyPrice,
+        deposit: item.deposit,
+        condition: item.condition || '',
+        description: item.description || '',
+      });
+
+      images.value = item.images.map((url, index) => ({
+        key: `saved-${index}`,
+        file: null,
+        url,
+      }));
+    } catch (err) {
+      if (!cancelled) {
+        editLoadError.value = err.message || '物品加载失败';
+      }
+    } finally {
+      if (!cancelled) {
+        editLoading.value = false;
+      }
+    }
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
   <main class="public-main">
     <header class="page-head">
       <div>
-        <h1>发布物品</h1>
-        <p>填写物品信息，审核通过后即可上架出租。</p>
+        <h1>{{ isEdit ? '编辑物品' : '发布物品' }}</h1>
+        <p>
+          {{
+            isEdit
+              ? '修改后需重新审核，通过后才能上架出租。'
+              : '填写物品信息，审核通过后即可上架出租。'
+          }}
+        </p>
       </div>
       <div class="actions">
         <router-link class="btn" to="/my-items"> 我的物品 </router-link>
@@ -213,7 +301,14 @@ async function submitItem() {
       </div>
     </header>
 
-    <div class="two">
+    <section v-if="editLoading" class="panel" role="status">正在加载物品…</section>
+
+    <section v-else-if="editLoadError" class="panel" role="alert">
+      <p>{{ editLoadError }}</p>
+      <router-link class="btn" to="/my-items"> 返回我的物品 </router-link>
+    </section>
+
+    <div v-else class="two">
       <div>
         <form
           class="panel"
@@ -346,11 +441,11 @@ async function submitItem() {
               <p class="help">已选择 {{ images.length }} 张，第一张作为封面。</p>
 
               <div class="thumbs">
-                <div v-for="(image, index) in images" :key="image.url">
+                <div v-for="(image, index) in images" :key="image.key">
                   <img
                     class="art small"
                     :src="image.url"
-                    :alt="`物品图片 ${index + 1}：${image.file.name}`"
+                    :alt="`物品图片 ${index + 1}：${image.file?.name || '已保存图片'}`"
                   />
                   <button
                     class="btn small"
@@ -371,7 +466,7 @@ async function submitItem() {
 
             <div class="actions">
               <button class="btn primary" type="submit" :disabled="submitting || communityLoading">
-                {{ submitting ? '正在提交…' : '提交审核' }}
+                {{ submitting ? '正在提交…' : isEdit ? '保存并重新提交审核' : '提交审核' }}
               </button>
               <router-link class="btn" to="/items"> 取消 </router-link>
             </div>
