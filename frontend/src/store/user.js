@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { computed } from 'vue';
-import { useAuthStore } from './auth';
+
+import { useAuthStore } from '@/store/auth';
 
 // 物品模块沿用此接口，身份统一来自真实登录状态，不再维护预设用户。
 export const useUserStore = defineStore('user', () => {

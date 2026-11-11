@@ -1,11 +1,11 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { useAuthStore } from '@/store/auth';
+
 import { getWallet } from '@/api/modules/wallet';
+import ViewTabs from '@/components/ViewTabs.vue';
+import { useAuthStore } from '@/store/auth';
 import { formatAmount } from '@/utils/format';
 
-const router = useRouter();
 const auth = useAuthStore();
 
 const activeTab = ref('profile');
@@ -153,28 +153,13 @@ async function submitRealName() {
   }
 }
 
-function goLogin() {
-  if (router.hasRoute('login')) {
-    router.push('/login');
-  } else {
-    pageError.value = '登录页路由尚未注册，请先在 router/index.js 引入 authRoutes';
-  }
-}
-
-async function logout() {
-  await auth.logout();
-  router.push(router.hasRoute('login') ? '/login' : '/community');
-}
-
 onMounted(load);
 </script>
 
 <template>
   <main class="public-main">
     <header class="page-head">
-      <div>
-        <h1>个人中心</h1>
-      </div>
+      <h1>个人中心</h1>
     </header>
 
     <div v-if="!auth.isLoggedIn" class="narrow">
@@ -183,7 +168,7 @@ onMounted(load);
         <p class="muted">登录后可以查看个人资料、实名认证和钱包信息。</p>
         <p v-if="pageError" class="form-message error">{{ pageError }}</p>
         <div class="actions">
-          <button class="btn primary" type="button" @click="goLogin">去登录</button>
+          <router-link class="btn primary" to="/login">去登录</router-link>
           <router-link class="btn" to="/community">先逛逛社区</router-link>
         </div>
       </section>
@@ -195,23 +180,9 @@ onMounted(load);
       <section v-if="loading" class="panel">正在加载个人资料…</section>
 
       <template v-else>
-        <nav class="view-tabs" role="tablist" aria-label="个人中心">
-          <a
-            v-for="tab in tabs"
-            :key="tab.id"
-            class="view-tab"
-            :href="`#${tab.id}`"
-            role="tab"
-            :aria-selected="activeTab === tab.id"
-            @click.prevent="activeTab = tab.id"
-          >
-            {{ tab.label }}
-          </a>
-        </nav>
+        <ViewTabs v-model="activeTab" :tabs="tabs" label="个人中心" />
 
-        <section v-show="activeTab === 'profile'" class="view-panel" role="tabpanel">
-          <h2 class="view-heading">我的资料</h2>
-
+        <section v-show="activeTab === 'profile'" class="view-panel">
           <section class="panel">
             <div class="row">
               <span class="avatar large">{{ avatarText }}</span>
@@ -302,8 +273,7 @@ onMounted(load);
           </div>
         </section>
 
-        <section v-show="activeTab === 'settings'" class="view-panel" role="tabpanel">
-          <h2 class="view-heading">编辑资料</h2>
+        <section v-show="activeTab === 'settings'" class="view-panel">
           <div class="two">
             <div>
               <form class="panel" @submit.prevent="saveProfile">
@@ -313,9 +283,7 @@ onMounted(load);
 
                 <div class="row">
                   <span class="avatar large">{{ avatarText }}</span>
-                  <div class="grow">
-                    <small>演示阶段使用图片地址，上传接口后续接入。</small>
-                  </div>
+                  <div class="grow"></div>
                 </div>
 
                 <hr class="rule" />
@@ -395,7 +363,6 @@ onMounted(load);
 
                   <div class="actions">
                     <button class="btn primary" type="submit">修改密码</button>
-                    <button class="btn danger" type="button" @click="logout">退出登录</button>
                   </div>
                 </form>
               </section>
@@ -403,8 +370,7 @@ onMounted(load);
           </div>
         </section>
 
-        <section v-show="activeTab === 'verify'" class="view-panel" role="tabpanel">
-          <h2 class="view-heading">实名认证</h2>
+        <section v-show="activeTab === 'verify'" class="view-panel">
           <div class="narrow">
             <section class="panel">
               <div class="panel-title">

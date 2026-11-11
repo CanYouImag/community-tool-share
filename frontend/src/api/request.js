@@ -1,8 +1,10 @@
+import axios from 'axios';
+
+import { matchMock } from '@/api/mock/index';
+import { useAuthStore } from '@/store/auth';
+
 // axios 统一封装
 // Mock 阶段：__USE_MOCK__ 为 true 时走本地假数据；接口就绪后置为 false 即透传真实后端
-import axios from 'axios';
-import { matchMock } from './mock/index';
-import { useAuthStore } from '../store/auth';
 
 const http = axios.create({
   baseURL: '/api',

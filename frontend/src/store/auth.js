@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+
 import * as authApi from '@/api/modules/auth';
 
 const TOKEN_KEY = 'cts_token';

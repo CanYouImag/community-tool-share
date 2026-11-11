@@ -1,11 +1,12 @@
 <script setup>
+import { computed, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
+
 import { favoriteItem, getItem, unfavoriteItem } from '@/api/modules/item';
 import ItemAvailabilityCalendar from '@/components/ItemAvailabilityCalendar.vue';
 import { useUserStore } from '@/store/user';
 import { formatDate, formatMoney, formatRating } from '@/utils/format';
 import { pickItemListQuery } from '@/utils/itemListRoute';
-import { computed, ref, watch } from 'vue';
-import { useRoute } from 'vue-router';
 
 const route = useRoute();
 const returnToList = computed(() => ({ name: 'items', query: pickItemListQuery(route.query) }));
@@ -98,9 +99,7 @@ watch(
 <template>
   <main class="public-main">
     <header class="page-head">
-      <div>
-        <h1>物品详情</h1>
-      </div>
+      <h1>物品详情</h1>
       <router-link class="btn" :to="returnToList"> 返回物品广场 </router-link>
     </header>
 

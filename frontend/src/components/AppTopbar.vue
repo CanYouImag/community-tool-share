@@ -1,6 +1,7 @@
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+
 import { useAuthStore } from '@/store/auth';
 
 const route = useRoute();
@@ -21,16 +22,15 @@ async function logout() {
   }
 }
 
-// 顶部导航项，active 由路由匹配决定
-const navItems = [
-  { path: '/orders', label: '我的订单', match: ['orders'] },
-  { path: '/community', label: '社区', match: ['community'] },
-  { path: '/wallet', label: '钱包', match: ['wallet'] },
-];
-
-function isActive(item) {
-  return item.match.some((seg) => route.path.includes(seg));
-}
+// 详情、编辑等页面的导航归属统一在路由 meta.nav 中声明。
+const navItems = computed(() => [
+  { to: '/items', label: '物品广场' },
+  { to: '/community', label: '社区' },
+  { to: '/publish', label: '发布 / 我的物品' },
+  { to: '/orders', label: '我的订单' },
+  { to: '/wallet', label: '钱包' },
+  auth.isLoggedIn ? { to: '/account', label: '个人中心' } : { to: '/login', label: '登录 / 注册' },
+]);
 </script>
 
 <template>
@@ -42,38 +42,23 @@ function isActive(item) {
       </router-link>
       <nav class="nav" aria-label="主导航">
         <router-link
-          to="/items"
-          :class="{ active: route.path === '/items' || route.path.startsWith('/items/') }"
+          v-for="item in navItems"
+          :key="item.to"
+          :to="item.to"
+          :class="{ active: route.meta.nav === item.to }"
+          :aria-current="route.meta.nav === item.to ? 'location' : undefined"
         >
-          物品广场
+          {{ item.label }}
         </router-link>
-        <router-link to="/community" class="" :class="{ active: isActive(navItems[1]) }">
-          社区
-        </router-link>
-        <router-link
-          to="/publish"
-          :class="{
-            active:
-              route.path === '/publish' ||
-              route.path.startsWith('/publish/') ||
-              route.path === '/my-items',
-          }"
+        <button
+          v-if="auth.isLoggedIn"
+          class="btn small"
+          type="button"
+          :disabled="loggingOut"
+          @click="logout"
         >
-          发布 / 我的物品
-        </router-link>
-        <router-link to="/orders" class="" :class="{ active: isActive(navItems[0]) }">
-          我的订单
-        </router-link>
-        <router-link to="/wallet" class="" :class="{ active: isActive(navItems[2]) }">
-          钱包
-        </router-link>
-        <template v-if="auth.isLoggedIn">
-          <router-link to="/account" active-class="active"> 个人中心 </router-link>
-          <button class="btn small" type="button" :disabled="loggingOut" @click="logout">
-            {{ loggingOut ? '正在退出…' : '退出登录' }}
-          </button>
-        </template>
-        <router-link v-else to="/login" active-class="active"> 登录 / 注册 </router-link>
+          {{ loggingOut ? '正在退出…' : '退出登录' }}
+        </button>
       </nav>
     </div>
   </header>

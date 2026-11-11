@@ -1,17 +1,18 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue';
-import CommunityCard from '@/components/CommunityCard.vue';
-import ItemCard from '@/components/ItemCard.vue';
-import StatusBadge from '@/components/StatusBadge.vue';
-import EmptyState from '@/components/EmptyState.vue';
-import Pagination from '@/components/Pagination.vue';
+
 import {
   getCommunities,
   getCommunityHome,
   getMyMemberships,
   joinCommunity,
 } from '@/api/modules/community';
-import { MEMBER_STATUS } from '@/utils/constants';
+import CommunityCard from '@/components/CommunityCard.vue';
+import EmptyState from '@/components/EmptyState.vue';
+import ItemCard from '@/components/ItemCard.vue';
+import Pagination from '@/components/Pagination.vue';
+import StatusBadge from '@/components/StatusBadge.vue';
+import ViewTabs from '@/components/ViewTabs.vue';
 
 // 页内 Tab
 const tabs = [
@@ -93,10 +94,6 @@ async function applyJoin(c) {
   }
 }
 
-function memberBadge(status) {
-  return status === 'JOINED' ? MEMBER_STATUS.JOINED : MEMBER_STATUS.PENDING;
-}
-
 onMounted(() => {
   loadCommunities();
   loadMemberships();
@@ -106,28 +103,18 @@ onMounted(() => {
 <template>
   <main class="public-main">
     <header class="page-head">
-      <div>
-        <h1>社区</h1>
-      </div>
+      <h1>社区</h1>
     </header>
 
-    <nav class="view-tabs" role="tablist" aria-label="页内功能">
-      <a
-        v-for="t in tabs"
-        :key="t.id"
-        class="view-tab"
-        :href="`#${t.id}`"
-        role="tab"
-        :aria-selected="activeTab === t.id"
-        @click.prevent="switchTab(t.id)"
-      >
-        {{ t.label }}
-      </a>
-    </nav>
+    <ViewTabs
+      :model-value="activeTab"
+      :tabs="tabs"
+      label="社区功能"
+      @update:model-value="switchTab"
+    />
 
     <!-- 发现社区 -->
     <section v-show="activeTab === 'discover'" class="view-panel">
-      <h2 class="view-heading">发现社区</h2>
       <section class="panel">
         <div class="filters">
           <label class="field">
@@ -161,7 +148,6 @@ onMounted(() => {
 
     <!-- 社区主页 -->
     <section v-show="activeTab === 'home'" class="view-panel">
-      <h2 class="view-heading">社区主页</h2>
       <template v-if="currentCommunity">
         <section class="panel">
           <div class="row between">
@@ -172,9 +158,14 @@ onMounted(() => {
                 在租物品 {{ currentCommunity.onRent }} 件
               </p>
             </div>
-            <a v-if="!joinState" class="btn primary" @click="applyJoin(currentCommunity)"
-              >申请加入</a
+            <button
+              type="button"
+              v-if="!joinState"
+              class="btn primary"
+              @click="applyJoin(currentCommunity)"
             >
+              申请加入
+            </button>
             <span v-else-if="joinState === 'APPLIED'" class="badge warn">待审核</span>
             <span v-else class="badge">已加入</span>
           </div>
@@ -185,7 +176,6 @@ onMounted(() => {
         <section class="panel">
           <div class="panel-title">
             <h2>置顶推荐</h2>
-            <span class="badge">本社区最多置顶 3 件</span>
           </div>
           <EmptyState v-if="!homeData.top.length" text="暂无置顶物品" />
           <div v-else class="item-grid">
@@ -213,7 +203,6 @@ onMounted(() => {
 
     <!-- 我的社区 -->
     <section v-show="activeTab === 'joined'" class="view-panel">
-      <h2 class="view-heading">我的社区</h2>
       <section class="panel">
         <div class="panel-title">
           <h2>成员关系</h2>
@@ -237,14 +226,16 @@ onMounted(() => {
                 <td>{{ m.time }}</td>
                 <td>
                   <div class="actions">
-                    <a
+                    <button
+                      type="button"
                       v-if="m.status === 'JOINED'"
-                      class=""
+                      class="link-button"
                       @click="enterCommunity(allCommunities.find((c) => c.id === m.id))"
-                      >社区主页</a
                     >
+                      社区主页
+                    </button>
                     <template v-if="m.status === 'JOINED'">
-                      <a class="">退出社区</a>
+                      <button disabled type="button" class="link-button">退出社区</button>
                     </template>
                     <span v-else>等待审核</span>
                   </div>

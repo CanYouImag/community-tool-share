@@ -1,14 +1,13 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import StatusBadge from '@/components/StatusBadge.vue';
-import Pagination from '@/components/Pagination.vue';
-import EmptyState from '@/components/EmptyState.vue';
+
 import { getWallet, getFlows, getDeposits } from '@/api/modules/wallet';
+import EmptyState from '@/components/EmptyState.vue';
+import Pagination from '@/components/Pagination.vue';
+import StatusBadge from '@/components/StatusBadge.vue';
+import ViewTabs from '@/components/ViewTabs.vue';
 import { FLOW_TYPE, FLOW_TYPE_FILTER } from '@/utils/constants';
 import { formatAmount } from '@/utils/format';
-
-const router = useRouter();
 
 const wallet = ref(null);
 const flows = ref([]);
@@ -55,9 +54,7 @@ onMounted(load);
 <template>
   <main class="public-main">
     <header class="page-head">
-      <div>
-        <h1>钱包</h1>
-      </div>
+      <h1>钱包</h1>
     </header>
 
     <div class="stats">
@@ -79,23 +76,10 @@ onMounted(load);
       </div>
     </div>
 
-    <nav class="view-tabs" role="tablist" aria-label="页内功能">
-      <a
-        v-for="t in tabs"
-        :key="t.id"
-        class="view-tab"
-        :href="`#${t.id}`"
-        role="tab"
-        :aria-selected="activeTab === t.id"
-        @click.prevent="activeTab = t.id"
-      >
-        {{ t.label }}
-      </a>
-    </nav>
+    <ViewTabs v-model="activeTab" :tabs="tabs" label="钱包明细" />
 
     <!-- 资金流水 -->
     <section v-show="activeTab === 'flows'" class="view-panel">
-      <h2 class="view-heading">资金流水</h2>
       <section class="panel">
         <div class="filters">
           <label class="field">
@@ -127,11 +111,10 @@ onMounted(load);
                 <td>{{ flowText(f) }}</td>
                 <td>{{ f.orderId || f.remark }}</td>
                 <td>
-                  <a
+                  <router-link
                     v-if="f.orderId"
-                    class=""
-                    @click="router.push({ name: 'order-detail', params: { id: f.orderId } })"
-                    >订单详情</a
+                    :to="{ name: 'order-detail', params: { id: f.orderId } }"
+                    >订单详情</router-link
                   >
                   <span v-else>—</span>
                 </td>
@@ -145,7 +128,6 @@ onMounted(load);
 
     <!-- 押金明细 -->
     <section v-show="activeTab === 'deposits'" class="view-panel">
-      <h2 class="view-heading">押金明细</h2>
       <section class="panel">
         <EmptyState v-if="!deposits.length" text="暂无押金记录" />
         <div v-else class="table-wrap">

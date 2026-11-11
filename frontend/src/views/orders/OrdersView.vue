@@ -1,13 +1,17 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import StatusBadge from '@/components/StatusBadge.vue';
-import Pagination from '@/components/Pagination.vue';
-import EmptyState from '@/components/EmptyState.vue';
+
 import { getOrders } from '@/api/modules/order';
+import EmptyState from '@/components/EmptyState.vue';
+import Pagination from '@/components/Pagination.vue';
+import StatusBadge from '@/components/StatusBadge.vue';
+import ViewTabs from '@/components/ViewTabs.vue';
 import { ORDER_STATUS_FILTER } from '@/utils/constants';
 
-const router = useRouter();
+const tabs = [
+  { id: 'borrow', label: '我租入的' },
+  { id: 'lend', label: '我租出的' },
+];
 
 const activeTab = ref('borrow'); // borrow | lend
 const keyword = ref('');
@@ -26,12 +30,18 @@ async function load() {
   total.value = res.total;
 }
 
+function resetFilters() {
+  keyword.value = '';
+  status.value = '';
+  load();
+}
+
 function switchTab(tab) {
   activeTab.value = tab;
   load();
 }
 
-function goDetail(order, action) {
+function orderLocation(order) {
   // 不同状态跳转对应订单阶段锚点（Mock 阶段统一到详情页）
   const hash =
     {
@@ -46,7 +56,7 @@ function goDetail(order, action) {
       DISPUTED: 'renting',
       CLOSED: 'complete',
     }[order.status] || 'pending';
-  router.push({ name: 'order-detail', params: { id: order.id }, hash: `#${hash}` });
+  return { name: 'order-detail', params: { id: order.id }, hash: `#${hash}` };
 }
 
 // 操作文案：区分租入/租出视角
@@ -73,32 +83,17 @@ onMounted(load);
 <template>
   <main class="public-main">
     <header class="page-head">
-      <div>
-        <h1>我的订单</h1>
-      </div>
+      <h1>我的订单</h1>
     </header>
 
-    <nav class="view-tabs" role="tablist" aria-label="页内功能">
-      <a
-        class="view-tab"
-        href="#borrow"
-        role="tab"
-        :aria-selected="activeTab === 'borrow'"
-        @click.prevent="switchTab('borrow')"
-        >我租入的</a
-      >
-      <a
-        class="view-tab"
-        href="#lend"
-        role="tab"
-        :aria-selected="activeTab === 'lend'"
-        @click.prevent="switchTab('lend')"
-        >我租出的</a
-      >
-    </nav>
+    <ViewTabs
+      :model-value="activeTab"
+      :tabs="tabs"
+      label="订单类型"
+      @update:model-value="switchTab"
+    />
 
     <section class="view-panel">
-      <h2 class="view-heading">{{ activeTab === 'borrow' ? '我租入的' : '我租出的' }}</h2>
       <section class="panel">
         <div class="filters">
           <label class="field">
@@ -114,16 +109,8 @@ onMounted(load);
             </select>
           </label>
           <div class="actions">
-            <a class="btn primary" @click="load">搜索</a>
-            <a
-              class="btn"
-              @click="
-                keyword = '';
-                status = '';
-                load();
-              "
-              >清除筛选</a
-            >
+            <button type="button" class="btn primary" @click="load">搜索</button>
+            <button type="button" class="btn" @click="resetFilters">清除筛选</button>
           </div>
         </div>
 
@@ -151,7 +138,7 @@ onMounted(load);
                 <td>¥{{ o.rent }} / ¥{{ o.deposit }}</td>
                 <td><StatusBadge :status="o.status" /></td>
                 <td>
-                  <a class="" @click="goDetail(o)">{{ actionText(o) }}</a>
+                  <router-link :to="orderLocation(o)">{{ actionText(o) }}</router-link>
                 </td>
               </tr>
             </tbody>

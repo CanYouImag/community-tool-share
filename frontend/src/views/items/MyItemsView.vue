@@ -1,11 +1,12 @@
 <script setup>
+import { onMounted, ref } from 'vue';
+
 import { deleteItem, getMyItems, updateItemStatus } from '@/api/modules/item';
 import EmptyState from '@/components/EmptyState.vue';
 import StatusBadge from '@/components/StatusBadge.vue';
 import { useUserStore } from '@/store/user';
 import { ITEM_STATUS } from '@/utils/constants';
 import { formatMoney } from '@/utils/format';
-import { onMounted, ref } from 'vue';
 
 const user = useUserStore();
 const items = ref([]);
@@ -69,6 +70,11 @@ async function removeItem(item) {
   }
 }
 
+function changeFilter() {
+  actionError.value = '';
+  loadMyItems();
+}
+
 async function loadMyItems() {
   if (!user.isLoggedIn) {
     items.value = [];
@@ -97,10 +103,7 @@ onMounted(loadMyItems);
 <template>
   <main class="public-main">
     <header class="page-head">
-      <div>
-        <h1>我的物品</h1>
-        <p>查看自己发布的物品及审核状态。</p>
-      </div>
+      <h1>我的物品</h1>
       <router-link v-if="user.isCertified" class="btn primary" to="/publish">
         发布物品
       </router-link>
@@ -122,10 +125,7 @@ onMounted(loadMyItems);
           <select
             v-model="selectedStatus"
             :disabled="loading || Boolean(savingId)"
-            @change="
-              actionError = '';
-              loadMyItems();
-            "
+            @change="changeFilter"
           >
             <option value="">全部状态</option>
             <option v-for="(state, value) in ITEM_STATUS" :key="value" :value="value">

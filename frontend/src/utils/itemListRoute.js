@@ -1,5 +1,5 @@
-import { ITEM_CATEGORY } from './constants';
-import { ITEM_SORT_OPTIONS, parsePriceRange } from './itemFilters';
+import { ITEM_CATEGORY } from '@/utils/constants';
+import { ITEM_SORT_OPTIONS, parsePriceRange } from '@/utils/itemFilters';
 
 const routeKeys = [
   'tab',

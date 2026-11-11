@@ -1,15 +1,22 @@
 <script setup>
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+
 import { getCommunities } from '@/api/modules/community';
 import { getItems } from '@/api/modules/item';
 import EmptyState from '@/components/EmptyState.vue';
 import ItemCard from '@/components/ItemCard.vue';
 import Pagination from '@/components/Pagination.vue';
+import ViewTabs from '@/components/ViewTabs.vue';
 import { useUserStore } from '@/store/user';
 import { ITEM_CATEGORY } from '@/utils/constants';
 import { ITEM_SORT_OPTIONS, parsePriceRange } from '@/utils/itemFilters';
 import { itemListQuery, readItemListQuery } from '@/utils/itemListRoute';
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+
+const tabs = [
+  { id: 'browse', label: '浏览物品' },
+  { id: 'favorites', label: '我的收藏' },
+];
 
 const user = useUserStore();
 const route = useRoute();
@@ -210,36 +217,15 @@ onBeforeUnmount(() => {
 
 <template>
   <main class="public-main">
-    <div class="page-head">
-      <div>
-        <h1>物品广场</h1>
-        <p>发现邻里好物，让闲置工具流动起来。</p>
-      </div>
-    </div>
+    <header class="page-head"><h1>物品广场</h1></header>
 
-    <div class="view-tabs" role="group" aria-label="物品列表范围">
-      <button
-        class="btn"
-        :class="{ primary: activeTab === 'browse' }"
-        type="button"
-        :aria-pressed="activeTab === 'browse'"
-        :disabled="loading"
-        @click="switchTab('browse')"
-      >
-        浏览物品
-      </button>
-
-      <button
-        class="btn"
-        :class="{ primary: activeTab === 'favorites' }"
-        type="button"
-        :aria-pressed="activeTab === 'favorites'"
-        :disabled="loading"
-        @click="switchTab('favorites')"
-      >
-        我的收藏
-      </button>
-    </div>
+    <ViewTabs
+      :model-value="activeTab"
+      :tabs="tabs"
+      :disabled="loading"
+      label="物品列表范围"
+      @update:model-value="switchTab"
+    />
 
     <section v-if="activeTab === 'favorites' && !user.isLoggedIn" class="panel" role="alert">
       <h2>请先登录</h2>
@@ -260,7 +246,7 @@ onBeforeUnmount(() => {
             :disabled="loading || communityLoading"
             @change="searchItems"
           >
-            <option v-if="user.isLoggedIn" value="joined">已加入社区（未加入时展示全部）</option>
+            <option v-if="user.isLoggedIn" value="joined">已加入社区</option>
             <option value="all">全部社区</option>
             <option v-for="community in communities" :key="community.id" :value="community.id">
               {{ community.name }}
@@ -361,13 +347,6 @@ onBeforeUnmount(() => {
       </div>
 
       <template v-else>
-        <div class="panel-title">
-          <h2>
-            {{ activeTab === 'favorites' ? '我的收藏' : '浏览物品' }}
-          </h2>
-          <small>共 {{ total }} 件物品</small>
-        </div>
-
         <EmptyState
           v-if="items.length === 0"
           :text="activeTab === 'favorites' ? '没有符合条件的收藏物品' : '没有符合条件的物品'"

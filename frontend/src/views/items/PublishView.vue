@@ -1,10 +1,11 @@
 <script setup>
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
+import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
+
 import { getMyMemberships } from '@/api/modules/community';
 import { createItem, getMyItem, updateItem } from '@/api/modules/item';
 import { useUserStore } from '@/store/user';
 import { ITEM_CATEGORY } from '@/utils/constants';
-import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
-import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 
 const router = useRouter();
 const route = useRoute();
@@ -30,6 +31,11 @@ const message = ref('');
 const joinedCommunities = ref([]);
 const communityLoading = ref(true);
 const communityError = ref('');
+
+function clearFeedback() {
+  message.value = '';
+  error.value = '';
+}
 
 async function loadJoinedCommunities() {
   if (!user.isLoggedIn || !user.isCertified) {
@@ -365,32 +371,19 @@ watch(
 <template>
   <main class="public-main">
     <header class="page-head">
-      <div>
-        <h1>{{ isEdit ? '编辑物品' : '发布物品' }}</h1>
-        <p>
-          {{
-            isEdit
-              ? '修改后需重新审核，通过后才能上架出租。'
-              : '填写物品信息，审核通过后即可上架出租。'
-          }}
-        </p>
-      </div>
+      <h1>{{ isEdit ? '编辑物品' : '发布物品' }}</h1>
       <div class="actions">
         <router-link class="btn" to="/my-items"> 我的物品 </router-link>
-        <router-link class="btn" to="/items"> 返回物品广场 </router-link>
       </div>
     </header>
 
     <section v-if="!user.isLoggedIn" class="panel" role="alert">
       <h2>请先登录</h2>
       <p>登录并完成实名认证后，才能发布或编辑物品。</p>
-      <router-link class="btn" to="/items">返回物品广场</router-link>
     </section>
 
     <section v-else-if="!user.isCertified" class="panel" role="alert">
       <h2>请先完成实名认证</h2>
-      <p>发布或编辑物品需要完成实名认证。</p>
-      <router-link class="btn" to="/items">返回物品广场</router-link>
     </section>
 
     <section v-else-if="editLoading" class="panel" role="status">正在加载物品…</section>
@@ -402,14 +395,7 @@ watch(
 
     <div v-else class="two">
       <div>
-        <form
-          class="panel"
-          @submit.prevent="submitItem"
-          @input="
-            message = '';
-            error = '';
-          "
-        >
+        <form class="panel" @submit.prevent="submitItem" @input="clearFeedback">
           <fieldset class="publish-fields" :disabled="submitting || submissionComplete">
             <div class="panel-title">
               <h2>物品信息</h2>
@@ -530,7 +516,7 @@ watch(
             </label>
 
             <template v-if="images.length > 0">
-              <p class="help">已选择 {{ images.length }} 张，第一张作为封面。</p>
+              <p class="help">{{ images.length }} 张图片，首张为封面</p>
 
               <div class="thumbs">
                 <div v-for="(image, index) in images" :key="image.key">
@@ -553,7 +539,6 @@ watch(
 
             <p v-if="error" role="alert">{{ error }}</p>
             <p v-if="message" role="status">{{ message }}</p>
-            <p v-if="hasUnsavedChanges && !submitting" class="help">有尚未提交的修改。</p>
 
             <hr class="rule" />
 
@@ -569,7 +554,7 @@ watch(
                     : submitting
                       ? '正在提交…'
                       : isEdit
-                        ? '保存并重新提交审核'
+                        ? '重新提交审核'
                         : '提交审核'
                 }}
               </button>

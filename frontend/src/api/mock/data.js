@@ -1,6 +1,7 @@
+import { localDateKey, shiftDate } from '@/utils/itemCalendar';
+
 // 假数据：字段命名与需求 4.4 节核心实体对齐
 // 接口就绪后本文件整体废弃，由真实后端接管
-import { localDateKey, shiftDate } from '../../utils/itemCalendar';
 
 const asset = (name) => `/assets/${name}`;
 

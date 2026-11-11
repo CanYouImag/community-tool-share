@@ -1,5 +1,5 @@
-import { isDateKey, localDateKey } from '../../utils/itemCalendar';
-import * as db from './data';
+import * as db from '@/api/mock/data';
+import { isDateKey, localDateKey } from '@/utils/itemCalendar';
 
 const finishedStatuses = ['COMPLETED', 'CANCELLED', 'CLOSED'];
 const awaitingReturnStatuses = [

@@ -1,9 +1,10 @@
+import * as db from '@/api/mock/data';
+import { getItemRentalDetails } from '@/api/mock/itemDetails';
+import { useUserStore } from '@/store/user';
+import { ITEM_CATEGORY } from '@/utils/constants';
+import { paginateItems, parsePriceRange, sortItems } from '@/utils/itemFilters';
+
 // Mock 路由分发：根据 method + url 返回假数据
-import { useUserStore } from '../../store/user';
-import { ITEM_CATEGORY } from '../../utils/constants';
-import { paginateItems, parsePriceRange, sortItems } from '../../utils/itemFilters';
-import * as db from './data';
-import { getItemRentalDetails } from './itemDetails';
 
 const favoritesByUser = new Map();
 

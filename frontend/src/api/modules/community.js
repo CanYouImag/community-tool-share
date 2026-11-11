@@ -1,5 +1,6 @@
+import http from '@/api/request';
+
 // 社区相关 API
-import http from '../request';
 
 export const getCommunities = () => http.get('/communities');
 

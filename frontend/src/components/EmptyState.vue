@@ -9,10 +9,9 @@ const emit = defineEmits(['action']);
 
 <template>
   <div class="empty">
-    <div class="result-mark">空</div>
     <p>{{ text }}</p>
     <div v-if="actionText" class="actions">
-      <a class="btn primary" @click="emit('action')">{{ actionText }}</a>
+      <button type="button" class="btn primary" @click="emit('action')">{{ actionText }}</button>
     </div>
   </div>
 </template>

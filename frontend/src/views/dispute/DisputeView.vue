@@ -1,12 +1,14 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import StatusBadge from '@/components/StatusBadge.vue';
+import { useRoute } from 'vue-router';
+
 import { getDispute, submitDispute, getAward, submitReport } from '@/api/modules/dispute';
-import { DISPUTE_STATUS, REPORT_TARGET, REPORT_TYPE } from '@/utils/constants';
+import StatusBadge from '@/components/StatusBadge.vue';
+import ViewTabs from '@/components/ViewTabs.vue';
+import { REPORT_TARGET, REPORT_TYPE } from '@/utils/constants';
 import { formatAmount } from '@/utils/format';
 
-const router = useRouter();
+const route = useRoute();
 
 const tabs = [
   { id: 'new', label: '发起纠纷' },
@@ -52,7 +54,7 @@ async function doSubmitReport() {
 
 // 从订单详情跳转时定位到对应 tab
 function initStageFromHash() {
-  const h = router.currentRoute.value.hash.replace('#', '');
+  const h = route.hash.replace('#', '');
   if (tabs.some((t) => t.id === h)) activeTab.value = h;
 }
 
@@ -65,28 +67,13 @@ onMounted(() => {
 <template>
   <main class="public-main">
     <header class="page-head">
-      <div>
-        <h1>纠纷与举报</h1>
-      </div>
+      <h1>纠纷与举报</h1>
     </header>
 
-    <nav class="view-tabs" role="tablist" aria-label="页内功能">
-      <a
-        v-for="t in tabs"
-        :key="t.id"
-        class="view-tab"
-        :href="`#${t.id}`"
-        role="tab"
-        :aria-selected="activeTab === t.id"
-        @click.prevent="activeTab = t.id"
-      >
-        {{ t.label }}
-      </a>
-    </nav>
+    <ViewTabs v-model="activeTab" :tabs="tabs" label="纠纷与举报" />
 
     <!-- 发起纠纷 -->
     <section v-show="activeTab === 'new'" class="view-panel">
-      <h2 class="view-heading">发起纠纷</h2>
       <div class="two">
         <div>
           <section class="panel">
@@ -115,11 +102,11 @@ onMounted(() => {
               引用本订单的取物／归还存证和留言记录
             </label>
             <div class="actions">
-              <a class="btn primary" @click="doSubmitDispute">提交纠纷</a>
-              <a
+              <button type="button" class="btn primary" @click="doSubmitDispute">提交纠纷</button>
+              <router-link
                 class="btn"
-                @click="router.push({ name: 'order-detail', params: { id: dispute?.orderId } })"
-                >返回订单</a
+                :to="{ name: 'order-detail', params: { id: dispute?.orderId } }"
+                >返回订单</router-link
               >
             </div>
           </section>
@@ -129,7 +116,6 @@ onMounted(() => {
 
     <!-- 处理进度 -->
     <section v-show="activeTab === 'progress'" class="view-panel">
-      <h2 class="view-heading">处理进度</h2>
       <section class="panel">
         <div class="row between">
           <div>
@@ -202,8 +188,10 @@ onMounted(() => {
               {{ dispute?.mediatorMessage?.content }}
             </div>
             <div class="actions">
-              <a class="btn" @click="activeTab = 'award'">查看仲裁结果</a>
-              <a class="btn" @click="router.push({ name: 'orders', hash: '#borrow' })">返回订单</a>
+              <button type="button" class="btn" @click="activeTab = 'award'">查看仲裁结果</button>
+              <router-link class="btn" :to="{ name: 'orders', hash: '#borrow' }"
+                >返回订单</router-link
+              >
             </div>
           </section>
         </div>
@@ -212,7 +200,6 @@ onMounted(() => {
 
     <!-- 裁决书 -->
     <section v-show="activeTab === 'award'" class="view-panel">
-      <h2 class="view-heading">裁决书</h2>
       <div class="narrow">
         <section class="panel">
           <article class="receipt">
@@ -260,17 +247,18 @@ onMounted(() => {
           </article>
         </section>
         <div class="actions">
-          <a class="btn primary" @click="router.push({ name: 'wallet', hash: '#wallet' })"
-            >查看资金流水</a
+          <router-link class="btn primary" :to="{ name: 'wallet', hash: '#wallet' }"
+            >查看资金流水</router-link
           >
-          <a class="btn" @click="router.push({ name: 'orders', hash: '#borrow' })">返回订单列表</a>
+          <router-link class="btn" :to="{ name: 'orders', hash: '#borrow' }"
+            >返回订单列表</router-link
+          >
         </div>
       </div>
     </section>
 
     <!-- 举报内容 -->
     <section v-show="activeTab === 'report'" class="view-panel">
-      <h2 class="view-heading">举报内容</h2>
       <div class="narrow">
         <section class="panel">
           <div class="panel-title">
@@ -307,8 +295,8 @@ onMounted(() => {
               <input type="file" accept="image/*" multiple aria-label="上传举报证据" />
             </label>
             <div class="actions">
-              <a class="btn primary" @click="doSubmitReport">提交举报</a>
-              <a class="btn" @click="activeTab = 'new'">取消</a>
+              <button type="button" class="btn primary" @click="doSubmitReport">提交举报</button>
+              <button type="button" class="btn" @click="activeTab = 'new'">取消</button>
             </div>
           </template>
         </section>

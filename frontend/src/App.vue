@@ -1,9 +1,10 @@
 <script setup>
-import AppTopbar from './components/AppTopbar.vue';
-import { useUserStore } from './store/user';
-import { useAuthStore } from './store/auth';
 import { computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+
+import AppTopbar from '@/components/AppTopbar.vue';
+import { useAuthStore } from '@/store/auth';
+import { useUserStore } from '@/store/user';
 
 const user = useUserStore();
 const auth = useAuthStore();

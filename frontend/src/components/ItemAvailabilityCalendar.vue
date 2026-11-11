@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue';
+
 import { dateAvailability, isDateKey, localDateKey, monthCells } from '@/utils/itemCalendar';
 
 const props = defineProps({
@@ -28,11 +29,6 @@ const weeks = computed(() => {
   );
 });
 const hasOpenEndedBooking = computed(() => props.ranges?.some((range) => range.endDate === null));
-const occupiedDays = computed(() =>
-  hasAvailability.value
-    ? monthCells(month.value).filter((cell) => cell && status(cell.date).code === 'busy').length
-    : 0,
-);
 
 function changeMonth(offset) {
   const date = new Date(`${month.value}-01T00:00:00Z`);
@@ -102,16 +98,12 @@ function status(date) {
 
       <div class="calendar-legend" aria-label="日期状态说明">
         <span class="legend-available">可租</span>
-        <span class="legend-busy">已占用（划线）</span>
-        <span class="legend-past">已过去（浅色）</span>
+        <span class="legend-busy">已占用</span>
+        <span class="legend-past">已过去</span>
       </div>
-      <p class="help" aria-live="polite">
-        {{ occupiedDays ? `本月有 ${occupiedDays} 天已占用。` : '本月暂无已占用日期。' }}
-      </p>
       <p v-if="hasOpenEndedBooking" class="help" role="status">
-        该物品有尚未结束的租赁，后续可租时间需待归还和验收后确认。
+        租赁尚未结束，可租时间待归还验收后确认。
       </p>
-      <p class="help">实际可租时间以下单时的校验结果为准。</p>
     </template>
   </section>
 </template>
