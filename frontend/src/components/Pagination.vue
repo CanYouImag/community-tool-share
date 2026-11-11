@@ -2,13 +2,13 @@
 defineProps({
   total: { type: Number, default: 0 },
   page: { type: Number, default: 1 },
-  pageSize: { type: Number, default: 10 }
-})
+  pageSize: { type: Number, default: 10 },
+});
 
-const emit = defineEmits(['change'])
+const emit = defineEmits(['change']);
 
 function go(p) {
-  emit('change', p)
+  emit('change', p);
 }
 </script>
 

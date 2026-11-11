@@ -15,7 +15,11 @@ public class PermissionInterceptor implements HandlerInterceptor {
     private static final String COMMUNITY_ADMIN = "COMMUNITY_ADMIN";
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+    public boolean preHandle(
+        HttpServletRequest request,
+        HttpServletResponse response,
+        Object handler
+    ) {
         if (!(handler instanceof HandlerMethod handlerMethod)) {
             return true;
         }
@@ -37,8 +41,10 @@ public class PermissionInterceptor implements HandlerInterceptor {
             if (code.startsWith("platform:") && !PLATFORM_ADMIN.equals(user.role())) {
                 continue;
             }
-            if (code.startsWith("community:")
-                    && (COMMUNITY_ADMIN.equals(user.role()) || PLATFORM_ADMIN.equals(user.role()))) {
+            if (
+                code.startsWith("community:") &&
+                (COMMUNITY_ADMIN.equals(user.role()) || PLATFORM_ADMIN.equals(user.role()))
+            ) {
                 return true;
             }
             if (!code.contains(":")) {

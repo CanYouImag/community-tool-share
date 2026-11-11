@@ -1,76 +1,73 @@
 -- 邻租：用户与资金域建表脚本
 -- 说明：本文件由陈麒元维护，最终由窦源泽合并进 db/init.sql。
 -- 执行方式：mysql -uroot -p < db/user-wallet.sql
-
 -- 强制客户端按 utf8mb4 读取本脚本，避免中文被 latin1 双重编码成乱码
 SET NAMES utf8mb4;
 
-CREATE DATABASE IF NOT EXISTS linzu
-    DEFAULT CHARACTER SET utf8mb4
-    COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS linzu DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 USE linzu;
 
 CREATE TABLE IF NOT EXISTS t_user (
-    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键',
-    username VARCHAR(32) NOT NULL COMMENT '登录名',
-    phone VARCHAR(20) DEFAULT NULL COMMENT '手机号',
-    password_hash VARCHAR(100) NOT NULL COMMENT 'BCrypt 密码',
-    nickname VARCHAR(32) DEFAULT NULL COMMENT '昵称',
-    avatar_url VARCHAR(255) DEFAULT NULL COMMENT '头像地址',
-    bio VARCHAR(255) DEFAULT NULL COMMENT '个人简介',
-    role VARCHAR(32) NOT NULL DEFAULT 'REGISTERED' COMMENT 'REGISTERED/CERTIFIED/COMMUNITY_ADMIN/PLATFORM_ADMIN',
-    status VARCHAR(16) NOT NULL DEFAULT 'ACTIVE' COMMENT 'ACTIVE/BANNED',
-    credit_score INT NOT NULL DEFAULT 100 COMMENT '信用分',
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted TINYINT NOT NULL DEFAULT 0 COMMENT '逻辑删除',
-    PRIMARY KEY (id),
-    UNIQUE KEY uk_user_username (username),
-    UNIQUE KEY uk_user_phone (phone),
-    KEY idx_user_role (role),
-    KEY idx_user_status (status)
+  id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键',
+  username VARCHAR(32) NOT NULL COMMENT '登录名',
+  phone VARCHAR(20) DEFAULT NULL COMMENT '手机号',
+  password_hash VARCHAR(100) NOT NULL COMMENT 'BCrypt 密码',
+  nickname VARCHAR(32) DEFAULT NULL COMMENT '昵称',
+  avatar_url VARCHAR(255) DEFAULT NULL COMMENT '头像地址',
+  bio VARCHAR(255) DEFAULT NULL COMMENT '个人简介',
+  role VARCHAR(32) NOT NULL DEFAULT 'REGISTERED' COMMENT 'REGISTERED/CERTIFIED/COMMUNITY_ADMIN/PLATFORM_ADMIN',
+  status VARCHAR(16) NOT NULL DEFAULT 'ACTIVE' COMMENT 'ACTIVE/BANNED',
+  credit_score INT NOT NULL DEFAULT 100 COMMENT '信用分',
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  deleted TINYINT NOT NULL DEFAULT 0 COMMENT '逻辑删除',
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_user_username (username),
+  UNIQUE KEY uk_user_phone (phone),
+  KEY idx_user_role (role),
+  KEY idx_user_status (status)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '用户';
 
 CREATE TABLE IF NOT EXISTS t_user_real_name (
-    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键',
-    user_id BIGINT NOT NULL COMMENT '用户 ID',
-    real_name VARCHAR(32) NOT NULL COMMENT '真实姓名',
-    id_card_no VARCHAR(32) NOT NULL COMMENT '身份证号',
-    status VARCHAR(16) NOT NULL DEFAULT 'PENDING' COMMENT 'PENDING/VERIFIED/REJECTED',
-    reject_reason VARCHAR(255) DEFAULT NULL COMMENT '驳回原因',
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    UNIQUE KEY uk_real_name_user (user_id),
-    KEY idx_real_name_status (status)
+  id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键',
+  user_id BIGINT NOT NULL COMMENT '用户 ID',
+  real_name VARCHAR(32) NOT NULL COMMENT '真实姓名',
+  id_card_no VARCHAR(32) NOT NULL COMMENT '身份证号',
+  status VARCHAR(16) NOT NULL DEFAULT 'PENDING' COMMENT 'PENDING/VERIFIED/REJECTED',
+  reject_reason VARCHAR(255) DEFAULT NULL COMMENT '驳回原因',
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_real_name_user (user_id),
+  KEY idx_real_name_status (status)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '用户实名认证';
 
 CREATE TABLE IF NOT EXISTS t_wallet (
-    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键',
-    user_id BIGINT NOT NULL COMMENT '用户 ID',
-    balance DECIMAL(12, 2) NOT NULL DEFAULT 0.00 COMMENT '可用余额',
-    frozen_balance DECIMAL(12, 2) NOT NULL DEFAULT 0.00 COMMENT '冻结金额',
-    total_income DECIMAL(12, 2) NOT NULL DEFAULT 0.00 COMMENT '累计收入',
-    version INT NOT NULL DEFAULT 0 COMMENT '乐观锁版本',
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    UNIQUE KEY uk_wallet_user (user_id)
+  id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键',
+  user_id BIGINT NOT NULL COMMENT '用户 ID',
+  balance DECIMAL(12, 2) NOT NULL DEFAULT 0.00 COMMENT '可用余额',
+  frozen_balance DECIMAL(12, 2) NOT NULL DEFAULT 0.00 COMMENT '冻结金额',
+  total_income DECIMAL(12, 2) NOT NULL DEFAULT 0.00 COMMENT '累计收入',
+  version INT NOT NULL DEFAULT 0 COMMENT '乐观锁版本',
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_wallet_user (user_id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '用户钱包';
 
 CREATE TABLE IF NOT EXISTS t_wallet_transaction (
-    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键',
-    user_id BIGINT NOT NULL COMMENT '用户 ID',
-    type VARCHAR(32) NOT NULL COMMENT 'FREEZE/UNFREEZE/RENT_PAY/INCOME/COMMISSION/WITHDRAW/REFUND',
-    amount DECIMAL(12, 2) NOT NULL COMMENT '变动金额，支出为负',
-    balance_after DECIMAL(12, 2) NOT NULL COMMENT '变动后可用余额',
-    ref_type VARCHAR(32) DEFAULT NULL COMMENT '关联业务类型',
-    ref_id BIGINT DEFAULT NULL COMMENT '关联业务 ID',
-    remark VARCHAR(255) DEFAULT NULL COMMENT '备注',
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    KEY idx_wallet_tx_user_time (user_id, created_at),
-    KEY idx_wallet_tx_type (type),
-    KEY idx_wallet_tx_ref (ref_type, ref_id)
+  id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键',
+  user_id BIGINT NOT NULL COMMENT '用户 ID',
+  type VARCHAR(32) NOT NULL COMMENT 'FREEZE/UNFREEZE/RENT_PAY/INCOME/COMMISSION/WITHDRAW/REFUND',
+  amount DECIMAL(12, 2) NOT NULL COMMENT '变动金额，支出为负',
+  balance_after DECIMAL(12, 2) NOT NULL COMMENT '变动后可用余额',
+  ref_type VARCHAR(32) DEFAULT NULL COMMENT '关联业务类型',
+  ref_id BIGINT DEFAULT NULL COMMENT '关联业务 ID',
+  remark VARCHAR(255) DEFAULT NULL COMMENT '备注',
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_wallet_tx_user_time (user_id, created_at),
+  KEY idx_wallet_tx_type (type),
+  KEY idx_wallet_tx_ref (ref_type, ref_id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '钱包流水';

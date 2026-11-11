@@ -1,0 +1,25 @@
+# Dependencies and generated output
+**/node_modules/
+**/dist/
+**/dist-ssr/
+**/target/
+**/coverage/
+**/package-lock.json
+
+# Local configuration and tool state
+.git/
+.workbuddy/
+.codex/
+.agents/
+**/.env
+**/.env.*
+**/*.local
+**/*.log
+**/.gitignore
+**/.prettierignore
+
+# Binary documents and design assets
+**/*.docx
+**/*.pdf
+**/*.drawio
+**/*.svg

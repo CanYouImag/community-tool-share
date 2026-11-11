@@ -1,7 +1,7 @@
 // 假数据：字段命名与需求 4.4 节核心实体对齐
 // 接口就绪后本文件整体废弃，由真实后端接管
 
-const asset = (name) => `/assets/${name}`
+const asset = (name) => `/assets/${name}`;
 
 export const communities = [
   {
@@ -12,7 +12,7 @@ export const communities = [
     onRent: 38,
     admin: '周宁',
     notice: '取物和归还时请核对配件并拍照。',
-    autoApprove: false
+    autoApprove: false,
   },
   {
     id: 'c_1002',
@@ -22,7 +22,7 @@ export const communities = [
     onRent: 26,
     admin: '林晚',
     notice: '欢迎新邻居加入，共享闲置工具。',
-    autoApprove: false
+    autoApprove: false,
   },
   {
     id: 'c_1003',
@@ -32,15 +32,15 @@ export const communities = [
     onRent: 19,
     admin: '顾言',
     notice: '本周六社区置换活动，欢迎参加。',
-    autoApprove: true
-  }
-]
+    autoApprove: true,
+  },
+];
 
 // 当前用户的社区成员关系
 export const myMemberships = [
   { id: 'c_1001', name: '青禾社区', status: 'JOINED', time: '2026-10-01' },
-  { id: 'c_1002', name: '梧桐里社区', status: 'PENDING', time: '2026-10-09' }
-]
+  { id: 'c_1002', name: '梧桐里社区', status: 'PENDING', time: '2026-10-09' },
+];
 
 export const items = [
   {
@@ -53,7 +53,7 @@ export const items = [
     deposit: 200,
     owner: '陈禾',
     ownerCredit: 92,
-    image: asset('item-30556edc.svg')
+    image: asset('item-30556edc.svg'),
   },
   {
     id: 'i_1002',
@@ -65,7 +65,7 @@ export const items = [
     deposit: 300,
     owner: '周宁',
     ownerCredit: 95,
-    image: asset('item-dde811a0.svg')
+    image: asset('item-dde811a0.svg'),
   },
   {
     id: 'i_1003',
@@ -77,7 +77,7 @@ export const items = [
     deposit: 500,
     owner: '许安',
     ownerCredit: 90,
-    image: asset('item-15f4c496.svg')
+    image: asset('item-15f4c496.svg'),
   },
   {
     id: 'i_1004',
@@ -89,7 +89,7 @@ export const items = [
     deposit: 100,
     owner: '李青',
     ownerCredit: 86,
-    image: asset('item-206bd1ad.svg')
+    image: asset('item-206bd1ad.svg'),
   },
   {
     id: 'i_1005',
@@ -101,7 +101,7 @@ export const items = [
     deposit: 250,
     owner: 'Starling',
     ownerCredit: 88,
-    image: asset('item-cce1a346.svg')
+    image: asset('item-cce1a346.svg'),
   },
   {
     id: 'i_1006',
@@ -113,19 +113,19 @@ export const items = [
     deposit: 150,
     owner: '陆川',
     ownerCredit: 82,
-    image: asset('item-dde811a0.svg')
-  }
-]
+    image: asset('item-dde811a0.svg'),
+  },
+];
 
 // 社区主页：置顶推荐 + 最新上架
 export const communityHome = {
   c_1001: {
     top: ['i_1001', 'i_1002', 'i_1003'],
-    latest: ['i_1001', 'i_1002', 'i_1003', 'i_1004']
+    latest: ['i_1001', 'i_1002', 'i_1003', 'i_1004'],
   },
   c_1002: { top: ['i_1005'], latest: ['i_1005', 'i_1006'] },
-  c_1003: { top: [], latest: [] }
-}
+  c_1003: { top: [], latest: [] },
+};
 
 export const orders = [
   {
@@ -142,7 +142,7 @@ export const orders = [
     rent: 60,
     deposit: 200,
     status: 'PENDING_PAYMENT',
-    createdAt: '2026-10-09 10:00'
+    createdAt: '2026-10-09 10:00',
   },
   {
     id: 'LZ202610080012',
@@ -159,7 +159,7 @@ export const orders = [
     deposit: 300,
     status: 'PENDING_PICKUP',
     pickupCode: '826 419',
-    createdAt: '2026-10-08 09:00'
+    createdAt: '2026-10-08 09:00',
   },
   {
     id: 'LZ202610050009',
@@ -175,7 +175,7 @@ export const orders = [
     rent: 135,
     deposit: 500,
     status: 'OVERDUE',
-    createdAt: '2026-10-05 14:00'
+    createdAt: '2026-10-05 14:00',
   },
   {
     id: 'LZ202610010003',
@@ -191,9 +191,9 @@ export const orders = [
     rent: 45,
     deposit: 100,
     status: 'COMPLETED',
-    createdAt: '2026-10-01 09:00'
-  }
-]
+    createdAt: '2026-10-01 09:00',
+  },
+];
 
 // 租出视角（当前用户作为出租者）
 export const lendOrders = [
@@ -206,7 +206,7 @@ export const lendOrders = [
     endDate: '2026-10-14',
     rent: 60,
     deposit: 200,
-    status: 'PENDING_ACCEPT'
+    status: 'PENDING_ACCEPT',
   },
   {
     id: 'LZ202610080012',
@@ -217,7 +217,7 @@ export const lendOrders = [
     endDate: '2026-10-12',
     rent: 105,
     deposit: 300,
-    status: 'PENDING_PICKUP'
+    status: 'PENDING_PICKUP',
   },
   {
     id: 'LZ202610050009',
@@ -228,7 +228,7 @@ export const lendOrders = [
     endDate: '2026-10-08',
     rent: 135,
     deposit: 500,
-    status: 'PENDING_INSPECT'
+    status: 'PENDING_INSPECT',
   },
   {
     id: 'LZ202610010003',
@@ -239,17 +239,17 @@ export const lendOrders = [
     endDate: '2026-10-04',
     rent: 45,
     deposit: 100,
-    status: 'COMPLETED'
-  }
-]
+    status: 'COMPLETED',
+  },
+];
 
 // 钱包（字段对齐 WalletDO：balance + freezeBalance）
 export const wallet = {
   balance: 240.0,
   freezeBalance: 200.0,
   totalIncome: 0.0,
-  recentRentSpent: 60.0
-}
+  recentRentSpent: 60.0,
+};
 
 // 资金流水
 export const flows = [
@@ -259,7 +259,7 @@ export const flows = [
     type: 'FREEZE',
     amount: 200.0,
     orderId: 'LZ202610090018',
-    remark: '冻结押金'
+    remark: '冻结押金',
   },
   {
     id: 'f_2',
@@ -267,7 +267,7 @@ export const flows = [
     type: 'EXPENSE',
     amount: 60.0,
     orderId: 'LZ202610090018',
-    remark: '支付租金'
+    remark: '支付租金',
   },
   {
     id: 'f_3',
@@ -275,9 +275,9 @@ export const flows = [
     type: 'INCOME',
     amount: 500.0,
     orderId: '',
-    remark: '初始化测试余额'
-  }
-]
+    remark: '初始化测试余额',
+  },
+];
 
 // 押金明细（冻结押金按订单展开）
 export const deposits = [
@@ -286,16 +286,16 @@ export const deposits = [
     itemTitle: '18V 充电式电钻',
     amount: 200.0,
     status: 'FREEZE',
-    time: '2026-10-09 10:00'
+    time: '2026-10-09 10:00',
   },
   {
     orderId: 'LZ202610080012',
     itemTitle: '双人露营帐篷',
     amount: 300.0,
     status: 'UNFREEZE',
-    time: '2026-10-12 12:00'
-  }
-]
+    time: '2026-10-12 12:00',
+  },
+];
 
 // 纠纷单（两级机制：社区调解 → 平台仲裁）
 export const dispute = {
@@ -318,21 +318,36 @@ export const dispute = {
     status: 'MEDIATING',
     conclusion: null,
     timeline: [
-      { time: '10-15 09:00', actor: '系统', text: '纠纷已提交', detail: '陈禾提交理由与归还照片，押金 ¥200.00 已冻结。' },
-      { time: '10-15 11:20', actor: '周宁', text: '介入调解', detail: '请双方确认交接时的外壳状态，并补充近距离照片。' }
-    ]
+      {
+        time: '10-15 09:00',
+        actor: '系统',
+        text: '纠纷已提交',
+        detail: '陈禾提交理由与归还照片，押金 ¥200.00 已冻结。',
+      },
+      {
+        time: '10-15 11:20',
+        actor: '周宁',
+        text: '介入调解',
+        detail: '请双方确认交接时的外壳状态，并补充近距离照片。',
+      },
+    ],
   },
   // 平台仲裁信息（调解不成立后升级）
   arbitration: null,
   timeline: [
     { time: '10-15 09:00', actor: '系统', text: '纠纷已提交', detail: '陈禾提交理由与归还照片。' },
-    { time: '10-15 11:20', actor: '周宁', text: '介入调解', detail: '请双方确认交接时的外壳状态。' }
+    {
+      time: '10-15 11:20',
+      actor: '周宁',
+      text: '介入调解',
+      detail: '请双方确认交接时的外壳状态。',
+    },
   ],
   mediatorMessage: {
     from: '社区管理员 周宁',
-    content: '已查看取还照片，请补充近距离照片与交接说明。'
-  }
-}
+    content: '已查看取还照片，请补充近距离照片与交接说明。',
+  },
+};
 
 // 裁决书
 export const award = {
@@ -347,5 +362,5 @@ export const award = {
   rentRelief: 0.0,
   reason: '根据取还存证及双方说明，认定归还时新增损坏，维修补偿金额为 ¥50.00。',
   time: '2026-10-16 14:30',
-  arbitrator: '系统管理员'
-}
+  arbitrator: '系统管理员',
+};

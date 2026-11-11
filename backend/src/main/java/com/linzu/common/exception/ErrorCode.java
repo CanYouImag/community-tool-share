@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ErrorCode {
-
     SUCCESS(0, "ok", HttpStatus.OK),
 
     PARAM_ERROR(1001, "参数校验失败", HttpStatus.BAD_REQUEST),

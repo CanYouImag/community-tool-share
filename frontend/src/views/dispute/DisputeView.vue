@@ -1,70 +1,65 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import StatusBadge from '@/components/StatusBadge.vue'
-import {
-  getDispute,
-  submitDispute,
-  getAward,
-  submitReport
-} from '@/api/modules/dispute'
-import { DISPUTE_STATUS, REPORT_TARGET, REPORT_TYPE } from '@/utils/constants'
-import { formatAmount } from '@/utils/format'
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import StatusBadge from '@/components/StatusBadge.vue';
+import { getDispute, submitDispute, getAward, submitReport } from '@/api/modules/dispute';
+import { DISPUTE_STATUS, REPORT_TARGET, REPORT_TYPE } from '@/utils/constants';
+import { formatAmount } from '@/utils/format';
 
-const router = useRouter()
+const router = useRouter();
 
 const tabs = [
   { id: 'new', label: '发起纠纷' },
   { id: 'progress', label: '处理进度' },
   { id: 'award', label: '裁决书' },
-  { id: 'report', label: '举报内容' }
-]
-const activeTab = ref('new')
+  { id: 'report', label: '举报内容' },
+];
+const activeTab = ref('new');
 
-const dispute = ref(null)
-const award = ref(null)
+const dispute = ref(null);
+const award = ref(null);
 
 // 发起纠纷表单
-const reason = ref('归还时发现电钻外壳损坏，双方对责任存在分歧。')
-const citeEvidence = ref(true)
+const reason = ref('归还时发现电钻外壳损坏，双方对责任存在分歧。');
+const citeEvidence = ref(true);
 
 // 举报表单
-const reportTarget = ref('物品')
-const reportType = ref('信息不实')
-const reportDesc = ref('')
-const reportDone = ref(false)
+const reportTarget = ref('物品');
+const reportType = ref('信息不实');
+const reportDesc = ref('');
+const reportDone = ref(false);
 
 async function load() {
-  dispute.value = await getDispute()
-  award.value = await getAward()
+  dispute.value = await getDispute();
+  award.value = await getAward();
 }
 
 async function doSubmitDispute() {
-  if (!reason.value.trim()) return
-  await submitDispute({ reason: reason.value, citeEvidence: citeEvidence.value })
-  activeTab.value = 'progress'
+  if (!reason.value.trim()) return;
+  await submitDispute({ reason: reason.value, citeEvidence: citeEvidence.value });
+  activeTab.value = 'progress';
 }
 
 async function doSubmitReport() {
-  if (!reportDesc.value.trim()) return
+  if (!reportDesc.value.trim()) return;
   await submitReport({
     target: reportTarget.value,
     type: reportType.value,
-    desc: reportDesc.value
-  })
-  reportDone.value = true
+    desc: reportDesc.value,
+  });
+  reportDone.value = true;
 }
 
 // 从订单详情跳转时定位到对应 tab
 function initStageFromHash() {
-  const h = router.currentRoute.value.hash.replace('#', '')
-  if (tabs.some((t) => t.id === h)) activeTab.value = h
+  const h = router.currentRoute.value.hash.replace('#', '');
+  if (tabs.some((t) => t.id === h)) activeTab.value = h;
 }
 
 onMounted(() => {
-  initStageFromHash()
-  load()
-})
+  initStageFromHash();
+  load();
+});
 </script>
 
 <template>
@@ -121,7 +116,11 @@ onMounted(() => {
             </label>
             <div class="actions">
               <a class="btn primary" @click="doSubmitDispute">提交纠纷</a>
-              <a class="btn" @click="router.push({ name: 'order-detail', params: { id: dispute?.orderId } })">返回订单</a>
+              <a
+                class="btn"
+                @click="router.push({ name: 'order-detail', params: { id: dispute?.orderId } })"
+                >返回订单</a
+              >
             </div>
           </section>
         </div>
@@ -145,8 +144,8 @@ onMounted(() => {
           <span class="step">平台仲裁</span>
         </div>
         <p class="muted">
-          当前由「{{ dispute?.mediation?.mediatorRole }} {{ dispute?.mediation?.mediator }}」介入社区调解，
-          调解不成立可升级至平台仲裁。
+          当前由「{{ dispute?.mediation?.mediatorRole }}
+          {{ dispute?.mediation?.mediator }}」介入社区调解， 调解不成立可升级至平台仲裁。
         </p>
       </section>
       <div class="two">
@@ -164,9 +163,18 @@ onMounted(() => {
               </div>
             </div>
             <dl class="line-list">
-              <div><dt>发起人</dt><dd>{{ dispute?.initiator }}</dd></div>
-              <div><dt>纠纷理由</dt><dd>{{ dispute?.reason }}</dd></div>
-              <div><dt>涉及押金</dt><dd>¥{{ formatAmount(dispute?.deposit) }}</dd></div>
+              <div>
+                <dt>发起人</dt>
+                <dd>{{ dispute?.initiator }}</dd>
+              </div>
+              <div>
+                <dt>纠纷理由</dt>
+                <dd>{{ dispute?.reason }}</dd>
+              </div>
+              <div>
+                <dt>涉及押金</dt>
+                <dd>¥{{ formatAmount(dispute?.deposit) }}</dd>
+              </div>
             </dl>
             <div class="thumbs">
               <img class="art small" src="/assets/item-30556edc.svg" alt="取物存证示意" />
@@ -211,13 +219,34 @@ onMounted(() => {
             <small>邻租平台 / 裁决编号 {{ award?.id }}</small>
             <h2>订单纠纷裁决书</h2>
             <dl class="line-list">
-              <div><dt>关联订单</dt><dd>{{ award?.orderId }}</dd></div>
-              <div><dt>申请人 / 相对方</dt><dd>{{ award?.applicant }} / {{ award?.counterpart }}</dd></div>
-              <div><dt>原押金金额</dt><dd>¥{{ formatAmount(award?.deposit) }}</dd></div>
-              <div><dt>裁决类型</dt><dd>{{ award?.type }}</dd></div>
-              <div><dt>赔付出租者</dt><dd>¥{{ formatAmount(award?.toLender) }}</dd></div>
-              <div><dt>退回租客押金</dt><dd>¥{{ formatAmount(award?.toBorrower) }}</dd></div>
-              <div><dt>租金减免</dt><dd>¥{{ formatAmount(award?.rentRelief) }}</dd></div>
+              <div>
+                <dt>关联订单</dt>
+                <dd>{{ award?.orderId }}</dd>
+              </div>
+              <div>
+                <dt>申请人 / 相对方</dt>
+                <dd>{{ award?.applicant }} / {{ award?.counterpart }}</dd>
+              </div>
+              <div>
+                <dt>原押金金额</dt>
+                <dd>¥{{ formatAmount(award?.deposit) }}</dd>
+              </div>
+              <div>
+                <dt>裁决类型</dt>
+                <dd>{{ award?.type }}</dd>
+              </div>
+              <div>
+                <dt>赔付出租者</dt>
+                <dd>¥{{ formatAmount(award?.toLender) }}</dd>
+              </div>
+              <div>
+                <dt>退回租客押金</dt>
+                <dd>¥{{ formatAmount(award?.toBorrower) }}</dd>
+              </div>
+              <div>
+                <dt>租金减免</dt>
+                <dd>¥{{ formatAmount(award?.rentRelief) }}</dd>
+              </div>
             </dl>
             <p>
               <strong>裁决理由</strong><br />
@@ -231,7 +260,9 @@ onMounted(() => {
           </article>
         </section>
         <div class="actions">
-          <a class="btn primary" @click="router.push({ name: 'wallet', hash: '#wallet' })">查看资金流水</a>
+          <a class="btn primary" @click="router.push({ name: 'wallet', hash: '#wallet' })"
+            >查看资金流水</a
+          >
           <a class="btn" @click="router.push({ name: 'orders', hash: '#borrow' })">返回订单列表</a>
         </div>
       </div>
@@ -265,7 +296,11 @@ onMounted(() => {
             </label>
             <label class="field">
               <span>举报说明<em>*</em></span>
-              <textarea v-model="reportDesc" aria-label="举报说明" placeholder="请具体描述问题，以便管理员核实。"></textarea>
+              <textarea
+                v-model="reportDesc"
+                aria-label="举报说明"
+                placeholder="请具体描述问题，以便管理员核实。"
+              ></textarea>
             </label>
             <label class="upload">
               <strong>＋ 上传举报证据</strong>

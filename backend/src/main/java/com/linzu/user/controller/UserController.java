@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "用户")
 @RestController
-@RequestMapping({"/api/v1/users", "/api/users"})
+@RequestMapping({ "/api/v1/users", "/api/users" })
 @RequiredArgsConstructor
 public class UserController {
 
@@ -55,6 +55,8 @@ public class UserController {
     @Operation(summary = "修改头像")
     @PutMapping("/me/avatar")
     public Result<UserProfileResponse> updateAvatar(@Valid @RequestBody AvatarRequest request) {
-        return Result.ok(userService.updateAvatar(AuthContext.requireUserId(), request.avatarUrl()));
+        return Result.ok(
+            userService.updateAvatar(AuthContext.requireUserId(), request.avatarUrl())
+        );
     }
 }

@@ -1,78 +1,92 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router';
+import { authRoutes } from './auth.routes';
 
 const routes = [
+  ...authRoutes,
+  {
+    path: '/items',
+    name: 'items',
+    component: () => import('@/views/items/ItemsView.vue'),
+    meta: { title: '物品广场' },
+  },
+  {
+    path: '/items/:id',
+    name: 'item-detail',
+    component: () => import('@/views/items/ItemDetailView.vue'),
+    meta: { title: '物品详情' },
+  },
   {
     path: '/',
-    redirect: '/community'
+    redirect: '/items',
   },
   {
     path: '/community',
     name: 'community',
     component: () => import('@/views/community/CommunityView.vue'),
-    meta: { title: '社区' }
+    meta: { title: '社区' },
   },
   {
     path: '/orders',
     name: 'orders',
     component: () => import('@/views/orders/OrdersView.vue'),
-    meta: { title: '我的订单' }
+    meta: { title: '我的订单' },
   },
   {
     path: '/order-detail/:id',
     name: 'order-detail',
     component: () => import('@/views/orders/OrderDetailView.vue'),
-    meta: { title: '订单详情与操作' }
+    meta: { title: '订单详情与操作' },
   },
   {
     path: '/wallet',
     name: 'wallet',
     component: () => import('@/views/wallet/WalletView.vue'),
-    meta: { title: '钱包' }
+    meta: { title: '钱包' },
   },
   {
     path: '/dispute',
     name: 'dispute',
     component: () => import('@/views/dispute/DisputeView.vue'),
-    meta: { title: '纠纷与举报' }
+    meta: { title: '纠纷与举报' },
   },
   {
     path: '/admin',
-    redirect: '/admin/community'
+    redirect: '/admin/platform',
   },
   {
     path: '/admin/community',
     name: 'admin-community',
     component: () => import('@/views/admin/CommunityAdminView.vue'),
-    meta: { title: '社区管理' }
+    meta: { title: '社区管理' },
   },
   {
     path: '/admin/mediation',
     name: 'admin-mediation',
     component: () => import('@/views/admin/MediationView.vue'),
-    meta: { title: '调解工作台' }
+    meta: { title: '调解工作台' },
   },
   {
     path: '/admin/platform',
     name: 'admin-platform',
     component: () => import('@/views/admin/PlatformAdminView.vue'),
-    meta: { title: '平台管理' }
+    meta: { title: '平台管理' },
   },
   {
     path: '/admin/arbitration',
     name: 'admin-arbitration',
     component: () => import('@/views/admin/ArbitrationView.vue'),
-    meta: { title: '仲裁中心' }
-  }
-]
+    meta: { title: '仲裁中心' },
+  },
+];
 
 const router = createRouter({
   history: createWebHashHistory(),
-  routes
-})
+  routes,
+});
 
 router.afterEach((to) => {
-  const base = '邻租'
-  document.title = to.meta?.title ? `${to.meta.title} · ${base}` : base
-})
+  const base = '邻租';
+  document.title = to.meta?.title ? `${to.meta.title} · ${base}` : base;
+});
 
-export default router
+export default router;

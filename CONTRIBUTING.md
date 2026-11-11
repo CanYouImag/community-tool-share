@@ -4,6 +4,20 @@
 2. 修改或实现功能
 3. 提交Pull Request接受审核
 
+## 代码格式
+
+在仓库根目录安装格式化工具并运行：
+
+```powershell
+npm.cmd ci
+npm.cmd run format
+npm.cmd run format:check
+```
+
+统一使用根目录的 `.prettierrc.json` 格式化。
+
+提交前运行 `npm.cmd run format:check`；格式整理尽量单独提交，便于审核业务改动。
+
 ## 提交信息要求
 
 这边不懂应该填什么提交信息的问AI

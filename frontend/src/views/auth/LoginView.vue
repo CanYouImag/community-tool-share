@@ -1,117 +1,117 @@
 <script setup>
-import { reactive, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useAuthStore } from '@/store/auth'
+import { reactive, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useAuthStore } from '@/store/auth';
 
 const props = defineProps({
-  initialTab: { type: String, default: 'login' }
-})
+  initialTab: { type: String, default: 'login' },
+});
 
-const router = useRouter()
-const route = useRoute()
-const auth = useAuthStore()
+const router = useRouter();
+const route = useRoute();
+const auth = useAuthStore();
 
-const activeTab = ref(props.initialTab === 'register' ? 'register' : 'login')
-const submitting = ref(false)
-const loginError = ref('')
-const registerError = ref('')
+const activeTab = ref(props.initialTab === 'register' ? 'register' : 'login');
+const submitting = ref(false);
+const loginError = ref('');
+const registerError = ref('');
 
 const loginForm = reactive({
   account: '',
-  password: ''
-})
+  password: '',
+});
 
 const registerForm = reactive({
   username: '',
   password: '',
   confirmPassword: '',
-  nickname: ''
-})
+  nickname: '',
+});
 
 // 演示用前端验证码；接入后端图形验证码接口后替换这里
-const captchaCode = ref('')
-const captchaInput = ref('')
+const captchaCode = ref('');
+const captchaInput = ref('');
 
 function refreshCaptcha() {
-  const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ'
-  let code = ''
+  const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+  let code = '';
   for (let i = 0; i < 4; i += 1) {
-    code += chars[Math.floor(Math.random() * chars.length)]
+    code += chars[Math.floor(Math.random() * chars.length)];
   }
-  captchaCode.value = code
-  captchaInput.value = ''
+  captchaCode.value = code;
+  captchaInput.value = '';
 }
 
-refreshCaptcha()
+refreshCaptcha();
 
 function goAfterAuth() {
-  const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : ''
+  const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : '';
   if (redirect.startsWith('/')) {
-    router.push(redirect)
-    return
+    router.push(redirect);
+    return;
   }
-  router.push(router.hasRoute('account') ? '/account' : '/community')
+  router.push(router.hasRoute('account') ? '/account' : '/community');
 }
 
 async function submitLogin() {
-  loginError.value = ''
+  loginError.value = '';
   if (!loginForm.account.trim()) {
-    loginError.value = '请输入用户名或手机号'
-    return
+    loginError.value = '请输入用户名或手机号';
+    return;
   }
   if (!loginForm.password) {
-    loginError.value = '请输入密码'
-    return
+    loginError.value = '请输入密码';
+    return;
   }
   if (captchaInput.value.toUpperCase() !== captchaCode.value) {
-    loginError.value = '验证码不正确'
-    refreshCaptcha()
-    return
+    loginError.value = '验证码不正确';
+    refreshCaptcha();
+    return;
   }
 
-  submitting.value = true
+  submitting.value = true;
   try {
     await auth.login({
       account: loginForm.account.trim(),
-      password: loginForm.password
-    })
-    goAfterAuth()
+      password: loginForm.password,
+    });
+    goAfterAuth();
   } catch (e) {
-    loginError.value = e.message || '登录失败，请稍后重试'
-    refreshCaptcha()
+    loginError.value = e.message || '登录失败，请稍后重试';
+    refreshCaptcha();
   } finally {
-    submitting.value = false
+    submitting.value = false;
   }
 }
 
 async function submitRegister() {
-  registerError.value = ''
+  registerError.value = '';
   if (registerForm.username.trim().length < 3) {
-    registerError.value = '用户名至少 3 位'
-    return
+    registerError.value = '用户名至少 3 位';
+    return;
   }
   if (registerForm.password.length < 6) {
-    registerError.value = '密码至少 6 位'
-    return
+    registerError.value = '密码至少 6 位';
+    return;
   }
   if (registerForm.password !== registerForm.confirmPassword) {
-    registerError.value = '两次输入的密码不一致'
-    return
+    registerError.value = '两次输入的密码不一致';
+    return;
   }
 
-  submitting.value = true
+  submitting.value = true;
   try {
     await auth.register({
       username: registerForm.username.trim(),
       password: registerForm.password,
       confirmPassword: registerForm.confirmPassword,
-      nickname: registerForm.nickname.trim() || undefined
-    })
-    goAfterAuth()
+      nickname: registerForm.nickname.trim() || undefined,
+    });
+    goAfterAuth();
   } catch (e) {
-    registerError.value = e.message || '注册失败，请稍后重试'
+    registerError.value = e.message || '注册失败，请稍后重试';
   } finally {
-    submitting.value = false
+    submitting.value = false;
   }
 }
 </script>

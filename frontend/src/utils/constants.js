@@ -15,8 +15,8 @@ export const ORDER_STATUS = {
   CANCELLED: { label: '已取消', cls: 'neutral' },
   DISPUTED: { label: '纠纷中', cls: 'error' },
   OVERDUE: { label: '逾期', cls: 'error' },
-  CLOSED: { label: '已终结', cls: 'neutral' }
-}
+  CLOSED: { label: '已终结', cls: 'neutral' },
+};
 
 // 订单状态筛选项（下拉）
 export const ORDER_STATUS_FILTER = [
@@ -30,24 +30,24 @@ export const ORDER_STATUS_FILTER = [
   { value: 'CANCELLED', label: '已取消' },
   { value: 'DISPUTED', label: '纠纷中' },
   { value: 'OVERDUE', label: '逾期' },
-  { value: 'CLOSED', label: '已终结' }
-]
+  { value: 'CLOSED', label: '已终结' },
+];
 
 // 纠纷状态（两级机制：社区调解 → 平台仲裁，对齐设计文档「社区治理子系统」）
 export const DISPUTE_STATUS = {
   MEDIATING: { label: '调解中', cls: 'warn' },
   PENDING_ARBITRATION: { label: '待仲裁', cls: 'error' },
   RESOLVED: { label: '已调解', cls: '' },
-  ARBITRATED: { label: '已裁决', cls: 'blue' }
-}
+  ARBITRATED: { label: '已裁决', cls: 'blue' },
+};
 
 // 资金流水类型
 export const FLOW_TYPE = {
   INCOME: { label: '收入', sign: '+' },
   EXPENSE: { label: '支出', sign: '−' },
   FREEZE: { label: '冻结', sign: '' },
-  UNFREEZE: { label: '解冻', sign: '+' }
-}
+  UNFREEZE: { label: '解冻', sign: '+' },
+};
 
 // 流水类型筛选项
 export const FLOW_TYPE_FILTER = [
@@ -55,34 +55,34 @@ export const FLOW_TYPE_FILTER = [
   { value: 'INCOME', label: '收入' },
   { value: 'EXPENSE', label: '支出' },
   { value: 'FREEZE', label: '冻结' },
-  { value: 'UNFREEZE', label: '解冻' }
-]
+  { value: 'UNFREEZE', label: '解冻' },
+];
 
 // 物品分类
-export const ITEM_CATEGORY = ['工具', '家电', '户外', '数码', '其他']
+export const ITEM_CATEGORY = ['工具', '家电', '户外', '数码', '其他'];
 
 // 社区加入状态（成员关系）
 export const MEMBER_STATUS = {
   JOINED: { label: '已加入', cls: '' },
   PENDING: { label: '待审核', cls: 'warn' },
-  REJECTED: { label: '已拒绝', cls: 'neutral' }
-}
+  REJECTED: { label: '已拒绝', cls: 'neutral' },
+};
 
 // 社区申请审核结果（对齐设计文档 CommunityApplyDO，管理员侧审核）
 export const COMMUNITY_APPLY_STATUS = {
   PENDING: { label: '待审核', cls: 'warn' },
   PASSED: { label: '已通过', cls: '' },
-  REJECTED: { label: '已拒绝', cls: 'neutral' }
-}
+  REJECTED: { label: '已拒绝', cls: 'neutral' },
+};
 
 // 举报对象类型
-export const REPORT_TARGET = ['物品', '用户', '评价']
+export const REPORT_TARGET = ['物品', '用户', '评价'];
 
 // 举报类型
-export const REPORT_TYPE = ['信息不实', '违规内容', '恶意评价', '其他']
+export const REPORT_TYPE = ['信息不实', '违规内容', '恶意评价', '其他'];
 
 // 平台佣金比例（与 BR-07 一致，后台可配置）
-export const COMMISSION_RATE = 0.1
+export const COMMISSION_RATE = 0.1;
 
 // 逾期计费倍率（BR-08）
-export const OVERDUE_RATE = 1.5
+export const OVERDUE_RATE = 1.5;

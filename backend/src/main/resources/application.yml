@@ -45,7 +45,7 @@ app:
     # 首次启动时插入演示账号；不需要时设为 false
     seed: true
     username: Starling
-    password: "123456"
+    password: '123456'
     nickname: Starling
     # 演示阶段实名认证直接通过；接入管理端审核后改为 false
     auto-verify-real-name: true

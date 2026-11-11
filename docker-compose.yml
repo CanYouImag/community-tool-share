@@ -32,7 +32,7 @@ services:
       DB_PASSWORD: root
       JWT_SECRET: linzu-demo-secret-key-change-me-32bytes
     ports:
-      - "8080:8080"
+      - '8080:8080'
 
   frontend:
     build: ./frontend
