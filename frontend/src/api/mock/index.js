@@ -28,14 +28,16 @@ const handlers = [
   {
     method: 'GET',
     pattern: /^\/v1\/items\/mine$/,
-    handler: () => {
+    handler: (params) => {
       const user = useUserStore();
 
       if (!user.isLoggedIn) {
         throw new Error('请先登录');
       }
 
-      const records = db.items.filter((item) => item.ownerId === user.id);
+      const records = db.items.filter(
+        (item) => item.ownerId === user.id && (!params.status || item.status === params.status),
+      );
 
       return {
         records,
@@ -157,6 +159,38 @@ const handlers = [
     },
   },
   {
+    method: 'PATCH',
+    pattern: /^\/v1\/items\/([^/]+)\/status$/,
+    handler: (params, matches) => {
+      const user = useUserStore();
+      const id = decodeURIComponent(matches[1]);
+      const item = db.items.find((item) => item.id === id);
+
+      if (!user.isCertified) {
+        throw new Error('请先完成实名认证');
+      }
+
+      if (!item || item.ownerId !== user.id) {
+        throw new Error('物品不存在或无权操作');
+      }
+
+      const currentStatus = item.status ?? 'AVAILABLE';
+      const nextStatus = params.status;
+
+      const canPause = currentStatus === 'AVAILABLE' && nextStatus === 'PAUSED';
+      const canResume = currentStatus === 'PAUSED' && nextStatus === 'AVAILABLE';
+
+      if (!canPause && !canResume) {
+        throw new Error('当前状态不允许此操作，请刷新后重试');
+      }
+
+      item.status = nextStatus;
+      item.updatedAt = new Date().toISOString();
+
+      return { id: item.id, status: item.status };
+    },
+  },
+  {
     method: 'POST',
     pattern: /^\/v1\/items\/([^/]+)\/favorite$/,
     handler: (_params, matches) => setMockFavorite(decodeURIComponent(matches[1]), true),
@@ -193,7 +227,10 @@ const handlers = [
       const cid = matches[1];
       const home = db.communityHome[cid] || { top: [], latest: [] };
       const community = db.communities.find((c) => c.id === cid);
-      const resolve = (ids) => ids.map((id) => db.items.find((i) => i.id === id)).filter(Boolean);
+      const resolve = (ids) =>
+        ids
+          .map((id) => db.items.find((item) => item.id === id))
+          .filter((item) => item && (item.status ?? 'AVAILABLE') === 'AVAILABLE');
       return { ...community, top: resolve(home.top), latest: resolve(home.latest) };
     },
   },
