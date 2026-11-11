@@ -2,10 +2,12 @@
 import { deleteItem, getMyItems, updateItemStatus } from '@/api/modules/item';
 import EmptyState from '@/components/EmptyState.vue';
 import StatusBadge from '@/components/StatusBadge.vue';
+import { useUserStore } from '@/store/user';
 import { ITEM_STATUS } from '@/utils/constants';
 import { formatMoney } from '@/utils/format';
 import { onMounted, ref } from 'vue';
 
+const user = useUserStore();
 const items = ref([]);
 const loading = ref(true);
 const error = ref('');
@@ -13,8 +15,23 @@ const selectedStatus = ref('');
 const savingId = ref('');
 const actionError = ref('');
 
+function checkManagePermission() {
+  if (!user.isLoggedIn) {
+    actionError.value = '请先登录';
+    return false;
+  }
+
+  if (!user.isCertified) {
+    actionError.value = '请先完成实名认证后再管理物品';
+    return false;
+  }
+
+  return true;
+}
+
 async function changeStatus(item) {
   if (savingId.value || loading.value) return;
+  if (!checkManagePermission()) return;
 
   const nextStatus = item.status === 'AVAILABLE' ? 'PAUSED' : 'AVAILABLE';
 
@@ -33,6 +50,7 @@ async function changeStatus(item) {
 
 async function removeItem(item) {
   if (savingId.value || loading.value) return;
+  if (!checkManagePermission()) return;
 
   const confirmed = window.confirm(`确定删除「${item.title}」吗？删除后无法恢复。`);
 
@@ -52,6 +70,12 @@ async function removeItem(item) {
 }
 
 async function loadMyItems() {
+  if (!user.isLoggedIn) {
+    items.value = [];
+    loading.value = false;
+    return;
+  }
+
   loading.value = true;
   error.value = '';
 
@@ -77,10 +101,21 @@ onMounted(loadMyItems);
         <h1>我的物品</h1>
         <p>查看自己发布的物品及审核状态。</p>
       </div>
-      <router-link class="btn primary" to="/publish"> 发布物品 </router-link>
+      <router-link v-if="user.isCertified" class="btn primary" to="/publish">
+        发布物品
+      </router-link>
     </header>
 
-    <section class="panel">
+    <section v-if="!user.isLoggedIn" class="panel" role="alert">
+      <h2>请先登录</h2>
+      <p>登录后才能查看自己发布的物品。</p>
+      <router-link class="btn" to="/items">返回物品广场</router-link>
+    </section>
+
+    <section v-else class="panel">
+      <p v-if="!user.isCertified" role="status">
+        当前仅可查看物品，请先完成实名认证后再发布或管理物品。
+      </p>
       <div class="filters">
         <label class="field">
           <span>物品状态</span>
@@ -140,6 +175,7 @@ onMounted(loadMyItems);
               <td>
                 <router-link
                   v-if="
+                    user.isCertified &&
                     !savingId &&
                     ['PENDING_REVIEW', 'AVAILABLE', 'REJECTED', 'PAUSED'].includes(item.status)
                   "
@@ -149,7 +185,7 @@ onMounted(loadMyItems);
                   编辑
                 </router-link>
                 <button
-                  v-if="['AVAILABLE', 'PAUSED'].includes(item.status)"
+                  v-if="user.isCertified && ['AVAILABLE', 'PAUSED'].includes(item.status)"
                   class="btn small"
                   type="button"
                   :disabled="Boolean(savingId)"
@@ -164,6 +200,7 @@ onMounted(loadMyItems);
                   }}
                 </button>
                 <button
+                  v-if="user.isCertified"
                   class="btn small"
                   type="button"
                   :disabled="Boolean(savingId)"
@@ -171,6 +208,7 @@ onMounted(loadMyItems);
                 >
                   {{ savingId === item.id ? '处理中…' : '删除' }}
                 </button>
+                <span v-if="!user.isCertified" class="muted">仅可查看</span>
               </td>
             </tr>
           </tbody>

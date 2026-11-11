@@ -35,6 +35,12 @@ const communityLoading = ref(true);
 const communityError = ref('');
 
 async function loadJoinedCommunities() {
+  if (!user.isLoggedIn || !user.isCertified) {
+    joinedCommunities.value = [];
+    communityLoading.value = false;
+    return;
+  }
+
   communityLoading.value = true;
   communityError.value = '';
 
@@ -120,6 +126,16 @@ function checkForm() {
   error.value = '';
   message.value = '';
 
+  if (!user.isLoggedIn) {
+    error.value = '请先登录';
+    return;
+  }
+
+  if (!user.isCertified) {
+    error.value = '请先完成实名认证';
+    return;
+  }
+
   if (communityLoading.value) {
     error.value = '社区正在加载，请稍后再试';
     return;
@@ -151,11 +167,6 @@ function checkForm() {
 
   if (images.value.length === 0) {
     error.value = '请至少添加一张物品图片';
-    return;
-  }
-
-  if (!user.isCertified) {
-    error.value = '请先完成实名认证';
     return;
   }
 
@@ -247,7 +258,10 @@ watch(
       description: '',
     });
 
-    if (!id) return;
+    if (!id || !user.isLoggedIn || !user.isCertified) {
+      editLoading.value = false;
+      return;
+    }
 
     try {
       const item = await getMyItem(id);
@@ -301,7 +315,19 @@ watch(
       </div>
     </header>
 
-    <section v-if="editLoading" class="panel" role="status">正在加载物品…</section>
+    <section v-if="!user.isLoggedIn" class="panel" role="alert">
+      <h2>请先登录</h2>
+      <p>登录并完成实名认证后，才能发布或编辑物品。</p>
+      <router-link class="btn" to="/items">返回物品广场</router-link>
+    </section>
+
+    <section v-else-if="!user.isCertified" class="panel" role="alert">
+      <h2>请先完成实名认证</h2>
+      <p>发布或编辑物品需要完成实名认证。</p>
+      <router-link class="btn" to="/items">返回物品广场</router-link>
+    </section>
+
+    <section v-else-if="editLoading" class="panel" role="status">正在加载物品…</section>
 
     <section v-else-if="editLoadError" class="panel" role="alert">
       <p>{{ editLoadError }}</p>
