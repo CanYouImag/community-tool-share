@@ -1,5 +1,5 @@
 <script setup>
-import { getItem } from '@/api/modules/item';
+import { favoriteItem, getItem, unfavoriteItem } from '@/api/modules/item';
 import { formatMoney } from '@/utils/format';
 import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
@@ -8,6 +8,32 @@ const route = useRoute();
 const item = ref(null);
 const loading = ref(true);
 const error = ref('');
+const favoriteSaving = ref(false);
+const favoriteError = ref('');
+
+async function toggleFavorite() {
+    if (!item.value || favoriteSaving.value) return;
+
+    const target = item.value;
+    favoriteSaving.value = true;
+    favoriteError.value = '';
+
+    try {
+        const result = target.favorited
+            ? await unfavoriteItem(target.id)
+            : await favoriteItem(target.id);
+
+        if (item.value === target) {
+            target.favorited = result.favorited;
+        }
+    } catch (err) {
+        if (item.value === target) {
+            favoriteError.value = err.message || '收藏操作失败，请重试';
+        }
+    } finally {
+        favoriteSaving.value = false;
+    }
+}
 
 watch(
     () => route.params.id,
@@ -19,6 +45,7 @@ watch(
 
         loading.value = true;
         error.value = '';
+        favoriteError.value = '';
         item.value = null;
 
         try {
@@ -98,6 +125,27 @@ watch(
                         <dd>{{ item.communityName }}</dd>
                     </div>
                 </dl>
+
+                <div class="actions">
+                    <button
+                        class="btn"
+                        type="button"
+                        :disabled="favoriteSaving"
+                        :aria-pressed="Boolean(item.favorited)"
+                        @click="toggleFavorite"
+                    >
+                        {{
+                            favoriteSaving
+                                ? '处理中…'
+                                : item.favorited
+                                  ? '取消收藏'
+                                  : '收藏'
+                        }}
+                    </button>
+                </div>
+                <p v-if="favoriteError" role="alert">
+                    {{ favoriteError }}
+                </p>
             </section>
         </div>
     </main>

@@ -1,6 +1,24 @@
 // Mock 路由分发：根据 method + url 返回假数据
 import * as db from './data'
 
+const favoriteItemIds = new Set();
+
+function setMockFavorite(id, favorited) {
+  const item = db.items.find((item) => item.id === id);
+
+  if (!item) {
+    throw new Error('物品不存在');
+  }
+
+  if (favorited) {
+    favoriteItemIds.add(id);
+  } else {
+    favoriteItemIds.delete(id);
+  }
+
+  return { favorited: favoriteItemIds.has(id) };
+}
+
 const delay = (data, ms = 200) =>
   new Promise((resolve) => setTimeout(() => resolve(data), ms))
 
@@ -12,6 +30,7 @@ const handlers = [
     handler: (params) => {
       const keyword = (params.keyword || '').trim().toLowerCase();
       const category = params.category || '';
+      const favoritesOnly = params.favoritesOnly === true || params.favoritesOnly === 'true';
 
       const records = db.items.filter((item) => {
         const matchesKeyword =
@@ -19,7 +38,8 @@ const handlers = [
         const matchesCategory =
           !category || item.category === category;
 
-        return matchesKeyword && matchesCategory;
+        const matchesFavorite = !favoritesOnly || favoriteItemIds.has(item.id);
+        return matchesKeyword && matchesCategory && matchesFavorite;
       });
 
       return {
@@ -29,6 +49,18 @@ const handlers = [
         size: 10
       };
     }
+  },
+  {
+    method: 'POST',
+    pattern: /^\/v1\/items\/([^/]+)\/favorite$/,
+    handler: (_params, matches) =>
+        setMockFavorite(decodeURIComponent(matches[1]), true)
+  },
+  {
+    method: 'DELETE',
+    pattern: /^\/v1\/items\/([^/]+)\/favorite$/,
+    handler: (_params, matches) =>
+        setMockFavorite(decodeURIComponent(matches[1]), false)
   },
   {
     method: 'GET',
@@ -41,7 +73,10 @@ const handlers = [
         throw new Error('物品不存在');
         }
 
-        return { ...item };
+        return {
+            ...item,
+            favorited: favoriteItemIds.has(id)
+        };
     }
   },
   {

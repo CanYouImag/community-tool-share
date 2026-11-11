@@ -2,8 +2,8 @@
 import { getItems } from '@/api/modules/item';
 import EmptyState from '@/components/EmptyState.vue';
 import ItemCard from '@/components/ItemCard.vue';
-import { onMounted, ref } from 'vue';
 import { ITEM_CATEGORY } from '@/utils/constants';
+import { onMounted, ref } from 'vue';
 
 const items = ref([]);
 const total = ref(0);
@@ -11,6 +11,16 @@ const loading = ref(true);
 const error = ref('');
 const keyword = ref('');
 const category = ref('');
+const activeTab = ref('browse');
+
+function switchTab(tab) {
+    if (loading.value || activeTab.value === tab) return;
+
+    activeTab.value = tab;
+    keyword.value = '';
+    category.value = '';
+    loadItems();
+}
 
 function searchItems() {
     if (loading.value) return;
@@ -31,7 +41,8 @@ async function loadItems() {
     try {
         const data = await getItems({
             keyword: keyword.value.trim(),
-            category: category.value
+            category: category.value,
+            favoritesOnly: activeTab.value === 'favorites',
         });
         items.value = data.records;
         total.value = data.total;
@@ -52,6 +63,30 @@ onMounted(loadItems);
                 <h1>物品广场</h1>
                 <p>发现邻里好物，让闲置工具流动起来。</p>
             </div>
+        </div>
+
+        <div class="view-tabs" role="group" aria-label="物品列表范围">
+            <button
+                class="btn"
+                :class="{ primary: activeTab === 'browse' }"
+                type="button"
+                :aria-pressed="activeTab === 'browse'"
+                :disabled="loading"
+                @click="switchTab('browse')"
+            >
+                浏览物品
+            </button>
+
+            <button
+                class="btn"
+                :class="{ primary: activeTab === 'favorites' }"
+                type="button"
+                :aria-pressed="activeTab === 'favorites'"
+                :disabled="loading"
+                @click="switchTab('favorites')"
+            >
+                我的收藏
+            </button>
         </div>
 
         <form class="panel" @submit.prevent="searchItems">
@@ -108,11 +143,22 @@ onMounted(loadItems);
 
             <template v-else>
                 <div class="panel-title">
-                    <h2>浏览物品</h2>
+                    <h2>
+                        {{
+                            activeTab === 'favorites' ? '我的收藏' : '浏览物品'
+                        }}
+                    </h2>
                     <small>共 {{ total }} 件物品</small>
                 </div>
 
-                <EmptyState v-if="items.length === 0" text="暂无物品" />
+                <EmptyState
+                    v-if="items.length === 0"
+                    :text="
+                        activeTab === 'favorites'
+                            ? '没有符合条件的收藏物品'
+                            : '没有符合条件的物品'
+                    "
+                />
 
                 <div v-else class="item-grid">
                     <ItemCard
