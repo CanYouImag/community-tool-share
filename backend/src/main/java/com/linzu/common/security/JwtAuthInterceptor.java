@@ -5,28 +5,31 @@ import com.linzu.common.exception.ErrorCode;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import java.util.Set;
-
 @Component
 @RequiredArgsConstructor
 public class JwtAuthInterceptor implements HandlerInterceptor {
 
     private static final Set<String> WHITE_LIST = Set.of(
-            "/api/v1/auth/login",
-            "/api/v1/auth/register",
-            "/api/v1/health"
+        "/api/v1/auth/login",
+        "/api/v1/auth/register",
+        "/api/v1/health"
     );
 
     private final JwtUtil jwtUtil;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+    public boolean preHandle(
+        HttpServletRequest request,
+        HttpServletResponse response,
+        Object handler
+    ) {
         if (HttpMethod.OPTIONS.matches(request.getMethod())) {
             return true;
         }
@@ -56,10 +59,10 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            Object handler,
-            Exception ex
+        HttpServletRequest request,
+        HttpServletResponse response,
+        Object handler,
+        Exception ex
     ) {
         AuthContext.clear();
     }

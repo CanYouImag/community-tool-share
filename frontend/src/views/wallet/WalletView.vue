@@ -1,55 +1,55 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import StatusBadge from '@/components/StatusBadge.vue'
-import Pagination from '@/components/Pagination.vue'
-import EmptyState from '@/components/EmptyState.vue'
-import { getWallet, getFlows, getDeposits } from '@/api/modules/wallet'
-import { FLOW_TYPE, FLOW_TYPE_FILTER } from '@/utils/constants'
-import { formatAmount } from '@/utils/format'
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import StatusBadge from '@/components/StatusBadge.vue';
+import Pagination from '@/components/Pagination.vue';
+import EmptyState from '@/components/EmptyState.vue';
+import { getWallet, getFlows, getDeposits } from '@/api/modules/wallet';
+import { FLOW_TYPE, FLOW_TYPE_FILTER } from '@/utils/constants';
+import { formatAmount } from '@/utils/format';
 
-const router = useRouter()
+const router = useRouter();
 
-const wallet = ref(null)
-const flows = ref([])
-const deposits = ref([])
-const flowType = ref('')
-const flowTotal = ref(0)
+const wallet = ref(null);
+const flows = ref([]);
+const deposits = ref([]);
+const flowType = ref('');
+const flowTotal = ref(0);
 
 const tabs = [
   { id: 'flows', label: '资金流水' },
-  { id: 'deposits', label: '押金明细' }
-]
-const activeTab = ref('flows')
+  { id: 'deposits', label: '押金明细' },
+];
+const activeTab = ref('flows');
 
 async function load() {
-  wallet.value = await getWallet()
-  deposits.value = await getDeposits()
-  await loadFlows()
+  wallet.value = await getWallet();
+  deposits.value = await getDeposits();
+  await loadFlows();
 }
 
 async function loadFlows() {
-  const res = await getFlows({ type: flowType.value })
-  flows.value = res.list
-  flowTotal.value = res.total
+  const res = await getFlows({ type: flowType.value });
+  flows.value = res.list;
+  flowTotal.value = res.total;
 }
 
 // 流水金额显示（带符号 + 类型前缀）
 function flowText(f) {
-  const type = FLOW_TYPE[f.type] || {}
-  const sign = type.sign || ''
-  return `${sign} ¥${formatAmount(f.amount)}`
+  const type = FLOW_TYPE[f.type] || {};
+  const sign = type.sign || '';
+  return `${sign} ¥${formatAmount(f.amount)}`;
 }
 
 function flowLabel(f) {
-  return FLOW_TYPE[f.type]?.label || f.type
+  return FLOW_TYPE[f.type]?.label || f.type;
 }
 
 function depositStatus(s) {
-  return s === 'FREEZE' ? '冻结中' : '已解冻'
+  return s === 'FREEZE' ? '冻结中' : '已解冻';
 }
 
-onMounted(load)
+onMounted(load);
 </script>
 
 <template>

@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @SpringBootApplication
-@MapperScan({"com.linzu.user.mapper", "com.linzu.wallet.mapper"})
+@MapperScan({ "com.linzu.user.mapper", "com.linzu.wallet.mapper" })
 @EnableConfigurationProperties(JwtProperties.class)
 public class LinzuApplication {
 

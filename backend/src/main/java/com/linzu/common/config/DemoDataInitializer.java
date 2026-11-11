@@ -7,6 +7,7 @@ import com.linzu.user.mapper.UserMapper;
 import com.linzu.user.mapper.UserRealNameMapper;
 import com.linzu.wallet.entity.Wallet;
 import com.linzu.wallet.mapper.WalletMapper;
+import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,8 +16,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
 
 @Slf4j
 @Component
@@ -42,7 +41,7 @@ public class DemoDataInitializer implements CommandLineRunner {
     @Transactional
     public void run(String... args) {
         Long exists = userMapper.selectCount(
-                Wrappers.<User>lambdaQuery().eq(User::getUsername, username)
+            Wrappers.<User>lambdaQuery().eq(User::getUsername, username)
         );
         if (exists != null && exists > 0) {
             return;

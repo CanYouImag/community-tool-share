@@ -10,6 +10,9 @@ import com.linzu.wallet.service.WalletService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,13 +21,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 @Tag(name = "钱包")
 @RestController
-@RequestMapping({"/api/v1/wallet", "/api/wallet"})
+@RequestMapping({ "/api/v1/wallet", "/api/wallet" })
 @RequiredArgsConstructor
 public class WalletController {
 
@@ -39,13 +38,13 @@ public class WalletController {
     @Operation(summary = "分页查询资金流水")
     @GetMapping("/transactions")
     public Result<PageResult<WalletTransactionResponse>> transactions(
-            @RequestParam(defaultValue = "1") long page,
-            @RequestParam(defaultValue = "10") long size,
-            @RequestParam(required = false) String type
+        @RequestParam(defaultValue = "1") long page,
+        @RequestParam(defaultValue = "10") long size,
+        @RequestParam(required = false) String type
     ) {
-        return Result.ok(walletService.getTransactions(
-                AuthContext.requireUserId(), page, size, type
-        ));
+        return Result.ok(
+            walletService.getTransactions(AuthContext.requireUserId(), page, size, type)
+        );
     }
 
     /**
@@ -54,12 +53,15 @@ public class WalletController {
     @Operation(summary = "资金流水（兼容旧前端）")
     @GetMapping("/flows")
     public Result<Map<String, Object>> flows(
-            @RequestParam(defaultValue = "1") long page,
-            @RequestParam(defaultValue = "10") long size,
-            @RequestParam(required = false) String type
+        @RequestParam(defaultValue = "1") long page,
+        @RequestParam(defaultValue = "10") long size,
+        @RequestParam(required = false) String type
     ) {
         PageResult<WalletTransactionResponse> result = walletService.getTransactions(
-                AuthContext.requireUserId(), page, size, type
+            AuthContext.requireUserId(),
+            page,
+            size,
+            type
         );
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("list", result.getRecords());
@@ -80,24 +82,28 @@ public class WalletController {
     @Operation(summary = "冻结余额")
     @PostMapping("/freeze")
     public Result<WalletResponse> freeze(@Valid @RequestBody FreezeRequest request) {
-        return Result.ok(walletService.freeze(
+        return Result.ok(
+            walletService.freeze(
                 AuthContext.requireUserId(),
                 request.amount(),
                 request.refType(),
                 request.refId(),
                 request.remark()
-        ));
+            )
+        );
     }
 
     @Operation(summary = "解冻余额")
     @PostMapping("/unfreeze")
     public Result<WalletResponse> unfreeze(@Valid @RequestBody FreezeRequest request) {
-        return Result.ok(walletService.unfreeze(
+        return Result.ok(
+            walletService.unfreeze(
                 AuthContext.requireUserId(),
                 request.amount(),
                 request.refType(),
                 request.refId(),
                 request.remark()
-        ));
+            )
+        );
     }
 }

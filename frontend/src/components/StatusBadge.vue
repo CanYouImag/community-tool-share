@@ -1,12 +1,12 @@
 <script setup>
-import { computed } from 'vue'
+import { computed } from 'vue';
 
 const props = defineProps({
   status: { type: String, default: '' },
   // 支持直接传文案 + 颜色类（如自定义状态）
   label: { type: String, default: '' },
-  cls: { type: String, default: '' }
-})
+  cls: { type: String, default: '' },
+});
 
 const mapping = {
   PENDING_PAYMENT: { label: '待确认', cls: 'warn' },
@@ -28,13 +28,13 @@ const mapping = {
   MEMBER_PENDING: { label: '待审核', cls: 'warn' },
   MEMBER_REJECTED: { label: '已拒绝', cls: 'neutral' },
   APPLY_PASSED: { label: '已通过', cls: '' },
-  APPLY_REJECTED: { label: '已拒绝', cls: 'neutral' }
-}
+  APPLY_REJECTED: { label: '已拒绝', cls: 'neutral' },
+};
 
 const display = computed(() => {
-  if (props.label) return { label: props.label, cls: props.cls }
-  return mapping[props.status] || { label: props.status || '—', cls: '' }
-})
+  if (props.label) return { label: props.label, cls: props.cls };
+  return mapping[props.status] || { label: props.status || '—', cls: '' };
+});
 </script>
 
 <template>

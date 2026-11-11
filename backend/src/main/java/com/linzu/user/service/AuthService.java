@@ -12,13 +12,12 @@ import com.linzu.user.entity.User;
 import com.linzu.user.mapper.UserMapper;
 import com.linzu.wallet.entity.Wallet;
 import com.linzu.wallet.mapper.WalletMapper;
+import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
-import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor
@@ -38,7 +37,7 @@ public class AuthService {
 
         String username = request.username().trim();
         Long exists = userMapper.selectCount(
-                Wrappers.<User>lambdaQuery().eq(User::getUsername, username)
+            Wrappers.<User>lambdaQuery().eq(User::getUsername, username)
         );
         if (exists != null && exists > 0) {
             throw new BusinessException(ErrorCode.USERNAME_EXISTS);
@@ -47,9 +46,9 @@ public class AuthService {
         User user = new User();
         user.setUsername(username);
         user.setPasswordHash(passwordEncoder.encode(request.password()));
-        user.setNickname(StringUtils.hasText(request.nickname())
-                ? request.nickname().trim()
-                : username);
+        user.setNickname(
+            StringUtils.hasText(request.nickname()) ? request.nickname().trim() : username
+        );
         user.setRole("REGISTERED");
         user.setStatus("ACTIVE");
         user.setCreditScore(100);
@@ -69,11 +68,11 @@ public class AuthService {
     public LoginResponse login(LoginRequest request) {
         String account = request.account().trim();
         User user = userMapper.selectOne(
-                Wrappers.<User>lambdaQuery()
-                        .eq(User::getUsername, account)
-                        .or()
-                        .eq(User::getPhone, account)
-                        .last("limit 1")
+            Wrappers.<User>lambdaQuery()
+                .eq(User::getUsername, account)
+                .or()
+                .eq(User::getPhone, account)
+                .last("limit 1")
         );
         if (user == null || !passwordEncoder.matches(request.password(), user.getPasswordHash())) {
             throw new BusinessException(ErrorCode.ACCOUNT_OR_PASSWORD_ERROR);
@@ -91,9 +90,9 @@ public class AuthService {
     private LoginResponse buildLoginResponse(User user) {
         String token = jwtUtil.generateToken(user.getId(), user.getRole());
         return new LoginResponse(
-                token,
-                jwtUtil.getExpireSeconds(),
-                userService.getProfile(user.getId())
+            token,
+            jwtUtil.getExpireSeconds(),
+            userService.getProfile(user.getId())
         );
     }
 }

@@ -1,9 +1,9 @@
 <script setup>
-import { formatAmount } from '@/utils/format'
+import { formatAmount } from '@/utils/format';
 
 defineProps({
-  item: { type: Object, required: true }
-})
+  item: { type: Object, required: true },
+});
 </script>
 
 <template>
@@ -14,7 +14,9 @@ defineProps({
     <div class="body">
       <small>{{ item.category }} / {{ item.communityName }}</small>
       <h3>
-        <router-link :to="{ name: 'item-detail', params: { id: item.id } }">{{ item.title }}</router-link>
+        <router-link :to="{ name: 'item-detail', params: { id: item.id } }">{{
+          item.title
+        }}</router-link>
       </h3>
       <div class="bottom">
         <span class="price">

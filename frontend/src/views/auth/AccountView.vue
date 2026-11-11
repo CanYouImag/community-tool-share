@@ -1,174 +1,172 @@
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/store/auth'
-import { getWallet } from '@/api/modules/wallet'
-import { formatAmount } from '@/utils/format'
+import { computed, onMounted, reactive, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/store/auth';
+import { getWallet } from '@/api/modules/wallet';
+import { formatAmount } from '@/utils/format';
 
-const router = useRouter()
-const auth = useAuthStore()
+const router = useRouter();
+const auth = useAuthStore();
 
-const activeTab = ref('profile')
-const loading = ref(true)
-const pageError = ref('')
-const profileMessage = ref('')
-const passwordMessage = ref('')
-const realNameMessage = ref('')
-const wallet = ref(null)
+const activeTab = ref('profile');
+const loading = ref(true);
+const pageError = ref('');
+const profileMessage = ref('');
+const passwordMessage = ref('');
+const realNameMessage = ref('');
+const wallet = ref(null);
 
 const profileForm = reactive({
   nickname: '',
   bio: '',
-  avatarUrl: ''
-})
+  avatarUrl: '',
+});
 
 const passwordForm = reactive({
   oldPassword: '',
   newPassword: '',
-  confirmPassword: ''
-})
+  confirmPassword: '',
+});
 
 const realNameForm = reactive({
   realName: '',
-  idCardNo: ''
-})
+  idCardNo: '',
+});
 
 const tabs = [
   { id: 'profile', label: '我的资料' },
   { id: 'settings', label: '编辑资料' },
-  { id: 'verify', label: '实名认证' }
-]
+  { id: 'verify', label: '实名认证' },
+];
 
 const realNameLabels = {
   UNVERIFIED: '未实名',
   PENDING: '审核中',
   VERIFIED: '已实名认证',
-  REJECTED: '认证驳回'
-}
+  REJECTED: '认证驳回',
+};
 
 const roleLabels = {
   REGISTERED: '注册用户',
   CERTIFIED: '认证用户',
   COMMUNITY_ADMIN: '社区管理员',
-  PLATFORM_ADMIN: '平台管理员'
-}
+  PLATFORM_ADMIN: '平台管理员',
+};
 
-const user = computed(() => auth.user)
-const avatarText = computed(() => (auth.displayName || '邻').slice(0, 1).toUpperCase())
-const realNameText = computed(
-  () => realNameLabels[user.value?.realNameStatus] || '未实名'
-)
-const roleText = computed(() => roleLabels[user.value?.role] || user.value?.role || '—')
+const user = computed(() => auth.user);
+const avatarText = computed(() => (auth.displayName || '邻').slice(0, 1).toUpperCase());
+const realNameText = computed(() => realNameLabels[user.value?.realNameStatus] || '未实名');
+const roleText = computed(() => roleLabels[user.value?.role] || user.value?.role || '—');
 const canSubmitRealName = computed(
-  () => !['VERIFIED', 'PENDING'].includes(user.value?.realNameStatus)
-)
+  () => !['VERIFIED', 'PENDING'].includes(user.value?.realNameStatus),
+);
 
 function syncForms() {
-  profileForm.nickname = user.value?.nickname || ''
-  profileForm.bio = user.value?.bio || ''
-  profileForm.avatarUrl = user.value?.avatarUrl || ''
-  realNameForm.realName = user.value?.realName || ''
-  realNameForm.idCardNo = ''
+  profileForm.nickname = user.value?.nickname || '';
+  profileForm.bio = user.value?.bio || '';
+  profileForm.avatarUrl = user.value?.avatarUrl || '';
+  realNameForm.realName = user.value?.realName || '';
+  realNameForm.idCardNo = '';
 }
 
 async function load() {
-  pageError.value = ''
+  pageError.value = '';
   if (!auth.isLoggedIn) {
-    loading.value = false
-    return
+    loading.value = false;
+    return;
   }
-  loading.value = true
+  loading.value = true;
   try {
-    await auth.loadMe()
-    syncForms()
+    await auth.loadMe();
+    syncForms();
     try {
-      wallet.value = await getWallet()
+      wallet.value = await getWallet();
     } catch {
-      wallet.value = null
+      wallet.value = null;
     }
   } catch (e) {
-    pageError.value = e.message || '加载个人资料失败'
+    pageError.value = e.message || '加载个人资料失败';
     if (e.message?.includes('登录')) {
-      auth.clear()
+      auth.clear();
     }
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
 async function saveProfile() {
-  profileMessage.value = ''
+  profileMessage.value = '';
   try {
     await auth.updateProfile({
       nickname: profileForm.nickname,
       bio: profileForm.bio,
-      avatarUrl: profileForm.avatarUrl
-    })
-    syncForms()
-    profileMessage.value = '资料已保存'
-    activeTab.value = 'profile'
+      avatarUrl: profileForm.avatarUrl,
+    });
+    syncForms();
+    profileMessage.value = '资料已保存';
+    activeTab.value = 'profile';
   } catch (e) {
-    profileMessage.value = e.message || '保存失败'
+    profileMessage.value = e.message || '保存失败';
   }
 }
 
 async function savePassword() {
-  passwordMessage.value = ''
+  passwordMessage.value = '';
   if (passwordForm.newPassword.length < 6) {
-    passwordMessage.value = '新密码至少 6 位'
-    return
+    passwordMessage.value = '新密码至少 6 位';
+    return;
   }
   if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-    passwordMessage.value = '两次输入的新密码不一致'
-    return
+    passwordMessage.value = '两次输入的新密码不一致';
+    return;
   }
   try {
-    await auth.changePassword({ ...passwordForm })
-    passwordForm.oldPassword = ''
-    passwordForm.newPassword = ''
-    passwordForm.confirmPassword = ''
-    passwordMessage.value = '密码已修改'
+    await auth.changePassword({ ...passwordForm });
+    passwordForm.oldPassword = '';
+    passwordForm.newPassword = '';
+    passwordForm.confirmPassword = '';
+    passwordMessage.value = '密码已修改';
   } catch (e) {
-    passwordMessage.value = e.message || '修改密码失败'
+    passwordMessage.value = e.message || '修改密码失败';
   }
 }
 
 async function submitRealName() {
-  realNameMessage.value = ''
+  realNameMessage.value = '';
   if (!realNameForm.realName.trim()) {
-    realNameMessage.value = '请输入真实姓名'
-    return
+    realNameMessage.value = '请输入真实姓名';
+    return;
   }
   if (!/^\d{17}[\dXx]$/.test(realNameForm.idCardNo.trim())) {
-    realNameMessage.value = '请输入 18 位身份证号'
-    return
+    realNameMessage.value = '请输入 18 位身份证号';
+    return;
   }
   try {
     await auth.submitRealName({
       realName: realNameForm.realName.trim(),
-      idCardNo: realNameForm.idCardNo.trim()
-    })
-    syncForms()
-    realNameMessage.value = '实名认证已提交'
+      idCardNo: realNameForm.idCardNo.trim(),
+    });
+    syncForms();
+    realNameMessage.value = '实名认证已提交';
   } catch (e) {
-    realNameMessage.value = e.message || '提交失败'
+    realNameMessage.value = e.message || '提交失败';
   }
 }
 
 function goLogin() {
   if (router.hasRoute('login')) {
-    router.push('/login')
+    router.push('/login');
   } else {
-    pageError.value = '登录页路由尚未注册，请先在 router/index.js 引入 authRoutes'
+    pageError.value = '登录页路由尚未注册，请先在 router/index.js 引入 authRoutes';
   }
 }
 
 async function logout() {
-  await auth.logout()
-  router.push(router.hasRoute('login') ? '/login' : '/community')
+  await auth.logout();
+  router.push(router.hasRoute('login') ? '/login' : '/community');
 }
 
-onMounted(load)
+onMounted(load);
 </script>
 
 <template>
@@ -345,9 +343,7 @@ onMounted(load)
 
                 <div class="actions">
                   <button class="btn primary" type="submit">保存资料</button>
-                  <button class="btn" type="button" @click="activeTab = 'profile'">
-                    取消
-                  </button>
+                  <button class="btn" type="button" @click="activeTab = 'profile'">取消</button>
                 </div>
               </form>
             </div>
