@@ -32,7 +32,7 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
         }
 
         String path = request.getRequestURI();
-        if (!path.startsWith("/api/") || WHITE_LIST.contains(path)) {
+        if (!path.startsWith("/api/") || WHITE_LIST.contains(path) || isPublicBrowse(request, path)) {
             return true;
         }
 
@@ -52,6 +52,28 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
         } catch (JwtException | IllegalArgumentException e) {
             throw new BusinessException(ErrorCode.UNAUTHORIZED);
         }
+    }
+
+    /**
+     * 社区浏览（列表 / 主页 / 公告）对游客开放（UC-B1）。
+     * 仅放行只读 GET；成员管理、加入申请审核等写操作仍走登录与权限拦截。
+     */
+    private boolean isPublicBrowse(HttpServletRequest request, String path) {
+        if (!HttpMethod.GET.matches(request.getMethod())) {
+            return false;
+        }
+        for (String base : new String[]{"/api/communities", "/api/v1/communities"}) {
+            if (path.equals(base)) {
+                return true;
+            }
+            if (path.startsWith(base + "/home/")) {
+                return true;
+            }
+            if (path.matches(base + "/[^/]+/announcements")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
