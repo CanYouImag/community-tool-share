@@ -1,9 +1,23 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
+import { authRoutes } from './auth.routes'
 
 const routes = [
+  ...authRoutes,
+  {
+    path: '/items',
+    name: 'items',
+    component: () => import('@/views/items/ItemsView.vue'),
+    meta: { title: '物品广场' }
+  },
+  {
+    path: '/items/:id',
+    name: 'item-detail',
+    component: () => import('@/views/items/ItemDetailView.vue'),
+    meta: { title: '物品详情' }
+  },
   {
     path: '/',
-    redirect: '/community'
+    redirect: '/items'
   },
   {
     path: '/community',

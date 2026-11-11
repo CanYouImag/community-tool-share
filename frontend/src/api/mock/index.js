@@ -1,11 +1,84 @@
 // Mock 路由分发：根据 method + url 返回假数据
 import * as db from './data'
 
+const favoriteItemIds = new Set();
+
+function setMockFavorite(id, favorited) {
+  const item = db.items.find((item) => item.id === id);
+
+  if (!item) {
+    throw new Error('物品不存在');
+  }
+
+  if (favorited) {
+    favoriteItemIds.add(id);
+  } else {
+    favoriteItemIds.delete(id);
+  }
+
+  return { favorited: favoriteItemIds.has(id) };
+}
+
 const delay = (data, ms = 200) =>
   new Promise((resolve) => setTimeout(() => resolve(data), ms))
 
 // 按 url 匹配处理器
 const handlers = [
+  {
+    method: 'GET',
+    pattern: /^\/v1\/items$/,
+    handler: (params) => {
+      const keyword = (params.keyword || '').trim().toLowerCase();
+      const category = params.category || '';
+      const favoritesOnly = params.favoritesOnly === true || params.favoritesOnly === 'true';
+
+      const records = db.items.filter((item) => {
+        const matchesKeyword =
+          !keyword || item.title.toLowerCase().includes(keyword);
+        const matchesCategory =
+          !category || item.category === category;
+
+        const matchesFavorite = !favoritesOnly || favoriteItemIds.has(item.id);
+        return matchesKeyword && matchesCategory && matchesFavorite;
+      });
+
+      return {
+        records,
+        total: records.length,
+        page: 1,
+        size: 10
+      };
+    }
+  },
+  {
+    method: 'POST',
+    pattern: /^\/v1\/items\/([^/]+)\/favorite$/,
+    handler: (_params, matches) =>
+        setMockFavorite(decodeURIComponent(matches[1]), true)
+  },
+  {
+    method: 'DELETE',
+    pattern: /^\/v1\/items\/([^/]+)\/favorite$/,
+    handler: (_params, matches) =>
+        setMockFavorite(decodeURIComponent(matches[1]), false)
+  },
+  {
+    method: 'GET',
+    pattern: /^\/v1\/items\/([^/]+)$/,
+    handler: (_params, matches) => {
+        const id = decodeURIComponent(matches[1]);
+        const item = db.items.find((item) => item.id === id);
+
+        if (!item) {
+        throw new Error('物品不存在');
+        }
+
+        return {
+            ...item,
+            favorited: favoriteItemIds.has(id)
+        };
+    }
+  },
   {
     method: 'GET',
     pattern: /^\/communities$/,
