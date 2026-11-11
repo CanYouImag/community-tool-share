@@ -4,6 +4,10 @@ import { authRoutes } from './auth.routes';
 const routes = [
   ...authRoutes,
   {
+    path: '/',
+    redirect: '/items',
+  },
+  {
     path: '/items',
     name: 'items',
     component: () => import('@/views/items/ItemsView.vue'),
@@ -16,14 +20,16 @@ const routes = [
     meta: { title: '物品详情' },
   },
   {
-    path: '/',
-    redirect: '/items',
-  },
-  {
     path: '/community',
     name: 'community',
     component: () => import('@/views/community/CommunityView.vue'),
     meta: { title: '社区' },
+  },
+  {
+    path: '/publish',
+    name: 'publish',
+    component: () => import('@/views/items/PublishView.vue'),
+    meta: { title: '发布物品' },
   },
   {
     path: '/orders',

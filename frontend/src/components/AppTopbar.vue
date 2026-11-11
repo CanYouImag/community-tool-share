@@ -32,7 +32,14 @@ function isActive(item) {
         <router-link to="/community" class="" :class="{ active: isActive(navItems[1]) }">
           社区
         </router-link>
-        <router-link to="/community" class="">发布 / 我的物品</router-link>
+        <router-link
+          to="/publish"
+          :class="{
+            active: route.path === '/publish' || route.path === '/my-items',
+          }"
+        >
+          发布 / 我的物品
+        </router-link>
         <router-link to="/orders" class="" :class="{ active: isActive(navItems[0]) }">
           我的订单
         </router-link>
