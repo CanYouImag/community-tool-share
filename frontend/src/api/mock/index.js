@@ -169,6 +169,40 @@ const handlers = [
     },
   },
   {
+    method: 'DELETE',
+    pattern: /^\/v1\/items\/([^/]+)$/,
+    handler: (_params, matches) => {
+      const user = useUserStore();
+      const id = decodeURIComponent(matches[1]);
+
+      if (!user.isCertified) {
+        throw new Error('请先完成实名认证');
+      }
+
+      const index = db.items.findIndex((item) => item.id === id);
+      const item = db.items[index];
+
+      if (!item || item.ownerId !== user.id) {
+        throw new Error('物品不存在或无权操作');
+      }
+
+      // 只有明确结束的订单才不会阻止删除
+      const finishedStatuses = ['COMPLETED', 'CANCELLED', 'CLOSED'];
+      const hasActiveOrder = [...db.orders, ...db.lendOrders].some(
+        (order) => order.itemId === id && !finishedStatuses.includes(order.status),
+      );
+
+      if (hasActiveOrder) {
+        throw new Error('该物品有进行中的订单，暂不能删除');
+      }
+
+      db.items.splice(index, 1);
+      favoriteItemIds.delete(id);
+
+      return { id, deleted: true };
+    },
+  },
+  {
     method: 'PUT',
     pattern: /^\/v1\/items\/([^/]+)$/,
     handler: (params, matches) => {

@@ -8,14 +8,11 @@ export const getItem = (id) => http.get(`/v1/items/${encodeURIComponent(id)}`);
 export const favoriteItem = (id) => http.post(`/v1/items/${encodeURIComponent(id)}/favorite`);
 // 取消收藏
 export const unfavoriteItem = (id) => http.delete(`/v1/items/${encodeURIComponent(id)}/favorite`);
-
 export const getMyItems = (params = {}) => http.get('/v1/items/mine', { params });
-
 export const createItem = (data) => http.post('/v1/items', data);
-
 export const updateItemStatus = (id, status) =>
   http.patch(`/v1/items/${encodeURIComponent(id)}/status`, { status });
-
 export const getMyItem = (id) => http.get(`/v1/items/mine/${encodeURIComponent(id)}`);
-
 export const updateItem = (id, data) => http.put(`/v1/items/${encodeURIComponent(id)}`, data);
+// 删除自己的物品
+export const deleteItem = (id) => http.delete(`/v1/items/${encodeURIComponent(id)}`);

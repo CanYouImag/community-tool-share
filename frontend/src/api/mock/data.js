@@ -201,6 +201,7 @@ export const orders = [
 export const lendOrders = [
   {
     id: 'LZ202610090018',
+    itemId: 'i_1001',
     itemTitle: '18V 充电式电钻',
     lender: 'Starling',
     borrower: '陈禾',
@@ -212,6 +213,7 @@ export const lendOrders = [
   },
   {
     id: 'LZ202610080012',
+    itemId: 'i_1002',
     itemTitle: '双人露营帐篷',
     lender: 'Starling',
     borrower: '许安',
@@ -223,6 +225,7 @@ export const lendOrders = [
   },
   {
     id: 'LZ202610050009',
+    itemId: 'i_1003',
     itemTitle: '便携投影仪',
     lender: 'Starling',
     borrower: '李青',
@@ -234,6 +237,7 @@ export const lendOrders = [
   },
   {
     id: 'LZ202610010003',
+    itemId: 'i_1004',
     itemTitle: '家用折叠梯',
     lender: 'Starling',
     borrower: '周宁',

@@ -1,5 +1,5 @@
 <script setup>
-import { getMyItems, updateItemStatus } from '@/api/modules/item';
+import { deleteItem, getMyItems, updateItemStatus } from '@/api/modules/item';
 import EmptyState from '@/components/EmptyState.vue';
 import StatusBadge from '@/components/StatusBadge.vue';
 import { ITEM_STATUS } from '@/utils/constants';
@@ -26,6 +26,26 @@ async function changeStatus(item) {
     await loadMyItems();
   } catch (err) {
     actionError.value = err.message || '操作失败，请重试';
+  } finally {
+    savingId.value = '';
+  }
+}
+
+async function removeItem(item) {
+  if (savingId.value || loading.value) return;
+
+  const confirmed = window.confirm(`确定删除「${item.title}」吗？删除后无法恢复。`);
+
+  if (!confirmed) return;
+
+  savingId.value = item.id;
+  actionError.value = '';
+
+  try {
+    await deleteItem(item.id);
+    await loadMyItems();
+  } catch (err) {
+    actionError.value = err.message || '删除失败，请重试';
   } finally {
     savingId.value = '';
   }
@@ -143,14 +163,14 @@ onMounted(loadMyItems);
                         : '恢复出租'
                   }}
                 </button>
-                <span
-                  v-if="
-                    !['PENDING_REVIEW', 'AVAILABLE', 'REJECTED', 'PAUSED'].includes(item.status)
-                  "
-                  class="muted"
+                <button
+                  class="btn small"
+                  type="button"
+                  :disabled="Boolean(savingId)"
+                  @click="removeItem(item)"
                 >
-                  —
-                </span>
+                  {{ savingId === item.id ? '处理中…' : '删除' }}
+                </button>
               </td>
             </tr>
           </tbody>
