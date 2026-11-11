@@ -1,7 +1,10 @@
 <script setup>
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { useAuthStore } from '@/store/auth'
 
 const route = useRoute()
+const auth = useAuthStore()
 
 // 顶部导航项，active 由路由匹配决定
 const navItems = [
@@ -9,6 +12,15 @@ const navItems = [
   { path: '/community', label: '社区', match: ['community'] },
   { path: '/wallet', label: '钱包', match: ['wallet'] }
 ]
+
+const isAdmin = computed(() =>
+  ['COMMUNITY_ADMIN', 'PLATFORM_ADMIN'].includes(auth.user?.role)
+)
+
+// 平台管理员默认进平台管理，社区管理员进社区管理
+const adminHome = computed(() =>
+  auth.user?.role === 'PLATFORM_ADMIN' ? '/admin/platform' : '/admin/community'
+)
 
 function isActive(item) {
   return item.match.some((seg) => route.path.includes(seg))
@@ -37,6 +49,9 @@ function isActive(item) {
           钱包
         </router-link>
         <router-link to="/community" class="">个人中心</router-link>
+        <router-link v-if="isAdmin" :to="adminHome" class="" :class="{ active: route.path.includes('/admin') }">
+          管理后台
+        </router-link>
       </nav>
     </div>
   </header>
