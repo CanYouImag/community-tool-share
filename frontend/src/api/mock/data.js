@@ -102,6 +102,8 @@ export const items = [
     owner: 'Starling',
     ownerCredit: 88,
     image: asset('item-cce1a346.svg'),
+    ownerId: 'u_1001',
+    status: 'AVAILABLE',
   },
   {
     id: 'i_1006',

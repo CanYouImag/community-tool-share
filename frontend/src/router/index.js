@@ -20,6 +20,12 @@ const routes = [
     meta: { title: '物品详情' },
   },
   {
+    path: '/my-items',
+    name: 'my-items',
+    component: () => import('@/views/items/MyItemsView.vue'),
+    meta: { title: '我的物品' },
+  },
+  {
     path: '/community',
     name: 'community',
     component: () => import('@/views/community/CommunityView.vue'),

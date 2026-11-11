@@ -1,4 +1,6 @@
 // Mock 路由分发：根据 method + url 返回假数据
+import { useUserStore } from '../../store/user';
+import { ITEM_CATEGORY } from '../../utils/constants';
 import * as db from './data';
 
 const favoriteItemIds = new Set();
@@ -25,6 +27,26 @@ const delay = (data, ms = 200) => new Promise((resolve) => setTimeout(() => reso
 const handlers = [
   {
     method: 'GET',
+    pattern: /^\/v1\/items\/mine$/,
+    handler: () => {
+      const user = useUserStore();
+
+      if (!user.isLoggedIn) {
+        throw new Error('请先登录');
+      }
+
+      const records = db.items.filter((item) => item.ownerId === user.id);
+
+      return {
+        records,
+        total: records.length,
+        page: 1,
+        size: 10,
+      };
+    },
+  },
+  {
+    method: 'GET',
     pattern: /^\/v1\/items$/,
     handler: (params) => {
       const keyword = (params.keyword || '').trim().toLowerCase();
@@ -34,9 +56,9 @@ const handlers = [
       const records = db.items.filter((item) => {
         const matchesKeyword = !keyword || item.title.toLowerCase().includes(keyword);
         const matchesCategory = !category || item.category === category;
-
         const matchesFavorite = !favoritesOnly || favoriteItemIds.has(item.id);
-        return matchesKeyword && matchesCategory && matchesFavorite;
+        const isAvailable = (item.status ?? 'AVAILABLE') === 'AVAILABLE';
+        return isAvailable && matchesKeyword && matchesCategory && matchesFavorite;
       });
 
       return {
@@ -45,6 +67,93 @@ const handlers = [
         page: 1,
         size: 10,
       };
+    },
+  },
+  {
+    method: 'POST',
+    pattern: /^\/v1\/items$/,
+    handler: (params) => {
+      const user = useUserStore();
+
+      if (!user.isCertified) {
+        throw new Error('请先完成实名认证');
+      }
+
+      const membership = db.myMemberships.find(
+        (entry) => entry.id === params.communityId && entry.status === 'JOINED',
+      );
+      const community = db.communities.find((entry) => entry.id === params.communityId);
+
+      if (!membership || !community) {
+        throw new Error('只能向已加入的社区发布物品');
+      }
+
+      const title = String(params.title || '').trim();
+      const condition = String(params.condition || '').trim();
+      const description = String(params.description || '').trim();
+
+      if (!title || !condition || !description) {
+        throw new Error('请填写标题、成色说明和物品描述');
+      }
+
+      if (!ITEM_CATEGORY.includes(params.category)) {
+        throw new Error('物品分类无效');
+      }
+
+      const moneyPattern = /^\d+(?:\.\d{1,2})?$/;
+      const dailyPrice = Number(params.dailyPrice);
+      const deposit = Number(params.deposit);
+
+      if (
+        !moneyPattern.test(String(params.dailyPrice)) ||
+        !moneyPattern.test(String(params.deposit)) ||
+        !Number.isFinite(dailyPrice) ||
+        !Number.isFinite(deposit) ||
+        dailyPrice <= 0 ||
+        deposit < 0
+      ) {
+        throw new Error('租金必须大于零，押金不能为负，金额最多两位小数');
+      }
+
+      if (deposit > 500 && user.credit < 60) {
+        throw new Error('信用分不足，无法发布高押金物品');
+      }
+
+      const pictures = params.images;
+
+      if (
+        !Array.isArray(pictures) ||
+        pictures.length === 0 ||
+        pictures.some(
+          (image) =>
+            typeof image !== 'string' || !/^data:image\/(?:jpeg|png|webp);base64,/.test(image),
+        )
+      ) {
+        throw new Error('请至少上传一张有效图片');
+      }
+
+      const item = {
+        id: `i_${crypto.randomUUID()}`,
+        title,
+        category: params.category,
+        condition,
+        description,
+        dailyPrice,
+        deposit,
+        communityId: community.id,
+        communityName: community.name,
+        ownerId: user.id,
+        owner: user.name,
+        ownerCredit: user.credit,
+        image: pictures[0],
+        images: [...pictures],
+        status: 'PENDING_REVIEW',
+        createdAt: new Date().toISOString(),
+      };
+
+      db.items.unshift(item);
+
+      return { id: item.id, status: item.status };
     },
   },
   {
@@ -63,11 +172,9 @@ const handlers = [
     handler: (_params, matches) => {
       const id = decodeURIComponent(matches[1]);
       const item = db.items.find((item) => item.id === id);
-
-      if (!item) {
-        throw new Error('物品不存在');
+      if (!item || (item.status ?? 'AVAILABLE') !== 'AVAILABLE') {
+        throw new Error('物品不存在或尚未上架');
       }
-
       return {
         ...item,
         favorited: favoriteItemIds.has(id),
