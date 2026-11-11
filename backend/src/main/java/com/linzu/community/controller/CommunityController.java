@@ -48,6 +48,13 @@ public class CommunityController {
         return Result.ok(communityService.home(id));
     }
 
+    @Operation(summary = "我的管理社区（社区管理员）")
+    @GetMapping("/my-admin")
+    @RequirePermission(PermissionCodes.COMMUNITY_MEMBER_MANAGE)
+    public Result<CommunityResponse> myAdminCommunity() {
+        return Result.ok(communityService.myAdminCommunity(AuthContext.requireUserId()));
+    }
+
     @Operation(summary = "申请加入社区")
     @PostMapping("/{id}/join")
     public Result<Map<String, Object>> join(@PathVariable Long id) {

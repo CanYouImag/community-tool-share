@@ -22,6 +22,7 @@ import com.linzu.community.mapper.CommunityAnnouncementMapper;
 import com.linzu.community.mapper.CommunityJoinApplyMapper;
 import com.linzu.community.mapper.CommunityMapper;
 import com.linzu.community.mapper.CommunityMemberMapper;
+import com.linzu.platform.service.AuditLogService;
 import com.linzu.user.entity.User;
 import com.linzu.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +57,7 @@ public class CommunityService {
     private final CommunityAnnouncementMapper announcementMapper;
     private final CommunityJoinApplyMapper joinApplyMapper;
     private final UserMapper userMapper;
+    private final AuditLogService auditLogService;
 
     // ===== UC-B1 浏览社区 =====
 
@@ -178,6 +180,8 @@ public class CommunityService {
             apply.setStatus(REJECTED);
             joinApplyMapper.updateById(apply);
         }
+        auditLogService.record(operatorId, "AUDIT_JOIN_APPLY", "COMMUNITY", adminCommunityId,
+                "审核加入申请#" + applyId + "：" + (Boolean.TRUE.equals(request.approve()) ? "通过" : "拒绝"));
     }
 
     // ===== UC-B4 退出社区 =====
@@ -221,6 +225,8 @@ public class CommunityService {
         a.setImageUrl(request.imageUrl());
         a.setCreatedBy(operatorId);
         announcementMapper.insert(a);
+        auditLogService.record(operatorId, "PUBLISH_ANNOUNCEMENT", "COMMUNITY", adminCommunityId,
+                "发布公告：" + a.getTitle());
         return toAnnouncementResponse(a);
     }
 
@@ -231,6 +237,8 @@ public class CommunityService {
         if (a == null || !a.getCommunityId().equals(adminCommunityId)) {
             throw new BusinessException(ErrorCode.COMMUNITY_ANNOUNCEMENT_NOT_FOUND);
         }
+        auditLogService.record(operatorId, "DELETE_ANNOUNCEMENT", "COMMUNITY", adminCommunityId,
+                "删除公告#" + announcementId);
         announcementMapper.deleteById(announcementId);
     }
 
@@ -278,6 +286,8 @@ public class CommunityService {
         target.setStatus(LEFT);
         memberMapper.updateById(target);
         decrementMemberCount(community);
+        auditLogService.record(operatorId, "KICK_MEMBER", "COMMUNITY", adminCommunityId,
+                "踢出成员#" + targetUserId);
     }
 
     // ===== 我的社区成员关系（供前端 memberships/mine 使用）=====
@@ -309,6 +319,14 @@ public class CommunityService {
         return result;
     }
 
+    /**
+     * 社区管理员所辖社区（供管理后台首页取社区 ID）。
+     */
+    public CommunityResponse myAdminCommunity(Long operatorId) {
+        long communityId = requireAdminCommunityId(operatorId);
+        return toResponse(requireCommunity(communityId));
+    }
+
     // ===== 内部工具 =====
 
     public Community requireCommunity(Long communityId) {
@@ -337,7 +355,10 @@ public class CommunityService {
         return adminCommunityId;
     }
 
-    private long requireAdminCommunityId(Long operatorId) {
+    /**
+     * 取社区管理员所辖社区 ID（BR-13 行级隔离入口）。纠纷/举报域复用本方法做越权校验。
+     */
+    public long requireAdminCommunityId(Long operatorId) {
         CommunityMember admin = memberMapper.selectOne(
                 Wrappers.<CommunityMember>lambdaQuery()
                         .eq(CommunityMember::getUserId, operatorId)
