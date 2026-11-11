@@ -1,5 +1,5 @@
 <script setup>
-import { useRoute } from 'vue-router'
+import { useRoute } from 'vue-router';
 
 const route = useRoute()
 
@@ -23,8 +23,8 @@ function isActive(item) {
         <span>邻租</span>
       </router-link>
       <nav class="nav" aria-label="主导航">
-        <router-link to="/items" active-class="active">
-          物品广场
+        <router-link to="/items" :class="{ active: route.path === '/items' || route.path.startsWith('/items/') }">
+            物品广场
         </router-link>
         <router-link to="/community" class="" :class="{ active: isActive(navItems[1]) }">
           社区

@@ -10,6 +10,12 @@ const routes = [
     meta: { title: '物品广场' }
   },
   {
+    path: '/items/:id',
+    name: 'item-detail',
+    component: () => import('@/views/items/ItemDetailView.vue'),
+    meta: { title: '物品详情' }
+  },
+  {
     path: '/',
     redirect: '/items'
   },

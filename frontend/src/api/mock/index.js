@@ -32,6 +32,20 @@ const handlers = [
   },
   {
     method: 'GET',
+    pattern: /^\/v1\/items\/([^/]+)$/,
+    handler: (_params, matches) => {
+        const id = decodeURIComponent(matches[1]);
+        const item = db.items.find((item) => item.id === id);
+
+        if (!item) {
+        throw new Error('物品不存在');
+        }
+
+        return { ...item };
+    }
+  },
+  {
+    method: 'GET',
     pattern: /^\/communities$/,
     handler: () => db.communities
   },
