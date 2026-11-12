@@ -109,7 +109,7 @@ public class DisputeService {
                 evidenceMapper.insert(e);
             }
         }
-        // TODO: UC-F1 扩展流程“引用取/还物存证”（BR-09）待订单域（窦源泽）就绪后接入
+        // TODO: UC-F1 扩展流程"引用取/还物存证"（BR-09）待订单域（窦源泽）就绪后接入
         return toResponse(d);
     }
 
@@ -222,9 +222,16 @@ public class DisputeService {
         d.setMediationConclusion(req.conclusion().trim());
         d.setStatus(RESOLVED);
         disputeMapper.updateById(d);
+
+        // UC-F3 后置：调解成功解除押金冻结，全额退回租客（协商一致，无惩罚性扣除）
+        BigDecimal deposit = money(d.getDepositAmount());
+        if (deposit.compareTo(BigDecimal.ZERO) > 0) {
+            walletService.unfreeze(d.getRenterId(), deposit, "DISPUTE", disputeId, "调解成功退回押金");
+        }
+        // TODO: 订单状态恢复（恢复纠纷前阶段）待订单域状态机就绪后接入
+
         auditLogService.record(operatorId, "RESOLVE_DISPUTE", "DISPUTE", disputeId,
                 "标记调解成功：" + req.conclusion().trim());
-        // TODO: UC-F3 后置“订单解除冻结、恢复纠纷前阶段”待订单域就绪后接入
     }
 
     // ===== UC-F4 上报仲裁 =====
