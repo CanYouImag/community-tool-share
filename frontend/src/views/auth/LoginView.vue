@@ -1,7 +1,8 @@
 <script setup>
-import { reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
+import { getCaptcha } from '@/api/modules/auth';
 import ViewTabs from '@/components/ViewTabs.vue';
 import { useAuthStore } from '@/store/auth';
 
@@ -35,21 +36,31 @@ const registerForm = reactive({
   nickname: '',
 });
 
-// 演示用前端验证码；接入后端图形验证码接口后替换这里
-const captchaCode = ref('');
+// 图形验证码由后端生成并校验，前端只持有 captchaId 和图片
+const captchaId = ref('');
+const captchaImage = ref('');
+const captchaLoading = ref(false);
+const captchaError = ref('');
 const captchaInput = ref('');
 
-function refreshCaptcha() {
-  const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
-  let code = '';
-  for (let i = 0; i < 4; i += 1) {
-    code += chars[Math.floor(Math.random() * chars.length)];
-  }
-  captchaCode.value = code;
+async function refreshCaptcha() {
+  captchaLoading.value = true;
+  captchaError.value = '';
   captchaInput.value = '';
+  try {
+    const data = await getCaptcha();
+    captchaId.value = data.captchaId;
+    captchaImage.value = data.image;
+  } catch {
+    captchaId.value = '';
+    captchaImage.value = '';
+    captchaError.value = '验证码加载失败，请点击图片重试';
+  } finally {
+    captchaLoading.value = false;
+  }
 }
 
-refreshCaptcha();
+onMounted(refreshCaptcha);
 
 function goAfterAuth() {
   const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : '';
@@ -70,8 +81,12 @@ async function submitLogin() {
     loginError.value = '请输入密码';
     return;
   }
-  if (captchaInput.value.toUpperCase() !== captchaCode.value) {
-    loginError.value = '验证码不正确';
+  if (!captchaInput.value.trim()) {
+    loginError.value = '请输入图形验证码';
+    return;
+  }
+  if (!captchaId.value) {
+    loginError.value = '验证码未加载，请刷新后重试';
     refreshCaptcha();
     return;
   }
@@ -81,6 +96,8 @@ async function submitLogin() {
     await auth.login({
       account: loginForm.account.trim(),
       password: loginForm.password,
+      captchaId: captchaId.value,
+      captchaCode: captchaInput.value.trim(),
     });
     goAfterAuth();
   } catch (e) {
@@ -171,11 +188,18 @@ async function submitRegister() {
                 class="captcha-code"
                 type="button"
                 aria-label="刷新验证码"
+                :disabled="captchaLoading"
                 @click="refreshCaptcha"
               >
-                {{ captchaCode }}
+                <img
+                  v-if="captchaImage"
+                  :src="captchaImage"
+                  alt="图形验证码，点击刷新"
+                />
+                <span v-else>{{ captchaLoading ? '加载中…' : '点击重试' }}</span>
               </button>
             </div>
+            <small v-if="captchaError" class="field-hint error">{{ captchaError }}</small>
           </label>
 
           <p v-if="loginError" class="form-message error">{{ loginError }}</p>
@@ -267,6 +291,29 @@ async function submitRegister() {
 .captcha-code {
   cursor: pointer;
   user-select: none;
+  width: 120px;
+  height: 46px;
+  padding: 0;
+  overflow: hidden;
+  font-size: 13px;
+  letter-spacing: 0;
+}
+
+.captcha-code img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.field-hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+}
+
+.field-hint.error {
+  color: var(--color-danger);
 }
 
 .btn[disabled] {

@@ -28,6 +28,7 @@ public class AuthService {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final CaptchaService captchaService;
 
     @Transactional
     public LoginResponse register(RegisterRequest request) {
@@ -66,6 +67,12 @@ public class AuthService {
     }
 
     public LoginResponse login(LoginRequest request) {
+        if (
+            !captchaService.validate(request.captchaId(), request.captchaCode())
+        ) {
+            throw new BusinessException(ErrorCode.CAPTCHA_INVALID);
+        }
+
         String account = request.account().trim();
         User user = userMapper.selectOne(
             Wrappers.<User>lambdaQuery()

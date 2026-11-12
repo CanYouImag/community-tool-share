@@ -3,6 +3,8 @@ package com.linzu.user.service;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.linzu.common.exception.BusinessException;
 import com.linzu.common.exception.ErrorCode;
+import com.linzu.common.security.IdCardCipher;
+import com.linzu.common.util.IdCardUtil;
 import com.linzu.user.dto.ChangePasswordRequest;
 import com.linzu.user.dto.RealNameRequest;
 import com.linzu.user.dto.UpdateProfileRequest;
@@ -32,6 +34,7 @@ public class UserService {
     private final UserMapper userMapper;
     private final UserRealNameMapper userRealNameMapper;
     private final PasswordEncoder passwordEncoder;
+    private final IdCardCipher idCardCipher;
 
     @Value("${app.demo.auto-verify-real-name:true}")
     private boolean autoVerifyRealName;
@@ -104,19 +107,23 @@ public class UserService {
             throw new BusinessException(ErrorCode.REAL_NAME_EXISTS);
         }
 
-        String idCardNo = request.idCardNo().trim().toUpperCase();
+        String idCardNo = IdCardUtil.normalize(request.idCardNo());
+        if (!IdCardUtil.isValid(idCardNo)) {
+            throw new BusinessException(ErrorCode.REAL_NAME_FORMAT_ERROR);
+        }
+        String encryptedIdCardNo = idCardCipher.encrypt(idCardNo);
         String status = autoVerifyRealName ? VERIFIED : PENDING;
         if (realName == null) {
             realName = new UserRealName();
             realName.setUserId(userId);
             realName.setRealName(request.realName().trim());
-            realName.setIdCardNo(idCardNo);
+            realName.setIdCardNo(encryptedIdCardNo);
             realName.setStatus(status);
             realName.setRejectReason(null);
             userRealNameMapper.insert(realName);
         } else {
             realName.setRealName(request.realName().trim());
-            realName.setIdCardNo(idCardNo);
+            realName.setIdCardNo(encryptedIdCardNo);
             realName.setStatus(status);
             realName.setRejectReason(null);
             userRealNameMapper.updateById(realName);
@@ -146,7 +153,9 @@ public class UserService {
     private UserProfileResponse toProfile(User user, UserRealName realName) {
         String realNameStatus = realName == null ? UNVERIFIED : realName.getStatus();
         String realNameValue = realName == null ? null : realName.getRealName();
-        String idCardMasked = realName == null ? null : maskIdCard(realName.getIdCardNo());
+        String idCardMasked = realName == null
+            ? null
+            : maskIdCard(idCardCipher.decrypt(realName.getIdCardNo()));
         return new UserProfileResponse(
             user.getId(),
             user.getUsername(),

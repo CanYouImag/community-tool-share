@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.linzu.common.api.PageResult;
 import com.linzu.common.exception.BusinessException;
 import com.linzu.common.exception.ErrorCode;
+import com.linzu.user.entity.User;
+import com.linzu.user.service.UserService;
 import com.linzu.wallet.dto.WalletResponse;
 import com.linzu.wallet.dto.WalletTransactionResponse;
 import com.linzu.wallet.entity.Wallet;
@@ -26,6 +28,7 @@ public class WalletService {
 
     private final WalletMapper walletMapper;
     private final WalletTransactionMapper walletTransactionMapper;
+    private final UserService userService;
 
     public WalletResponse getWallet(Long userId) {
         Wallet wallet = getOrCreate(userId);
@@ -209,6 +212,40 @@ public class WalletService {
             refType,
             refId,
             remark
+        );
+        return getWallet(userId);
+    }
+
+    /**
+     * 管理员调整余额（UC-E2）：正数充值、负数扣减，调整后余额不能为负。
+     */
+    @Transactional
+    public WalletResponse adjust(Long userId, BigDecimal amount, String remark) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) == 0) {
+            throw new BusinessException(ErrorCode.PARAM_ERROR, "调整金额不能为 0");
+        }
+        BigDecimal value = amount.setScale(2, RoundingMode.HALF_UP);
+        User target = userService.requireUser(userId);
+        if (userService.isBanned(target)) {
+            throw new BusinessException(ErrorCode.ACCOUNT_BANNED);
+        }
+
+        Wallet wallet = getOrCreate(userId);
+        BigDecimal balanceAfter = wallet.getBalance().add(value);
+        if (balanceAfter.compareTo(BigDecimal.ZERO) < 0) {
+            throw new BusinessException(ErrorCode.PARAM_ERROR, "调整后余额不能为负");
+        }
+
+        wallet.setBalance(balanceAfter);
+        updateWallet(wallet);
+        record(
+            userId,
+            WalletTransactionType.ADMIN_ADJUST,
+            value,
+            balanceAfter,
+            "ADMIN",
+            null,
+            StringUtils.hasText(remark) ? remark.trim() : "管理员调整余额"
         );
         return getWallet(userId);
     }

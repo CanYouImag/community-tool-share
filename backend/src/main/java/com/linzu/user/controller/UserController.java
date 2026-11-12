@@ -2,6 +2,7 @@ package com.linzu.user.controller;
 
 import com.linzu.common.api.Result;
 import com.linzu.common.security.AuthContext;
+import com.linzu.common.storage.FileStorageService;
 import com.linzu.user.dto.AvatarRequest;
 import com.linzu.user.dto.ChangePasswordRequest;
 import com.linzu.user.dto.RealNameRequest;
@@ -12,12 +13,15 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "用户")
 @RestController
@@ -26,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private final UserService userService;
+    private final FileStorageService fileStorageService;
 
     @Operation(summary = "获取个人资料")
     @GetMapping("/me")
@@ -50,6 +55,17 @@ public class UserController {
     @PostMapping("/me/real-name")
     public Result<UserProfileResponse> submitRealName(@Valid @RequestBody RealNameRequest request) {
         return Result.ok(userService.submitRealName(AuthContext.requireUserId(), request));
+    }
+
+    @Operation(summary = "修改头像（上传文件）")
+    @PostMapping(value = "/me/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Result<UserProfileResponse> uploadAvatar(@RequestPart("file") MultipartFile file) {
+        return Result.ok(
+            userService.updateAvatar(
+                AuthContext.requireUserId(),
+                fileStorageService.storeAvatar(file)
+            )
+        );
     }
 
     @Operation(summary = "修改头像")

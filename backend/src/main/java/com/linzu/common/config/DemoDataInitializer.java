@@ -1,6 +1,7 @@
 package com.linzu.common.config;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.linzu.common.security.IdCardCipher;
 import com.linzu.user.entity.User;
 import com.linzu.user.entity.UserRealName;
 import com.linzu.user.mapper.UserMapper;
@@ -27,6 +28,7 @@ public class DemoDataInitializer implements CommandLineRunner {
     private final UserRealNameMapper userRealNameMapper;
     private final WalletMapper walletMapper;
     private final PasswordEncoder passwordEncoder;
+    private final IdCardCipher idCardCipher;
 
     @Value("${app.demo.username:Starling}")
     private String username;
@@ -37,42 +39,93 @@ public class DemoDataInitializer implements CommandLineRunner {
     @Value("${app.demo.nickname:Starling}")
     private String nickname;
 
+    @Value("${app.demo.admin-username:admin}")
+    private String adminUsername;
+
+    @Value("${app.demo.admin-password:admin123}")
+    private String adminPassword;
+
+    @Value("${app.demo.admin-nickname:平台管理员}")
+    private String adminNickname;
+
     @Override
     @Transactional
     public void run(String... args) {
+        seedUser(
+            username,
+            password,
+            nickname,
+            "CERTIFIED",
+            "13800000000",
+            "演示用户",
+            "220101199001011232",
+            new BigDecimal("500.00")
+        );
+        seedUser(
+            adminUsername,
+            adminPassword,
+            adminNickname,
+            "PLATFORM_ADMIN",
+            "13900000000",
+            "平台管理员",
+            "220101199001011240",
+            BigDecimal.ZERO
+        );
+    }
+
+    private void seedUser(
+        String loginName,
+        String rawPassword,
+        String displayName,
+        String role,
+        String phone,
+        String realName,
+        String idCardNo,
+        BigDecimal balance
+    ) {
         Long exists = userMapper.selectCount(
-            Wrappers.<User>lambdaQuery().eq(User::getUsername, username)
+            Wrappers
+                .<User>lambdaQuery()
+                .eq(User::getUsername, loginName)
+                .or()
+                .eq(User::getPhone, phone)
         );
         if (exists != null && exists > 0) {
             return;
         }
 
         User user = new User();
-        user.setUsername(username);
-        user.setPhone("13800000000");
-        user.setPasswordHash(passwordEncoder.encode(password));
-        user.setNickname(nickname);
+        user.setUsername(loginName);
+        user.setPhone(phone);
+        user.setPasswordHash(passwordEncoder.encode(rawPassword));
+        user.setNickname(displayName);
         user.setBio("把闲置交给需要它的邻居。");
-        user.setRole("CERTIFIED");
+        user.setRole(role);
         user.setStatus("ACTIVE");
         user.setCreditScore(100);
         userMapper.insert(user);
 
-        UserRealName realName = new UserRealName();
-        realName.setUserId(user.getId());
-        realName.setRealName("演示用户");
-        realName.setIdCardNo("220101199001011234");
-        realName.setStatus("VERIFIED");
-        userRealNameMapper.insert(realName);
+        UserRealName userRealName = new UserRealName();
+        userRealName.setUserId(user.getId());
+        userRealName.setRealName(realName);
+        userRealName.setIdCardNo(idCardCipher.encrypt(idCardNo));
+        userRealName.setStatus("VERIFIED");
+        userRealNameMapper.insert(userRealName);
 
         Wallet wallet = new Wallet();
         wallet.setUserId(user.getId());
-        wallet.setBalance(new BigDecimal("500.00"));
+        wallet.setBalance(balance);
         wallet.setFrozenBalance(BigDecimal.ZERO);
         wallet.setTotalIncome(BigDecimal.ZERO);
         wallet.setVersion(0);
         walletMapper.insert(wallet);
 
-        log.info("已创建演示账号：{} / {}（钱包余额 500.00）", username, password);
+        log.info(
+            "已创建演示账号：{} / {}（角色 {}，钱包余额 {}）",
+            loginName,
+            rawPassword,
+            role,
+            balance
+        );
     }
 }
