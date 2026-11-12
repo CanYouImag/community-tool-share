@@ -1,15 +1,9 @@
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import Pagination from '@/components/Pagination.vue'
 import EmptyState from '@/components/EmptyState.vue'
-import {
-  getDisputes,
-  getDisputeDetail,
-  mediateDispute,
-  resolveDispute,
-  escalateDispute
-} from '@/api/modules/admin'
+import { getDisputes, getDisputeDetail, mediateDispute, resolveDispute, escalateDispute } from '@/api/modules/admin'
 import { formatAmount, formatDateTime } from '@/utils/format'
 
 const STATUS_OPTIONS = [
@@ -29,6 +23,7 @@ const detail = ref(null)
 const mediateText = ref('')
 const resolveText = ref('')
 const escalateText = ref('')
+const errMsg = ref('')
 
 async function load() {
   const data = await getDisputes({ status: status.value || undefined, page: page.value, size: size.value })
@@ -41,31 +36,61 @@ function changePage(p) {
   load()
 }
 
-async function select(d) {
+async function open(d) {
+  errMsg.value = ''
+  mediateText.value = ''
+  resolveText.value = ''
+  escalateText.value = ''
   detail.value = await getDisputeDetail(d.id)
 }
 
+function close() {
+  detail.value = null
+}
+
 async function sendMessage() {
-  if (!mediateText.value.trim() || !detail.value) return
-  await mediateDispute(detail.value.id, { content: mediateText.value })
-  mediateText.value = ''
-  await select(detail.value)
+  errMsg.value = ''
+  if (!mediateText.value.trim()) {
+    errMsg.value = '请填写调解留言'
+    return
+  }
+  try {
+    await mediateDispute(detail.value.id, { content: mediateText.value })
+    mediateText.value = ''
+    detail.value = await getDisputeDetail(detail.value.id)
+  } catch (e) {
+    errMsg.value = e?.message || '发送失败'
+  }
 }
 
 async function doResolve() {
-  if (!resolveText.value.trim() || !detail.value) return
-  await resolveDispute(detail.value.id, { conclusion: resolveText.value })
-  resolveText.value = ''
-  detail.value = null
-  load()
+  errMsg.value = ''
+  if (!resolveText.value.trim()) {
+    errMsg.value = '请填写调解结论'
+    return
+  }
+  try {
+    await resolveDispute(detail.value.id, { conclusion: resolveText.value })
+    resolveText.value = ''
+    detail.value = await getDisputeDetail(detail.value.id)
+  } catch (e) {
+    errMsg.value = e?.message || '操作失败'
+  }
 }
 
 async function doEscalate() {
-  if (!escalateText.value.trim() || !detail.value) return
-  await escalateDispute(detail.value.id, { note: escalateText.value })
-  escalateText.value = ''
-  detail.value = null
-  load()
+  errMsg.value = ''
+  if (!escalateText.value.trim()) {
+    errMsg.value = '请填写上报仲裁说明'
+    return
+  }
+  try {
+    await escalateDispute(detail.value.id, { note: escalateText.value })
+    escalateText.value = ''
+    detail.value = await getDisputeDetail(detail.value.id)
+  } catch (e) {
+    errMsg.value = e?.message || '操作失败'
+  }
 }
 
 onMounted(load)
@@ -112,7 +137,9 @@ onMounted(load)
                 <td>{{ d.initiatorName }}</td>
                 <td>¥{{ formatAmount(d.deposit) }}</td>
                 <td><StatusBadge :status="d.status" /></td>
-                <td><a @click="select(d)">介入调解</a></td>
+                <td>
+                  <a @click="open(d)">介入调解</a>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -121,78 +148,124 @@ onMounted(load)
       </section>
     </section>
 
-    <!-- 详情 -->
-    <section v-if="detail" class="view-panel">
-      <h2 class="view-heading">纠纷详情 #{{ detail.id }}</h2>
-      <div class="two">
-        <div>
-          <section class="panel">
-            <div class="row between">
-              <div>
-                <small>订单 #{{ detail.orderId }} / {{ detail.communityName }}</small>
-                <h2>押金争议</h2>
-              </div>
-              <StatusBadge :status="detail.status" />
-            </div>
-            <dl class="line-list">
-              <div><dt>发起人</dt><dd>{{ detail.initiatorName }}</dd></div>
-              <div><dt>租客</dt><dd>{{ detail.renterName }}</dd></div>
-              <div><dt>出租者</dt><dd>{{ detail.ownerName }}</dd></div>
-              <div><dt>纠纷理由</dt><dd>{{ detail.reason }}</dd></div>
-              <div><dt>押金 / 租金</dt><dd>¥{{ formatAmount(detail.deposit) }} / ¥{{ formatAmount(detail.rent) }}</dd></div>
-              <div v-if="detail.mediationConclusion"><dt>调解结论</dt><dd>{{ detail.mediationConclusion }}</dd></div>
-              <div v-if="detail.escalateNote"><dt>上报说明</dt><dd>{{ detail.escalateNote }}</dd></div>
-            </dl>
-            <div v-if="detail.evidences?.length" class="thumbs">
-              <img v-for="e in detail.evidences" :key="e.id" class="art small" :src="e.imageUrl" :alt="e.evidenceType" />
-            </div>
-          </section>
+    <div v-if="detail" class="modal-mask" @click.self="close">
+      <div class="modal-panel">
+        <div class="modal-head">
+          <h2>纠纷详情 #{{ detail.id }}</h2>
+          <a class="btn" @click="close">返回列表</a>
         </div>
-        <div>
-          <section class="panel">
-            <div class="panel-title">
-              <h2>处理记录</h2>
-            </div>
-            <div v-if="detail.messages?.length" class="timeline">
-              <p v-for="m in detail.messages" :key="m.id">
-                {{ m.senderName }}（{{ m.senderRole }}）
-                <small>{{ formatDateTime(m.createdAt) }}</small>
-                <span>{{ m.content }}</span>
-              </p>
-            </div>
-            <p v-else class="muted">暂无留言</p>
-          </section>
 
-          <section v-if="detail.status === 'MEDIATING'" class="panel">
-            <div class="panel-title">
-              <h2>调解操作</h2>
-            </div>
-            <label class="field">
-              <span>调解留言</span>
-              <textarea v-model="mediateText" aria-label="调解留言"></textarea>
-            </label>
-            <div class="actions">
-              <a class="btn primary" @click="sendMessage">发送留言</a>
-            </div>
-            <hr class="rule" />
-            <label class="field">
-              <span>调解结论（达成一致时填写）</span>
-              <textarea v-model="resolveText" aria-label="调解结论"></textarea>
-            </label>
-            <div class="actions">
-              <a class="btn" @click="doResolve">标记调解成功</a>
-            </div>
-            <hr class="rule" />
-            <label class="field">
-              <span>上报仲裁说明（调解不成时填写）</span>
-              <textarea v-model="escalateText" aria-label="上报仲裁说明"></textarea>
-            </label>
-            <div class="actions">
-              <a class="btn" @click="doEscalate">上报平台仲裁</a>
-            </div>
-          </section>
+        <div class="two">
+          <div>
+            <section class="panel">
+              <div class="row between">
+                <div>
+                  <small>订单 #{{ detail.orderId }} / {{ detail.communityName }}</small>
+                  <h2>押金争议</h2>
+                </div>
+                <StatusBadge :status="detail.status" />
+              </div>
+              <dl class="line-list">
+                <div><dt>发起人</dt><dd>{{ detail.initiatorName }}</dd></div>
+                <div><dt>租客</dt><dd>{{ detail.renterName }}</dd></div>
+                <div><dt>出租者</dt><dd>{{ detail.ownerName }}</dd></div>
+                <div><dt>纠纷理由</dt><dd>{{ detail.reason }}</dd></div>
+                <div><dt>押金 / 租金</dt><dd>¥{{ formatAmount(detail.deposit) }} / ¥{{ formatAmount(detail.rent) }}</dd></div>
+                <div v-if="detail.mediationConclusion"><dt>调解结论</dt><dd>{{ detail.mediationConclusion }}</dd></div>
+                <div v-if="detail.escalateNote"><dt>上报说明</dt><dd>{{ detail.escalateNote }}</dd></div>
+              </dl>
+              <div v-if="detail.evidences?.length" class="thumbs">
+                <img v-for="e in detail.evidences" :key="e.id" class="art small" :src="e.imageUrl" :alt="e.evidenceType" />
+              </div>
+            </section>
+          </div>
+
+          <div>
+            <section class="panel">
+              <div class="panel-title">
+                <h2>处理记录</h2>
+              </div>
+              <div v-if="detail.messages?.length" class="timeline">
+                <p v-for="m in detail.messages" :key="m.id">
+                  {{ m.senderName }}（{{ m.senderRole }}）
+                  <small>{{ formatDateTime(m.createdAt) }}</small>
+                  <span>{{ m.content }}</span>
+                </p>
+              </div>
+              <p v-else class="muted">暂无留言</p>
+            </section>
+
+            <section v-if="detail.status === 'MEDIATING'" class="panel">
+              <div class="panel-title">
+                <h2>调解操作</h2>
+              </div>
+              <p v-if="errMsg" class="form-error">{{ errMsg }}</p>
+              <label class="field">
+                <span>调解留言</span>
+                <textarea v-model="mediateText" aria-label="调解留言"></textarea>
+              </label>
+              <div class="actions">
+                <a class="btn primary" @click="sendMessage">发送留言</a>
+              </div>
+              <hr class="rule" />
+              <label class="field">
+                <span>调解结论（达成一致时填写）</span>
+                <textarea v-model="resolveText" aria-label="调解结论"></textarea>
+              </label>
+              <div class="actions">
+                <a class="btn" @click="doResolve">标记调解成功</a>
+              </div>
+              <hr class="rule" />
+              <label class="field">
+                <span>上报仲裁说明（调解不成时填写）</span>
+                <textarea v-model="escalateText" aria-label="上报仲裁说明"></textarea>
+              </label>
+              <div class="actions">
+                <a class="btn" @click="doEscalate">上报平台仲裁</a>
+              </div>
+            </section>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
   </main>
 </template>
+
+<style scoped>
+.modal-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 48px 16px;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.modal-panel {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  width: 100%;
+  max-width: 1000px;
+  padding: 24px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.35);
+}
+
+.modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.modal-head h2 {
+  margin: 0;
+}
+
+.form-error {
+  color: var(--color-danger);
+  margin: 8px 0;
+}
+</style>

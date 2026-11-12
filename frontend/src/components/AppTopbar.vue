@@ -29,6 +29,9 @@ const isAdmin = computed(() =>
 const adminHome = computed(() =>
   auth.user?.role === 'PLATFORM_ADMIN' ? '/admin/platform' : '/admin/community'
 )
+const adminHomeLabel = computed(() =>
+  auth.user?.role === 'PLATFORM_ADMIN' ? '平台管理' : '社区管理'
+)
 
 // 详情、编辑等页面的导航归属统一在路由 meta.nav 中声明。
 const navItems = computed(() => [
@@ -38,7 +41,7 @@ const navItems = computed(() => [
   { to: '/orders', label: '我的订单' },
   { to: '/wallet', label: '钱包' },
   auth.isLoggedIn ? { to: '/account', label: '个人中心' } : { to: '/login', label: '登录 / 注册' },
-  ...(isAdmin.value ? [{ to: adminHome.value, label: '管理后台', admin: true }] : []),
+  ...(isAdmin.value ? [{ to: adminHome.value, label: adminHomeLabel.value, admin: true }] : []),
 ]);
 </script>
 
@@ -54,7 +57,7 @@ const navItems = computed(() => [
           v-for="item in navItems"
           :key="item.to"
           :to="item.to"
-          :class="{ active: item.admin ? route.path.includes('/admin') : route.meta.nav === item.to }"
+          :class="{ active: item.admin ? route.path === item.to : route.meta.nav === item.to }"
           :aria-current="route.meta.nav === item.to ? 'location' : undefined"
         >
           {{ item.label }}

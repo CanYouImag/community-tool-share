@@ -29,6 +29,8 @@ const ROLE_LABEL = {
 const tabs = [
   { id: 'communities', label: '社区管理' },
   { id: 'users', label: '用户管理' },
+  { id: 'mediation', label: '调解工作台', to: '/admin/mediation' },
+  { id: 'arbitration', label: '仲裁中心', to: '/admin/arbitration' },
   { id: 'config', label: '参数配置' },
   { id: 'stats', label: '数据统计' },
   { id: 'logs', label: '操作日志' }
@@ -184,17 +186,19 @@ onMounted(async () => {
     </header>
 
     <nav class="view-tabs" role="tablist" aria-label="平台管理功能">
-      <a
-        v-for="t in tabs"
-        :key="t.id"
-        class="view-tab"
-        :href="`#${t.id}`"
-        role="tab"
-        :aria-selected="activeTab === t.id"
-        @click.prevent="activeTab = t.id"
-      >
-        {{ t.label }}
-      </a>
+      <template v-for="t in tabs" :key="t.id">
+        <router-link v-if="t.to" class="view-tab" :to="t.to">{{ t.label }}</router-link>
+        <a
+          v-else
+          class="view-tab"
+          :href="`#${t.id}`"
+          role="tab"
+          :aria-selected="activeTab === t.id"
+          @click.prevent="activeTab = t.id"
+        >
+          {{ t.label }}
+        </a>
+      </template>
     </nav>
 
     <!-- 社区管理 -->

@@ -162,6 +162,7 @@ onMounted(load)
       >
         {{ t.label }}
       </a>
+      <router-link class="view-tab" :to="{ name: 'admin-mediation' }">调解工作台</router-link>
     </nav>
 
     <!-- 加入申请 -->
