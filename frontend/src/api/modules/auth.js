@@ -6,6 +6,9 @@ export const login = (data) => http.post('/v1/auth/login', data);
 
 export const register = (data) => http.post('/v1/auth/register', data);
 
+export const getCaptcha = () =>
+  http.get('/v1/auth/captcha', { params: { t: Date.now() } });
+
 export const logout = () => http.post('/v1/auth/logout');
 
 export const getMe = () => http.get('/v1/users/me');
@@ -17,3 +20,9 @@ export const changePassword = (data) => http.put('/v1/users/me/password', data);
 export const submitRealName = (data) => http.post('/v1/users/me/real-name', data);
 
 export const updateAvatar = (avatarUrl) => http.put('/v1/users/me/avatar', { avatarUrl });
+
+export const uploadAvatar = (file) => {
+  const form = new FormData();
+  form.append('file', file);
+  return http.post('/v1/users/me/avatar', form);
+};

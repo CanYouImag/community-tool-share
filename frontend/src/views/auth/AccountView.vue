@@ -14,6 +14,9 @@ const pageError = ref('');
 const profileMessage = ref('');
 const passwordMessage = ref('');
 const realNameMessage = ref('');
+const avatarMessage = ref('');
+const avatarInput = ref(null);
+const avatarUploading = ref(false);
 const wallet = ref(null);
 
 const profileForm = reactive({
@@ -55,6 +58,7 @@ const roleLabels = {
 
 const user = computed(() => auth.user);
 const avatarText = computed(() => (auth.displayName || '邻').slice(0, 1).toUpperCase());
+const avatarPreview = computed(() => user.value?.avatarUrl || '');
 const realNameText = computed(() => realNameLabels[user.value?.realNameStatus] || '未实名');
 const roleText = computed(() => roleLabels[user.value?.role] || user.value?.role || '—');
 const canSubmitRealName = computed(
@@ -94,13 +98,43 @@ async function load() {
   }
 }
 
+function pickAvatar() {
+  avatarInput.value?.click();
+}
+
+async function onAvatarChange(event) {
+  const file = event.target.files?.[0];
+  event.target.value = '';
+  avatarMessage.value = '';
+  if (!file) return;
+  if (!['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(file.type)) {
+    avatarMessage.value = '仅支持 JPG、PNG、GIF、WebP 图片';
+    return;
+  }
+  if (file.size > 2 * 1024 * 1024) {
+    avatarMessage.value = '头像大小不能超过 2MB';
+    return;
+  }
+
+  avatarUploading.value = true;
+  try {
+    await auth.uploadAvatar(file);
+    syncForms();
+    avatarMessage.value = '头像已更新';
+  } catch (e) {
+    avatarMessage.value = e.message || '头像上传失败';
+  } finally {
+    avatarUploading.value = false;
+  }
+}
+
 async function saveProfile() {
   profileMessage.value = '';
   try {
+    // 头像只通过上传接口修改，避免保存资料时用旧值把刚上传的头像覆盖掉
     await auth.updateProfile({
       nickname: profileForm.nickname,
       bio: profileForm.bio,
-      avatarUrl: profileForm.avatarUrl,
     });
     syncForms();
     profileMessage.value = '资料已保存';
@@ -185,7 +219,13 @@ onMounted(load);
         <section v-show="activeTab === 'profile'" class="view-panel">
           <section class="panel">
             <div class="row">
-              <span class="avatar large">{{ avatarText }}</span>
+              <img
+                v-if="avatarPreview"
+                class="avatar large avatar-image"
+                :src="avatarPreview"
+                alt="头像"
+              />
+              <span v-else class="avatar large">{{ avatarText }}</span>
               <div class="grow">
                 <h2>{{ auth.displayName }}</h2>
                 <small>@{{ user?.username }}</small>
@@ -282,24 +322,40 @@ onMounted(load);
                 </div>
 
                 <div class="row">
-                  <span class="avatar large">{{ avatarText }}</span>
-                  <div class="grow"></div>
+                  <img
+                    v-if="avatarPreview"
+                    class="avatar large avatar-image"
+                    :src="avatarPreview"
+                    alt="头像"
+                  />
+                  <span v-else class="avatar large">{{ avatarText }}</span>
+                  <div class="grow">
+                    <button
+                      class="btn small"
+                      type="button"
+                      :disabled="avatarUploading"
+                      @click="pickAvatar"
+                    >
+                      {{ avatarUploading ? '上传中…' : '上传头像' }}
+                    </button>
+                    <input
+                      ref="avatarInput"
+                      class="hidden-file"
+                      type="file"
+                      accept="image/jpeg,image/png,image/gif,image/webp"
+                      @change="onAvatarChange"
+                    />
+                    <small class="field-hint">支持 JPG、PNG、GIF、WebP，最大 2MB</small>
+                  </div>
                 </div>
+
+                <p v-if="avatarMessage" class="form-message">{{ avatarMessage }}</p>
 
                 <hr class="rule" />
 
                 <label class="field">
                   <span>昵称</span>
                   <input v-model.trim="profileForm.nickname" type="text" maxlength="30" />
-                </label>
-
-                <label class="field">
-                  <span>头像地址</span>
-                  <input
-                    v-model.trim="profileForm.avatarUrl"
-                    type="url"
-                    placeholder="https://..."
-                  />
                 </label>
 
                 <label class="field">
@@ -446,6 +502,20 @@ onMounted(load);
 .row > .grow small {
   display: block;
   margin-top: 2px;
+}
+
+.avatar-image {
+  object-fit: cover;
+}
+
+.hidden-file {
+  display: none;
+}
+
+.field-hint {
+  display: block;
+  margin-top: 4px;
+  color: var(--color-muted);
 }
 
 @media (max-width: 760px) {

@@ -3,6 +3,8 @@ package com.linzu.wallet.controller;
 import com.linzu.common.api.PageResult;
 import com.linzu.common.api.Result;
 import com.linzu.common.security.AuthContext;
+import com.linzu.common.security.RequirePermission;
+import com.linzu.wallet.dto.AdjustBalanceRequest;
 import com.linzu.wallet.dto.FreezeRequest;
 import com.linzu.wallet.dto.WalletResponse;
 import com.linzu.wallet.dto.WalletTransactionResponse;
@@ -90,6 +92,18 @@ public class WalletController {
                 request.refId(),
                 request.remark()
             )
+        );
+    }
+
+    /**
+     * 管理员调整余额。权限码 platform:balance 待与钟姝伶的权限码清单对齐。
+     */
+    @Operation(summary = "管理员调整用户余额")
+    @RequirePermission("platform:balance")
+    @PostMapping("/admin/adjust")
+    public Result<WalletResponse> adjust(@Valid @RequestBody AdjustBalanceRequest request) {
+        return Result.ok(
+            walletService.adjust(request.userId(), request.amount(), request.remark())
         );
     }
 
