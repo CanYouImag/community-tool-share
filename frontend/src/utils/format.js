@@ -1,5 +1,12 @@
 // 通用格式化工具
 
+// 物品评价采用五分制，与用户信用分分开。
+export function formatRating(value) {
+  return Number.isFinite(value) && value >= 0 && value <= 5
+    ? `${value.toFixed(1)} / 5`
+    : '暂无评分';
+}
+
 // 金额格式化：1234.5 -> ¥1,234.50
 export function formatMoney(value) {
   const n = Number(value || 0);

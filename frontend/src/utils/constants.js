@@ -86,3 +86,12 @@ export const COMMISSION_RATE = 0.1;
 
 // 逾期计费倍率（BR-08）
 export const OVERDUE_RATE = 1.5;
+
+// 物品状态
+export const ITEM_STATUS = {
+  PENDING_REVIEW: { label: '待审核', cls: 'warn' },
+  AVAILABLE: { label: '已上架', cls: '' },
+  REJECTED: { label: '已驳回', cls: 'error' },
+  PAUSED: { label: '暂停出租', cls: 'neutral' },
+  REMOVED: { label: '已下架', cls: 'error' },
+};

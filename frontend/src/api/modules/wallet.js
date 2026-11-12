@@ -1,5 +1,6 @@
+import http from '@/api/request';
+
 // 钱包相关 API
-import http from '../request';
 
 export const getWallet = () => http.get('/wallet');
 

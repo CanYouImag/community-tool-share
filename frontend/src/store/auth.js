@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+
 import * as authApi from '@/api/modules/auth';
 
 const TOKEN_KEY = 'cts_token';
@@ -31,7 +32,7 @@ export const useAuthStore = defineStore('auth', {
   getters: {
     isLoggedIn: (state) => Boolean(state.token),
     displayName: (state) => state.user?.nickname || state.user?.username || '邻居',
-    isCertified: (state) => state.user?.realNameStatus === 'VERIFIED',
+    isCertified: (state) => Boolean(state.token) && state.user?.realNameStatus === 'VERIFIED',
   },
 
   actions: {
@@ -93,12 +94,14 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async logout() {
+      const token = this.token;
       try {
-        if (this.token) await authApi.logout();
+        if (token) await authApi.logout();
       } catch {
         // 后端不可用时也要允许前端退出
       } finally {
-        this.clear();
+        // 退出请求返回前若已登录其他会话，不清除新的账号状态。
+        if (this.token === token) this.clear();
       }
     },
 

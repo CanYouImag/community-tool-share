@@ -1,7 +1,14 @@
 <script setup>
 import { reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+
+import ViewTabs from '@/components/ViewTabs.vue';
 import { useAuthStore } from '@/store/auth';
+
+const tabs = [
+  { id: 'login', label: '账号登录' },
+  { id: 'register', label: '注册账号' },
+];
 
 const props = defineProps({
   initialTab: { type: String, default: 'login' },
@@ -50,7 +57,7 @@ function goAfterAuth() {
     router.push(redirect);
     return;
   }
-  router.push(router.hasRoute('account') ? '/account' : '/community');
+  router.push('/account');
 }
 
 async function submitLogin() {
@@ -119,34 +126,12 @@ async function submitRegister() {
 <template>
   <main class="public-main">
     <header class="page-head">
-      <div>
-        <h1>登录/注册</h1>
-      </div>
+      <h1>登录/注册</h1>
     </header>
 
-    <nav class="view-tabs" role="tablist" aria-label="登录注册">
-      <a
-        class="view-tab"
-        href="#login"
-        role="tab"
-        :aria-selected="activeTab === 'login'"
-        @click.prevent="activeTab = 'login'"
-      >
-        账号登录
-      </a>
-      <a
-        class="view-tab"
-        href="#register"
-        role="tab"
-        :aria-selected="activeTab === 'register'"
-        @click.prevent="activeTab = 'register'"
-      >
-        注册账号
-      </a>
-    </nav>
+    <ViewTabs v-model="activeTab" :tabs="tabs" label="登录注册" />
 
-    <section v-show="activeTab === 'login'" class="view-panel" role="tabpanel">
-      <h2 class="view-heading">账号登录</h2>
+    <section v-show="activeTab === 'login'" class="view-panel">
       <div class="narrow">
         <form class="panel" @submit.prevent="submitLogin">
           <h2>登录邻租</h2>
@@ -182,7 +167,14 @@ async function submitRegister() {
                 autocomplete="off"
                 placeholder="输入右侧字符"
               />
-              <output title="点击刷新验证码" @click="refreshCaptcha">{{ captchaCode }}</output>
+              <button
+                class="captcha-code"
+                type="button"
+                aria-label="刷新验证码"
+                @click="refreshCaptcha"
+              >
+                {{ captchaCode }}
+              </button>
             </div>
           </label>
 
@@ -192,16 +184,15 @@ async function submitRegister() {
             <button class="btn primary" type="submit" :disabled="submitting">
               {{ submitting ? '登录中…' : '登录' }}
             </button>
-            <a href="#register" @click.prevent="activeTab = 'register'">注册新账号</a>
+            <button class="link-button" type="button" @click="activeTab = 'register'">
+              注册新账号
+            </button>
           </div>
-
-          <p class="auth-hint">演示账号：Starling / 123456</p>
         </form>
       </div>
     </section>
 
-    <section v-show="activeTab === 'register'" class="view-panel" role="tabpanel">
-      <h2 class="view-heading">注册账号</h2>
+    <section v-show="activeTab === 'register'" class="view-panel">
       <div class="narrow">
         <form class="panel" @submit.prevent="submitRegister">
           <h2>创建邻租账号</h2>
@@ -253,7 +244,9 @@ async function submitRegister() {
             <button class="btn primary" type="submit" :disabled="submitting">
               {{ submitting ? '创建中…' : '创建账号' }}
             </button>
-            <a href="#login" @click.prevent="activeTab = 'login'">已有账号，去登录</a>
+            <button class="link-button" type="button" @click="activeTab = 'login'">
+              已有账号，去登录
+            </button>
           </div>
         </form>
       </div>
@@ -262,12 +255,6 @@ async function submitRegister() {
 </template>
 
 <style scoped>
-.auth-hint {
-  margin-top: 18px;
-  color: var(--color-muted);
-  font-size: 12px;
-}
-
 .form-message {
   margin: -4px 0 16px;
   font-size: 13px;
@@ -277,7 +264,7 @@ async function submitRegister() {
   color: var(--color-danger);
 }
 
-.captcha output {
+.captcha-code {
   cursor: pointer;
   user-select: none;
 }

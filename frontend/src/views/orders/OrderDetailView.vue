@@ -1,11 +1,12 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
+
 import { getOrder, getOrderMessages, postOrderMessage } from '@/api/modules/order';
+import ViewTabs from '@/components/ViewTabs.vue';
 import { formatMoney } from '@/utils/format';
 
 const route = useRoute();
-const router = useRouter();
 
 const order = ref(null);
 const messages = ref([]);
@@ -69,36 +70,23 @@ watch(
 <template>
   <main class="public-main">
     <header class="page-head">
-      <div>
-        <h1>订单详情与操作</h1>
-      </div>
+      <h1>订单详情与操作</h1>
     </header>
 
-    <nav class="view-tabs" role="tablist" aria-label="页内功能">
-      <a
-        v-for="s in stages"
-        :key="s.id"
-        class="view-tab"
-        :href="`#${s.id}`"
-        role="tab"
-        :aria-selected="activeStage === s.id"
-        @click.prevent="setStage(s.id)"
-      >
-        {{ s.label }}
-      </a>
-    </nav>
+    <ViewTabs v-model="activeStage" :tabs="stages" label="订单阶段" />
 
     <!-- 待确认 -->
     <section v-show="activeStage === 'pending'" class="view-panel">
-      <h2 class="view-heading">待确认</h2>
       <section class="panel">
         <h2>待确认 / 租客 / 出租者操作</h2>
         <hr class="rule" />
         <p>等待出租者接单</p>
         <hr class="rule" />
         <div class="actions">
-          <a class="btn primary" @click="setStage('pickup')">出租者：确认接单</a>
-          <a class="btn" @click="setStage('pending')">租客：取消订单</a>
+          <button type="button" class="btn primary" @click="setStage('pickup')">
+            出租者：确认接单
+          </button>
+          <button type="button" class="btn" @click="setStage('pending')">租客：取消订单</button>
         </div>
         <details class="inline-note">
           <summary>取消 / 拒单确认</summary>
@@ -113,7 +101,6 @@ watch(
 
     <!-- 确认支付 -->
     <section v-show="activeStage === 'checkout'" class="view-panel">
-      <h2 class="view-heading">确认支付</h2>
       <section class="panel">
         <h2>确认租期与费用</h2>
         <hr class="rule" />
@@ -140,16 +127,15 @@ watch(
           </div>
         </dl>
         <div class="actions">
-          <a class="btn primary" @click="setStage('pending')"
-            >确认支付 {{ formatMoney(orderTotal) }}</a
-          >
+          <button type="button" class="btn primary" @click="setStage('pending')">
+            确认支付 {{ formatMoney(orderTotal) }}
+          </button>
         </div>
       </section>
     </section>
 
     <!-- 待取物 -->
     <section v-show="activeStage === 'pickup'" class="view-panel">
-      <h2 class="view-heading">待取物</h2>
       <section class="panel">
         <h2>取物核销</h2>
         <hr class="rule" />
@@ -168,7 +154,9 @@ watch(
               <input type="file" accept="image/*" multiple />
             </label>
             <div class="actions">
-              <a class="btn primary" @click="setStage('renting')">核销并完成交接</a>
+              <button type="button" class="btn primary" @click="setStage('renting')">
+                核销并完成交接
+              </button>
             </div>
           </div>
         </div>
@@ -177,15 +165,14 @@ watch(
 
     <!-- 租用中 -->
     <section v-show="activeStage === 'renting'" class="view-panel">
-      <h2 class="view-heading">租用中</h2>
       <section class="panel">
         <h2>租用中</h2>
         <hr class="rule" />
         <p>请于 {{ order?.endDate }} 归还物品，归还时上传清晰照片。</p>
         <hr class="rule" />
         <div class="actions">
-          <a class="btn primary" @click="setStage('return')">发起归还</a>
-          <a class="btn" @click="router.push({ name: 'dispute', hash: '#new' })">发起纠纷</a>
+          <button type="button" class="btn primary" @click="setStage('return')">发起归还</button>
+          <router-link class="btn" :to="{ name: 'dispute', hash: '#new' }">发起纠纷</router-link>
         </div>
         <details class="inline-note">
           <summary>逾期时的提示</summary>
@@ -196,7 +183,6 @@ watch(
 
     <!-- 归还确认 -->
     <section v-show="activeStage === 'return'" class="view-panel">
-      <h2 class="view-heading">归还确认</h2>
       <section class="panel">
         <h2>归还与核验</h2>
         <hr class="rule" />
@@ -212,8 +198,12 @@ watch(
             <h3>出租者确认归还</h3>
             <hr class="rule" />
             <div class="actions">
-              <a class="btn primary" @click="setStage('inspect')">确认归还并验收</a>
-              <a class="btn" @click="router.push({ name: 'dispute', hash: '#new' })">发现损坏</a>
+              <button type="button" class="btn primary" @click="setStage('inspect')">
+                确认归还并验收
+              </button>
+              <router-link class="btn" :to="{ name: 'dispute', hash: '#new' }"
+                >发现损坏</router-link
+              >
             </div>
           </div>
         </div>
@@ -222,16 +212,17 @@ watch(
 
     <!-- 待验收 -->
     <section v-show="activeStage === 'inspect'" class="view-panel">
-      <h2 class="view-heading">待验收</h2>
       <section class="panel">
         <h2>出租者验收物品</h2>
         <hr class="rule" />
         <p>出租者请核对归还物品的完好情况。验收正常将结算并解冻押金；发现异常可发起纠纷。</p>
         <hr class="rule" />
         <div class="actions">
-          <a class="btn primary" @click="setStage('complete')">验收正常，结算完成</a>
-          <a class="btn" @click="router.push({ name: 'dispute', hash: '#new' })"
-            >验收异常，发起纠纷</a
+          <button type="button" class="btn primary" @click="setStage('complete')">
+            验收正常，结算完成
+          </button>
+          <router-link class="btn" :to="{ name: 'dispute', hash: '#new' }"
+            >验收异常，发起纠纷</router-link
           >
         </div>
         <details class="inline-note">
@@ -246,7 +237,6 @@ watch(
 
     <!-- 完成 / 评价 -->
     <section v-show="activeStage === 'complete'" class="view-panel">
-      <h2 class="view-heading">完成 / 评价</h2>
       <section class="panel">
         <h2>订单已完成</h2>
         <hr class="rule" />
@@ -271,8 +261,8 @@ watch(
           <textarea>配件齐全，交接顺利。</textarea>
         </label>
         <div class="actions">
-          <a class="btn primary" @click="setStage('complete')">提交评价</a>
-          <a class="btn" @click="router.push({ name: 'wallet' })">查看钱包</a>
+          <button type="button" class="btn primary" @click="setStage('complete')">提交评价</button>
+          <router-link class="btn" :to="{ name: 'wallet' }">查看钱包</router-link>
         </div>
       </section>
     </section>
@@ -347,7 +337,7 @@ watch(
             <span>合计支付</span>
             <span class="price">{{ formatMoney(orderTotal) }}</span>
           </div>
-          <a class="" @click="router.push({ name: 'wallet', hash: '#wallet' })">查看资金流水</a>
+          <router-link :to="{ name: 'wallet', hash: '#wallet' }">查看资金流水</router-link>
         </section>
       </div>
     </div>
@@ -369,7 +359,7 @@ watch(
           placeholder="输入留言内容，与对方沟通交接事宜"
           @keyup.enter="sendMessage"
         />
-        <a class="btn primary" @click="sendMessage">发送</a>
+        <button type="button" class="btn primary" @click="sendMessage">发送</button>
       </div>
     </section>
   </main>
