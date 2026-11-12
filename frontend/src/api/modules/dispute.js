@@ -1,5 +1,6 @@
+import http from '@/api/request';
+
 // 纠纷与举报相关 API
-import http from '../request';
 
 export const getDispute = () => http.get('/dispute');
 

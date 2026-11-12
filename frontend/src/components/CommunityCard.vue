@@ -23,8 +23,10 @@ const emit = defineEmits(['enter', 'join']);
           <dd>{{ community.onRent }} 件</dd>
         </div>
       </dl>
-      <a class="btn" @click="emit('enter', community)">进入社区</a>
-      <a v-if="joinable" class="btn primary" @click="emit('join', community)">申请加入</a>
+      <button type="button" class="btn" @click="emit('enter', community)">进入社区</button>
+      <button type="button" v-if="joinable" class="btn primary" @click="emit('join', community)">
+        申请加入
+      </button>
     </div>
   </article>
 </template>

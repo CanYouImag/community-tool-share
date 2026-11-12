@@ -1,30 +1,45 @@
 <script setup>
-import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { computed, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+
 import { useAuthStore } from '@/store/auth';
 
 const route = useRoute();
+const router = useRouter();
 const auth = useAuthStore();
+const loggingOut = ref(false);
 
-// 顶部导航项，active 由路由匹配决定
-const navItems = [
-  { path: '/orders', label: '我的订单', match: ['orders'] },
-  { path: '/community', label: '社区', match: ['community'] },
-  { path: '/wallet', label: '钱包', match: ['wallet'] },
-];
+async function logout() {
+  if (loggingOut.value) return;
+  loggingOut.value = true;
+  try {
+    // 先经过页面离开检查；取消放弃草稿时不退出账号。
+    const failure = await router.push({ name: 'login' });
+    if (failure && route.name !== 'login') return;
+    await auth.logout();
+  } finally {
+    loggingOut.value = false;
+  }
+}
 
+// 平台管理员默认进平台管理，社区管理员进社区管理
 const isAdmin = computed(() =>
   ['COMMUNITY_ADMIN', 'PLATFORM_ADMIN'].includes(auth.user?.role)
 )
-
-// 平台管理员默认进平台管理，社区管理员进社区管理
 const adminHome = computed(() =>
   auth.user?.role === 'PLATFORM_ADMIN' ? '/admin/platform' : '/admin/community'
 )
 
-function isActive(item) {
-  return item.match.some((seg) => route.path.includes(seg));
-}
+// 详情、编辑等页面的导航归属统一在路由 meta.nav 中声明。
+const navItems = computed(() => [
+  { to: '/items', label: '物品广场' },
+  { to: '/community', label: '社区' },
+  { to: '/publish', label: '发布 / 我的物品' },
+  { to: '/orders', label: '我的订单' },
+  { to: '/wallet', label: '钱包' },
+  auth.isLoggedIn ? { to: '/account', label: '个人中心' } : { to: '/login', label: '登录 / 注册' },
+  ...(isAdmin.value ? [{ to: adminHome.value, label: '管理后台', admin: true }] : []),
+]);
 </script>
 
 <template>
@@ -36,25 +51,23 @@ function isActive(item) {
       </router-link>
       <nav class="nav" aria-label="主导航">
         <router-link
-          to="/items"
-          :class="{ active: route.path === '/items' || route.path.startsWith('/items/') }"
+          v-for="item in navItems"
+          :key="item.to"
+          :to="item.to"
+          :class="{ active: item.admin ? route.path.includes('/admin') : route.meta.nav === item.to }"
+          :aria-current="route.meta.nav === item.to ? 'location' : undefined"
         >
-          物品广场
+          {{ item.label }}
         </router-link>
-        <router-link to="/community" class="" :class="{ active: isActive(navItems[1]) }">
-          社区
-        </router-link>
-        <router-link to="/community" class="">发布 / 我的物品</router-link>
-        <router-link to="/orders" class="" :class="{ active: isActive(navItems[0]) }">
-          我的订单
-        </router-link>
-        <router-link to="/wallet" class="" :class="{ active: isActive(navItems[2]) }">
-          钱包
-        </router-link>
-        <router-link to="/account" active-class="active"> 个人中心 </router-link>
-        <router-link v-if="isAdmin" :to="adminHome" class="" :class="{ active: route.path.includes('/admin') }">
-          管理后台
-        </router-link>
+        <button
+          v-if="auth.isLoggedIn"
+          class="btn small"
+          type="button"
+          :disabled="loggingOut"
+          @click="logout"
+        >
+          {{ loggingOut ? '正在退出…' : '退出登录' }}
+        </button>
       </nav>
     </div>
   </header>

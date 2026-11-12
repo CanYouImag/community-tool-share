@@ -1017,7 +1017,7 @@ dd {
   gap: 10px;
 }
 
-.captcha output {
+.captcha-code {
   display: block;
   padding: 6px 20px;
   border: 1px solid var(--color-input);
@@ -1513,7 +1513,7 @@ dd {
     padding: 8px 13px;
   }
 
-  .captcha output {
+  .captcha-code {
     padding: 9px;
     font-size: 21px;
   }
@@ -1644,28 +1644,48 @@ textarea:disabled {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 12px;
   margin-bottom: 24px;
-  border: 1px solid var(--color-rule);
-  background: var(--color-surface);
-  border-radius: 6px;
 }
 
 .view-tab {
+  border: 0;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
   padding: 8px 14px;
   border-radius: 4px;
   color: var(--color-muted);
   white-space: nowrap;
 }
 
-.view-tab[aria-selected='true'] {
+.view-tab[aria-pressed='true'] {
   background: var(--color-soft);
   color: var(--color-accent);
   font-weight: 700;
 }
 
-.view-heading {
-  margin-bottom: 20px;
+.view-tab:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.link-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-accent);
+  font: inherit;
+  cursor: pointer;
+}
+
+.link-button:hover {
+  text-decoration: underline;
+}
+
+.link-button:disabled {
+  color: var(--color-muted);
+  cursor: default;
+  text-decoration: none;
 }
 
 .inline-note {

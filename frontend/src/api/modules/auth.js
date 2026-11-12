@@ -1,5 +1,6 @@
+import http from '@/api/request';
+
 // 认证与个人资料 API
-import http from '../request';
 
 export const login = (data) => http.post('/v1/auth/login', data);
 

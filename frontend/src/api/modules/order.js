@@ -1,5 +1,6 @@
+import http from '@/api/request';
+
 // 订单相关 API
-import http from '../request';
 
 export const getOrders = (params) => http.get('/orders', { params });
 

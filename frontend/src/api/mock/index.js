@@ -1,14 +1,31 @@
-// Mock 路由分发：根据 method + url 返回假数据
-import * as db from './data';
+import * as db from '@/api/mock/data';
+import { getItemRentalDetails } from '@/api/mock/itemDetails';
+import { useUserStore } from '@/store/user';
+import { ITEM_CATEGORY } from '@/utils/constants';
+import { paginateItems, parsePriceRange, sortItems } from '@/utils/itemFilters';
 
-const favoriteItemIds = new Set();
+// Mock 路由分发：根据 method + url 返回假数据
+
+const favoritesByUser = new Map();
 
 function setMockFavorite(id, favorited) {
+  const user = useUserStore();
+
+  if (!user.isLoggedIn) {
+    throw new Error('请先登录后再收藏物品');
+  }
+
   const item = db.items.find((item) => item.id === id);
 
   if (!item) {
     throw new Error('物品不存在');
   }
+
+  if (favorited && (item.status ?? 'AVAILABLE') !== 'AVAILABLE') {
+    throw new Error('物品尚未上架，暂不能收藏');
+  }
+
+  const favoriteItemIds = favoritesByUser.get(user.id) || new Set();
 
   if (favorited) {
     favoriteItemIds.add(id);
@@ -16,28 +33,103 @@ function setMockFavorite(id, favorited) {
     favoriteItemIds.delete(id);
   }
 
+  favoritesByUser.set(user.id, favoriteItemIds);
+
   return { favorited: favoriteItemIds.has(id) };
 }
 
 const delay = (data, ms = 200) => new Promise((resolve) => setTimeout(() => resolve(data), ms));
 
+function validateItemInput(params, existingImages = []) {
+  const user = useUserStore();
+
+  if (!user.isCertified) {
+    throw new Error('请先完成实名认证');
+  }
+
+  const membership = db.myMemberships.find(
+    (entry) => entry.id === params.communityId && entry.status === 'JOINED',
+  );
+  const community = db.communities.find((entry) => entry.id === params.communityId);
+
+  if (!membership || !community) {
+    throw new Error('只能向已加入的社区发布物品');
+  }
+
+  const title = String(params.title || '').trim();
+  const condition = String(params.condition || '').trim();
+  const description = String(params.description || '').trim();
+
+  if (!title || !condition || !description) {
+    throw new Error('请填写标题、成色说明和物品描述');
+  }
+
+  if (!ITEM_CATEGORY.includes(params.category)) {
+    throw new Error('物品分类无效');
+  }
+
+  const moneyPattern = /^\d+(?:\.\d{1,2})?$/;
+  const dailyPrice = Number(params.dailyPrice);
+  const deposit = Number(params.deposit);
+
+  if (
+    !moneyPattern.test(String(params.dailyPrice)) ||
+    !moneyPattern.test(String(params.deposit)) ||
+    !Number.isFinite(dailyPrice) ||
+    !Number.isFinite(deposit) ||
+    dailyPrice <= 0 ||
+    deposit < 0
+  ) {
+    throw new Error('租金必须大于零，押金不能为负，金额最多两位小数');
+  }
+
+  if (deposit > 500 && user.credit < 60) {
+    throw new Error('信用分不足，无法发布高押金物品');
+  }
+
+  const pictures = params.images;
+
+  if (
+    !Array.isArray(pictures) ||
+    pictures.length === 0 ||
+    pictures.some(
+      (image) =>
+        typeof image !== 'string' ||
+        (!existingImages.includes(image) && !/^data:image\/(?:jpeg|png|webp);base64,/.test(image)),
+    )
+  ) {
+    throw new Error('请至少保留或上传一张有效图片');
+  }
+
+  return {
+    title,
+    category: params.category,
+    condition,
+    description,
+    dailyPrice,
+    deposit,
+    communityId: community.id,
+    communityName: community.name,
+    image: pictures[0],
+    images: [...pictures],
+  };
+}
+
 // 按 url 匹配处理器
 const handlers = [
   {
     method: 'GET',
-    pattern: /^\/v1\/items$/,
+    pattern: /^\/v1\/items\/mine$/,
     handler: (params) => {
-      const keyword = (params.keyword || '').trim().toLowerCase();
-      const category = params.category || '';
-      const favoritesOnly = params.favoritesOnly === true || params.favoritesOnly === 'true';
+      const user = useUserStore();
 
-      const records = db.items.filter((item) => {
-        const matchesKeyword = !keyword || item.title.toLowerCase().includes(keyword);
-        const matchesCategory = !category || item.category === category;
+      if (!user.isLoggedIn) {
+        throw new Error('请先登录');
+      }
 
-        const matchesFavorite = !favoritesOnly || favoriteItemIds.has(item.id);
-        return matchesKeyword && matchesCategory && matchesFavorite;
-      });
+      const records = db.items.filter(
+        (item) => item.ownerId === user.id && (!params.status || item.status === params.status),
+      );
 
       return {
         records,
@@ -45,6 +137,220 @@ const handlers = [
         page: 1,
         size: 10,
       };
+    },
+  },
+  {
+    method: 'GET',
+    pattern: /^\/v1\/items$/,
+    handler: (params) => {
+      const keyword = (params.keyword || '').trim().toLowerCase();
+      const category = params.category || '';
+      const favoritesOnly = params.favoritesOnly === true || params.favoritesOnly === 'true';
+      const user = useUserStore();
+
+      if (favoritesOnly && !user.isLoggedIn) {
+        throw new Error('请先登录后查看收藏');
+      }
+
+      const favoriteItemIds = user.isLoggedIn ? favoritesByUser.get(user.id) : undefined;
+      const { minPrice, maxPrice } = parsePriceRange(params.minPrice, params.maxPrice);
+      const communityScope =
+        params.communityScope ?? (user.isLoggedIn && !favoritesOnly ? 'joined' : 'all');
+      const communityId = params.communityId || '';
+
+      if (!['joined', 'all'].includes(communityScope)) {
+        throw new Error('社区范围无效');
+      }
+      if (communityId && !db.communities.some((community) => community.id === communityId)) {
+        throw new Error('所选社区不存在');
+      }
+
+      const joinedCommunityIds = user.isLoggedIn
+        ? db.myMemberships.filter((membership) => membership.status === 'JOINED').map((m) => m.id)
+        : [];
+
+      const records = db.items.filter((item) => {
+        const matchesKeyword =
+          !keyword ||
+          [item.title, item.description].some((text) =>
+            String(text || '')
+              .toLowerCase()
+              .includes(keyword),
+          );
+        const matchesCategory = !category || item.category === category;
+        const matchesFavorite = !favoritesOnly || favoriteItemIds?.has(item.id);
+        const matchesPrice =
+          (minPrice === undefined || item.dailyPrice >= minPrice) &&
+          (maxPrice === undefined || item.dailyPrice <= maxPrice);
+        const matchesCommunity = communityId
+          ? item.communityId === communityId
+          : communityScope === 'all' ||
+            joinedCommunityIds.length === 0 ||
+            joinedCommunityIds.includes(item.communityId);
+        const isAvailable = (item.status ?? 'AVAILABLE') === 'AVAILABLE';
+        return (
+          isAvailable &&
+          matchesKeyword &&
+          matchesCategory &&
+          matchesFavorite &&
+          matchesPrice &&
+          matchesCommunity
+        );
+      });
+
+      const ratedRecords = records.map((item) => ({
+        ...item,
+        rating: getItemRentalDetails(item.id).rating,
+      }));
+      return paginateItems(sortItems(ratedRecords, params.sort), params.page, params.size);
+    },
+  },
+  {
+    method: 'POST',
+    pattern: /^\/v1\/items$/,
+    handler: (params) => {
+      const user = useUserStore();
+      const fields = validateItemInput(params);
+
+      const item = {
+        ...fields,
+        id: `i_${crypto.randomUUID()}`,
+        ownerId: user.id,
+        owner: user.name,
+        ownerCredit: user.credit,
+        status: 'PENDING_REVIEW',
+        createdAt: new Date().toISOString(),
+      };
+
+      db.items.unshift(item);
+
+      return { id: item.id, status: item.status };
+    },
+  },
+  {
+    method: 'DELETE',
+    pattern: /^\/v1\/items\/([^/]+)$/,
+    handler: (_params, matches) => {
+      const user = useUserStore();
+      const id = decodeURIComponent(matches[1]);
+
+      if (!user.isCertified) {
+        throw new Error('请先完成实名认证');
+      }
+
+      const index = db.items.findIndex((item) => item.id === id);
+      const item = db.items[index];
+
+      if (!item || item.ownerId !== user.id) {
+        throw new Error('物品不存在或无权操作');
+      }
+
+      // 只有明确结束的订单才不会阻止删除
+      const finishedStatuses = ['COMPLETED', 'CANCELLED', 'CLOSED'];
+      const hasActiveOrder = [...db.orders, ...db.lendOrders, ...db.itemRentalHistory].some(
+        (order) => order.itemId === id && !finishedStatuses.includes(order.status),
+      );
+
+      if (hasActiveOrder) {
+        throw new Error('该物品有进行中的订单，暂不能删除');
+      }
+
+      db.items.splice(index, 1);
+      favoritesByUser.forEach((ids) => ids.delete(id));
+
+      return { id, deleted: true };
+    },
+  },
+  {
+    method: 'PUT',
+    pattern: /^\/v1\/items\/([^/]+)$/,
+    handler: (params, matches) => {
+      const user = useUserStore();
+      const id = decodeURIComponent(matches[1]);
+      const item = db.items.find((item) => item.id === id);
+
+      if (!user.isCertified) {
+        throw new Error('请先完成实名认证');
+      }
+
+      if (!item || item.ownerId !== user.id) {
+        throw new Error('物品不存在或无权操作');
+      }
+
+      const editableStatuses = ['PENDING_REVIEW', 'AVAILABLE', 'REJECTED', 'PAUSED'];
+
+      if (!editableStatuses.includes(item.status ?? 'AVAILABLE')) {
+        throw new Error('当前状态不允许编辑');
+      }
+
+      const existingImages = item.images || (item.image ? [item.image] : []);
+      const fields = validateItemInput(params, existingImages);
+
+      // 全部校验通过后才修改原记录
+      Object.assign(item, fields, {
+        status: 'PENDING_REVIEW',
+        updatedAt: new Date().toISOString(),
+      });
+
+      return { id: item.id, status: item.status };
+    },
+  },
+  {
+    method: 'GET',
+    pattern: /^\/v1\/items\/mine\/([^/]+)$/,
+    handler: (_params, matches) => {
+      const user = useUserStore();
+      const id = decodeURIComponent(matches[1]);
+      const item = db.items.find((item) => item.id === id);
+
+      if (!user.isCertified) {
+        throw new Error('请先完成实名认证');
+      }
+
+      if (!item || item.ownerId !== user.id) {
+        throw new Error('物品不存在或无权操作');
+      }
+
+      if (item.status === 'REMOVED') {
+        throw new Error('违规下架的物品不能编辑');
+      }
+
+      return {
+        ...item,
+        images: [...(item.images || (item.image ? [item.image] : []))],
+      };
+    },
+  },
+  {
+    method: 'PATCH',
+    pattern: /^\/v1\/items\/([^/]+)\/status$/,
+    handler: (params, matches) => {
+      const user = useUserStore();
+      const id = decodeURIComponent(matches[1]);
+      const item = db.items.find((item) => item.id === id);
+
+      if (!user.isCertified) {
+        throw new Error('请先完成实名认证');
+      }
+
+      if (!item || item.ownerId !== user.id) {
+        throw new Error('物品不存在或无权操作');
+      }
+
+      const currentStatus = item.status ?? 'AVAILABLE';
+      const nextStatus = params.status;
+
+      const canPause = currentStatus === 'AVAILABLE' && nextStatus === 'PAUSED';
+      const canResume = currentStatus === 'PAUSED' && nextStatus === 'AVAILABLE';
+
+      if (!canPause && !canResume) {
+        throw new Error('当前状态不允许此操作，请刷新后重试');
+      }
+
+      item.status = nextStatus;
+      item.updatedAt = new Date().toISOString();
+
+      return { id: item.id, status: item.status };
     },
   },
   {
@@ -63,14 +369,15 @@ const handlers = [
     handler: (_params, matches) => {
       const id = decodeURIComponent(matches[1]);
       const item = db.items.find((item) => item.id === id);
-
-      if (!item) {
-        throw new Error('物品不存在');
+      if (!item || (item.status ?? 'AVAILABLE') !== 'AVAILABLE') {
+        throw new Error('物品不存在或尚未上架');
       }
+      const user = useUserStore();
 
       return {
         ...item,
-        favorited: favoriteItemIds.has(id),
+        ...getItemRentalDetails(id),
+        favorited: Boolean(user.isLoggedIn && favoritesByUser.get(user.id)?.has(id)),
       };
     },
   },
@@ -86,7 +393,11 @@ const handlers = [
       const cid = matches[1];
       const home = db.communityHome[cid] || { top: [], latest: [] };
       const community = db.communities.find((c) => c.id === cid);
-      const resolve = (ids) => ids.map((id) => db.items.find((i) => i.id === id)).filter(Boolean);
+      const resolve = (ids) =>
+        ids
+          .map((id) => db.items.find((item) => item.id === id))
+          .filter((item) => item && (item.status ?? 'AVAILABLE') === 'AVAILABLE')
+          .map((item) => ({ ...item, rating: getItemRentalDetails(item.id).rating }));
       return { ...community, top: resolve(home.top), latest: resolve(home.latest) };
     },
   },
