@@ -22,7 +22,9 @@ community-tool-share/
 ├─ frontend/                       # Vue 3 前端（含 Dockerfile / nginx.conf）
 ├─ db/
 │  ├─ user-wallet.sql              # 用户与资金域建表（陈麒元维护）
-│  └─ community-dispute-platform.sql  # 社区/纠纷/平台域建表（钟姝伶维护）
+│  ├─ community-dispute-platform.sql  # 社区/纠纷/平台域建表（钟姝伶维护）
+│  ├─ order.sql                     # 订单域最小载体（待窦源泽替换为完整订单域）
+│  └─ init.sql                      # 建表入口占位（待表设计完成后补充）
 ├─ docs/                           # 需求 / 设计 / 原型 / 测试 / 配置管理文档
 └─ scripts/start.sh                # 一键启动脚本（Linux/macOS）
 ```
