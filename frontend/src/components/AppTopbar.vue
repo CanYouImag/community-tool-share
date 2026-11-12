@@ -22,16 +22,20 @@ async function logout() {
   }
 }
 
-// 平台管理员默认进平台管理，社区管理员进社区管理
-const isAdmin = computed(() =>
-  ['COMMUNITY_ADMIN', 'PLATFORM_ADMIN'].includes(auth.user?.role)
-)
-const adminHome = computed(() =>
-  auth.user?.role === 'PLATFORM_ADMIN' ? '/admin/platform' : '/admin/community'
-)
-const adminHomeLabel = computed(() =>
-  auth.user?.role === 'PLATFORM_ADMIN' ? '平台管理' : '社区管理'
-)
+// 平台管理员可同时进「平台管理」与「社区管理」（平台管理员兼任社区 1 管理员时需审核加入申请）；
+// 社区管理员仅进「社区管理」。
+const adminNavItems = computed(() => {
+  if (auth.user?.role === 'PLATFORM_ADMIN') {
+    return [
+      { to: '/admin/platform', label: '平台管理', admin: true },
+      { to: '/admin/community', label: '社区管理', admin: true },
+    ];
+  }
+  if (auth.user?.role === 'COMMUNITY_ADMIN') {
+    return [{ to: '/admin/community', label: '社区管理', admin: true }];
+  }
+  return [];
+});
 
 // 详情、编辑等页面的导航归属统一在路由 meta.nav 中声明。
 const navItems = computed(() => [
@@ -41,7 +45,7 @@ const navItems = computed(() => [
   { to: '/orders', label: '我的订单' },
   { to: '/wallet', label: '钱包' },
   auth.isLoggedIn ? { to: '/account', label: '个人中心' } : { to: '/login', label: '登录 / 注册' },
-  ...(isAdmin.value ? [{ to: adminHome.value, label: adminHomeLabel.value, admin: true }] : []),
+  ...adminNavItems.value,
 ]);
 </script>
 

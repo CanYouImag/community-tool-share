@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import Pagination from '@/components/Pagination.vue'
 import EmptyState from '@/components/EmptyState.vue'
@@ -41,6 +41,9 @@ const activeTab = ref('communities')
 const communities = ref([])
 const editing = reactive({ id: null, name: '', intro: '', coverUrl: '', autoApprove: false, status: 'ACTIVE' })
 const appoint = reactive({ communityId: null, userId: '' })
+const appointableUsers = computed(() =>
+  (users.value || []).filter((u) => u.role === 'CERTIFIED' && u.status === 'ACTIVE')
+)
 
 async function loadCommunities() {
   communities.value = await getPlatformCommunities()
@@ -91,6 +94,7 @@ async function doAppoint() {
   appoint.communityId = null
   appoint.userId = ''
   loadCommunities()
+  alert('已任命社区管理员，被任命者重新登录后生效')
 }
 async function doDismiss(c) {
   await dismissAdmin(c.id, c.adminId)
@@ -277,7 +281,12 @@ onMounted(async () => {
                     <a v-if="c.adminId" class="danger-text" @click="doDismiss(c)">罢免</a>
                   </div>
                   <div v-if="appoint.communityId === c.id" class="actions">
-                    <input v-model="appoint.userId" type="text" placeholder="输入用户 ID" />
+                    <select v-model="appoint.userId" aria-label="选择管理员">
+                      <option value="" disabled>选择认证用户</option>
+                      <option v-for="u in appointableUsers" :key="u.id" :value="u.id">
+                        {{ u.nickname || u.username }}（#{{ u.id }}）
+                      </option>
+                    </select>
                     <a class="btn small primary" @click="doAppoint">确认</a>
                     <a class="btn small" @click="appoint.communityId = null">取消</a>
                   </div>

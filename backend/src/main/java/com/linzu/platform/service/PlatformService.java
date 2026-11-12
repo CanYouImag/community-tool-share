@@ -109,8 +109,16 @@ public class PlatformService {
     public CommunityAdminResponse appointAdmin(Long operatorId, Long communityId, Long userId) {
         Community c = requireCommunity(communityId);
         User user = requireUser(userId);
-        if (!CERTIFIED.equals(user.getRole())) {
-            throw new BusinessException(ErrorCode.USER_NOT_CERTIFIED);
+        // 校验顺序：先“本社区是否已有管理员”，再“该用户是否已在别处任职”，
+        // 最后才校验实名认证，避免对已任社区管理员的用户误报“未通过实名认证”。
+        Long hasAdmin = memberMapper.selectCount(
+                Wrappers.<CommunityMember>lambdaQuery()
+                        .eq(CommunityMember::getCommunityId, communityId)
+                        .eq(CommunityMember::getRole, ADMIN)
+                        .eq(CommunityMember::getStatus, ACTIVE)
+        );
+        if (hasAdmin != null && hasAdmin > 0) {
+            throw new BusinessException(ErrorCode.COMMUNITY_ADMIN_EXISTS);
         }
         Long otherAdmin = memberMapper.selectCount(
                 Wrappers.<CommunityMember>lambdaQuery()
@@ -122,14 +130,8 @@ public class PlatformService {
         if (otherAdmin != null && otherAdmin > 0) {
             throw new BusinessException(ErrorCode.USER_ALREADY_ADMIN);
         }
-        Long hasAdmin = memberMapper.selectCount(
-                Wrappers.<CommunityMember>lambdaQuery()
-                        .eq(CommunityMember::getCommunityId, communityId)
-                        .eq(CommunityMember::getRole, ADMIN)
-                        .eq(CommunityMember::getStatus, ACTIVE)
-        );
-        if (hasAdmin != null && hasAdmin > 0) {
-            throw new BusinessException(ErrorCode.COMMUNITY_ADMIN_EXISTS);
+        if (!CERTIFIED.equals(user.getRole())) {
+            throw new BusinessException(ErrorCode.USER_NOT_CERTIFIED);
         }
 
         CommunityMember m = memberMapper.selectOne(

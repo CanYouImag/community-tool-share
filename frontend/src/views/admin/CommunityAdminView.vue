@@ -80,17 +80,25 @@ function changeMemberPage(p) {
 }
 
 async function approve(a) {
-  await auditJoinApply(community.value.id, a.id, { approve: true })
-  loadApplies()
+  try {
+    await auditJoinApply(community.value.id, a.id, { approve: true })
+    loadApplies()
+  } catch (e) {
+    alert(e?.message || '审核失败')
+  }
 }
 function reject(a) {
   rejecting.id = a.id
   rejecting.reason = ''
 }
 async function confirmReject() {
-  await auditJoinApply(community.value.id, rejecting.id, { approve: false, rejectReason: rejecting.reason })
-  rejecting.id = null
-  loadApplies()
+  try {
+    await auditJoinApply(community.value.id, rejecting.id, { approve: false, rejectReason: rejecting.reason })
+    rejecting.id = null
+    loadApplies()
+  } catch (e) {
+    alert(e?.message || '审核失败')
+  }
 }
 
 async function kick(userId) {

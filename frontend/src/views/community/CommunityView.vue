@@ -81,16 +81,15 @@ function switchTab(id) {
 }
 
 async function applyJoin(c) {
-  await joinCommunity(c.id);
-  joinState.value = 'APPLIED';
-  // 同步到我的社区列表
-  if (!memberships.value.find((m) => m.id === c.id)) {
-    memberships.value.push({
-      id: c.id,
-      name: c.name,
-      status: 'PENDING',
-      time: new Date().toISOString().slice(0, 10),
-    });
+  try {
+    const res = await joinCommunity(c.id);
+    // 后端返回 status：JOINED（自动通过，已加入）或 PENDING（待审核）
+    const joined = res?.status === 'JOINED';
+    joinState.value = joined ? 'JOINED' : 'APPLIED';
+    await loadMemberships();
+    if (joined) alert('已加入社区');
+  } catch (e) {
+    alert(e?.message || '加入失败');
   }
 }
 
