@@ -35,10 +35,12 @@ export const ORDER_STATUS_FILTER = [
 
 // 纠纷状态（两级机制：社区调解 → 平台仲裁，对齐设计文档「社区治理子系统」）
 export const DISPUTE_STATUS = {
+  AWAITING_RENTER: { label: '待租客回应', cls: 'blue' },
   MEDIATING: { label: '调解中', cls: 'warn' },
   PENDING_ARBITRATION: { label: '待仲裁', cls: 'error' },
   RESOLVED: { label: '已调解', cls: '' },
   ARBITRATED: { label: '已裁决', cls: 'blue' },
+  SETTLED: { label: '已和解', cls: '' },
 };
 
 // 资金流水类型

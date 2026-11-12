@@ -4,12 +4,12 @@ import { useAuthStore } from '@/store/auth';
 
 import {
   submitDispute,
+  respondDispute,
   getMyDisputes,
   getDisputeDetail,
   getAward,
   submitReport,
 } from '@/api/modules/dispute';
-import { getMyMemberships } from '@/api/modules/community';
 import { getMyOrders } from '@/api/modules/order';
 import StatusBadge from '@/components/StatusBadge.vue';
 import ViewTabs from '@/components/ViewTabs.vue';
@@ -18,21 +18,20 @@ import { formatAmount, formatDateTime } from '@/utils/format';
 const auth = useAuthStore();
 
 const tabs = [
-  { id: 'new', label: '发起纠纷' },
+  { id: 'new', label: '提出扣留押金' },
   { id: 'mine', label: '我的纠纷' },
   { id: 'award', label: '裁决书' },
   { id: 'report', label: '举报' },
 ];
 const activeTab = ref('new');
 
-// —— 发起纠纷 ——
-const communities = ref([]);
+// —— 提出扣留押金（仅物主） ——
 const orders = ref([]);
 const form = ref({
   orderId: '',
   communityId: '',
-  ownerId: '1',
   reason: '',
+  withholdAmount: '',
   depositAmount: '',
   rentAmount: '',
 });
@@ -41,6 +40,7 @@ const disputeDone = ref(false);
 // —— 我的纠纷 ——
 const myDisputes = ref([]);
 const detail = ref(null);
+const respondNote = ref('');
 
 // —— 裁决书 ——
 const awards = ref([]);
@@ -62,25 +62,26 @@ const report = ref({ target: 'ITEM', type: 'FALSE_INFO', targetId: '', desc: '' 
 const reportDone = ref(false);
 
 async function load() {
-  await loadMemberships();
-  await loadOrders();
   await loadMyDisputes();
+  await loadOrders();
   await loadAwards();
 }
 
-async function loadMemberships() {
-  const list = await getMyMemberships();
-  communities.value = (list || []).filter((c) => c.status === 'JOINED');
-  if (!form.value.communityId && communities.value.length) {
-    form.value.communityId = String(communities.value[0].id);
-  }
-}
-
 async function loadOrders() {
-  orders.value = (await getMyOrders()) || [];
-  if (!form.value.orderId && orders.value.length) {
-    form.value.orderId = String(orders.value[0].id);
-    onOrderChange();
+  const all = (await getMyOrders()) || [];
+  const me = String(auth.user?.id);
+  // 已发起过纠纷的订单（任意状态）不可再发起——直接在列表里标灰并禁用
+  const disputedIds = new Set((myDisputes.value || []).map((d) => String(d.orderId)));
+  // 只保留“我是物主（出租者）”的订单——扣留押金只能由物主提出
+  orders.value = all
+    .filter((o) => String(o.ownerId) === me)
+    .map((o) => ({ ...o, disputed: disputedIds.has(String(o.id)) }));
+  if (!form.value.orderId) {
+    const first = orders.value.find((o) => !o.disputed);
+    if (first) {
+      form.value.orderId = String(first.id);
+      onOrderChange();
+    }
   }
 }
 
@@ -88,7 +89,6 @@ function onOrderChange() {
   const o = orders.value.find((x) => String(x.id) === form.value.orderId);
   if (!o) return;
   form.value.communityId = String(o.communityId);
-  form.value.ownerId = String(o.ownerId);
   form.value.depositAmount = o.depositAmount ?? '';
   form.value.rentAmount = o.rentAmount ?? '';
 }
@@ -103,18 +103,38 @@ async function loadAwards() {
 }
 
 async function doSubmitDispute() {
-  if (!form.value.orderId || !form.value.communityId || !form.value.ownerId || !form.value.reason.trim()) return;
+  if (!form.value.orderId || !form.value.communityId || !form.value.reason.trim()) return;
+  const o = orders.value.find((x) => String(x.id) === form.value.orderId);
+  if (!o) return;
+  const me = auth.user?.id;
   await submitDispute({
     orderId: Number(form.value.orderId),
     communityId: Number(form.value.communityId),
-    renterId: auth.user?.id,
-    ownerId: Number(form.value.ownerId),
+    renterId: Number(o.renterId),
+    ownerId: Number(me),
+    withholdAmount: Number(form.value.withholdAmount),
     reason: form.value.reason.trim(),
     depositAmount: form.value.depositAmount === '' ? null : Number(form.value.depositAmount),
     rentAmount: form.value.rentAmount === '' ? null : Number(form.value.rentAmount),
   });
   disputeDone.value = true;
   form.value.reason = '';
+  form.value.withholdAmount = '';
+  form.value.orderId = '';
+  await loadMyDisputes();
+  await loadOrders();
+  await loadAwards();
+}
+
+async function doRespond(agree) {
+  if (!detail.value) return;
+  if (!agree && !respondNote.value.trim()) return;
+  await respondDispute(detail.value.id, {
+    agree,
+    note: agree ? '' : respondNote.value.trim(),
+  });
+  respondNote.value = '';
+  await openDetail(detail.value);
   await loadMyDisputes();
   await loadAwards();
 }
@@ -123,8 +143,14 @@ async function openDetail(d) {
   detail.value = await getDisputeDetail(d.id);
 }
 
+function closeDetail() {
+  detail.value = null;
+}
+
 async function openAward(d) {
   award.value = await getAward(d.id);
+  activeTab.value = 'award';
+  detail.value = null;
 }
 
 async function doSubmitReport() {
@@ -150,56 +176,65 @@ onMounted(load);
 
     <ViewTabs v-model="activeTab" :tabs="tabs" label="纠纷与举报" />
 
-    <!-- 发起纠纷 -->
+    <!-- 提出扣留押金（仅物主） -->
     <section v-show="activeTab === 'new'" class="view-panel">
       <div class="narrow">
         <section class="panel">
-          <div class="panel-title"><h2>发起纠纷</h2></div>
+          <div class="panel-title"><h2>提出扣留押金</h2></div>
+          <p v-if="orders.length" class="muted">
+            你是物主，对订单提出扣留押金：租客同意则立即和解划转，不同意则进入社区调解。
+          </p>
           <div v-if="disputeDone" class="result">
             <div class="result-mark">✓</div>
-            <h3>纠纷已提交</h3>
-            <p>已进入社区调解，可在「我的纠纷」查看进度。</p>
-            <a class="btn" @click="disputeDone = false">继续发起</a>
+            <h3>扣留押金已提出</h3>
+            <p>已通知租客回应，可在「我的纠纷」查看进度。</p>
+            <a class="btn" @click="disputeDone = false">继续提出</a>
           </div>
           <template v-else>
             <label class="field">
               <span>关联订单<em>*</em></span>
               <select v-model="form.orderId" aria-label="关联订单" @change="onOrderChange">
-                <option v-for="o in orders" :key="o.id" :value="String(o.id)">
-                  订单 #{{ o.id }} · {{ o.itemTitle }}（押金 ¥{{ formatAmount(o.depositAmount) }} / 租金 ¥{{ formatAmount(o.rentAmount) }}）
+                <option v-for="o in orders" :key="o.id" :value="String(o.id)" :disabled="o.disputed">
+                  订单 #{{ o.id }} · {{ o.itemTitle }}（我是物主｜押金 ¥{{ formatAmount(o.depositAmount) }}）{{ o.disputed ? '—— 已纠纷过，不可再发起' : '' }}
                 </option>
               </select>
-              <small v-if="!orders.length" class="muted">你还没有可发起纠纷的订单。</small>
+              <small v-if="!orders.length" class="muted">你还没有作为物主的订单，无法提出扣留押金。</small>
+              <small v-else-if="orders.every((o) => o.disputed)" class="muted">你的物主订单都已发起过纠纷，没有可再发起的订单。</small>
             </label>
-            <label class="field">
-              <span>所属社区<em>*</em></span>
-              <select v-model="form.communityId" aria-label="所属社区">
-                <option v-for="c in communities" :key="c.id" :value="String(c.id)">{{ c.name }}</option>
-              </select>
-              <small v-if="!communities.length" class="muted">你还没有加入任何社区，先去「社区」页加入。</small>
-            </label>
-            <label class="field">
-              <span>出租者用户 ID<em>*</em></span>
-              <input v-model="form.ownerId" type="number" aria-label="出租者用户 ID" disabled />
+            <label v-if="form.orderId" class="field">
+              <span>所属社区</span>
+              <input :value="'社区 #' + form.communityId" aria-label="所属社区" disabled />
               <small class="muted">由所选订单自动带入。</small>
             </label>
-            <label class="field">
-              <span>纠纷理由<em>*</em></span>
-              <textarea v-model="form.reason" aria-label="纠纷理由" placeholder="请描述争议情况"></textarea>
+            <label v-if="form.orderId" class="field">
+              <span>对方租客</span>
+              <input :value="'租客 ID ' + (orders.find((o) => String(o.id) === form.orderId)?.renterId ?? '')" aria-label="对方租客" disabled />
+              <small class="muted">由所选订单自动判断。</small>
             </label>
-            <div class="two">
+            <template v-if="form.orderId">
               <label class="field">
-                <span>押金金额（可选）</span>
-                <input v-model="form.depositAmount" type="number" min="0" step="0.01" aria-label="押金金额" />
+                <span>扣留金额<em>*</em></span>
+                <input v-model="form.withholdAmount" type="number" min="0" step="0.01" aria-label="扣留金额" placeholder="不超过押金金额" />
+                <small class="muted">需大于 0 且不超过押金 ¥{{ formatAmount(form.depositAmount) }}。</small>
               </label>
               <label class="field">
-                <span>租金金额（可选）</span>
-                <input v-model="form.rentAmount" type="number" min="0" step="0.01" aria-label="租金金额" />
+                <span>扣留理由<em>*</em></span>
+                <textarea v-model="form.reason" aria-label="扣留理由" placeholder="请描述物品损坏/缺件等情况"></textarea>
               </label>
-            </div>
-            <div class="actions">
-              <a class="btn primary" @click="doSubmitDispute">提交纠纷</a>
-            </div>
+              <div class="two">
+                <label class="field">
+                  <span>押金金额</span>
+                  <input v-model="form.depositAmount" type="number" min="0" step="0.01" aria-label="押金金额" disabled />
+                </label>
+                <label class="field">
+                  <span>租金金额</span>
+                  <input v-model="form.rentAmount" type="number" min="0" step="0.01" aria-label="租金金额" disabled />
+                </label>
+              </div>
+              <div class="actions">
+                <a class="btn primary" @click="doSubmitDispute">提出扣留押金</a>
+              </div>
+            </template>
           </template>
         </section>
       </div>
@@ -236,49 +271,69 @@ onMounted(load);
         </div>
       </section>
 
-      <section v-if="detail" class="view-panel">
-        <h2 class="view-heading">纠纷详情 #{{ detail.id }}</h2>
-        <div class="two">
-          <div>
-            <section class="panel">
-              <div class="row between">
-                <div>
-                  <small>订单 #{{ detail.orderId }} / {{ detail.communityName }}</small>
-                  <h2>押金争议</h2>
-                </div>
-                <StatusBadge :status="detail.status" />
-              </div>
-              <dl class="line-list">
-                <div><dt>发起人</dt><dd>{{ detail.initiatorName }}</dd></div>
-                <div><dt>出租者</dt><dd>{{ detail.ownerName }}</dd></div>
-                <div><dt>纠纷理由</dt><dd>{{ detail.reason }}</dd></div>
-                <div><dt>押金 / 租金</dt><dd>¥{{ formatAmount(detail.deposit) }} / ¥{{ formatAmount(detail.rent) }}</dd></div>
-                <div v-if="detail.mediationConclusion"><dt>调解结论</dt><dd>{{ detail.mediationConclusion }}</dd></div>
-                <div v-if="detail.escalateNote"><dt>上报说明</dt><dd>{{ detail.escalateNote }}</dd></div>
-              </dl>
-              <p v-if="detail.evidences?.length" class="muted">已提交举证 {{ detail.evidences.length }} 份</p>
-            </section>
+      <div v-if="detail" class="modal-mask" @click.self="closeDetail">
+        <div class="modal-panel">
+          <div class="modal-head">
+            <h2>纠纷详情 #{{ detail.id }}</h2>
+            <a class="btn" @click="closeDetail">返回列表</a>
           </div>
-          <div>
-            <section class="panel">
-              <div class="panel-title"><h2>处理记录</h2></div>
-              <div v-if="detail.messages?.length" class="timeline">
-                <p v-for="m in detail.messages" :key="m.id">
-                  {{ m.senderName }}
-                  <small>{{ formatDateTime(m.createdAt) }}</small>
-                  <span>{{ m.content }}</span>
-                </p>
-              </div>
-              <p v-else class="muted">暂无留言</p>
-            </section>
-            <section v-if="detail.status === 'ARBITRATED'" class="panel">
-              <div class="actions">
-                <a class="btn primary" @click="openAward(detail)">查看裁决书</a>
-              </div>
-            </section>
+          <div class="two">
+            <div>
+              <section class="panel">
+                <div class="row between">
+                  <div>
+                    <small>订单 #{{ detail.orderId }} / {{ detail.communityName }}</small>
+                    <h2>押金争议</h2>
+                  </div>
+                  <StatusBadge :status="detail.status" />
+                </div>
+                <dl class="line-list">
+                  <div><dt>发起人</dt><dd>{{ detail.initiatorName }}</dd></div>
+                  <div><dt>出租者</dt><dd>{{ detail.ownerName }}</dd></div>
+                  <div><dt>租客</dt><dd>{{ detail.renterName }}</dd></div>
+                  <div><dt>扣留理由</dt><dd>{{ detail.reason }}</dd></div>
+                  <div><dt>扣留金额</dt><dd>¥{{ formatAmount(detail.withholdAmount) }}</dd></div>
+                  <div><dt>押金 / 租金</dt><dd>¥{{ formatAmount(detail.deposit) }} / ¥{{ formatAmount(detail.rent) }}</dd></div>
+                  <div v-if="detail.renterNote"><dt>租客回应</dt><dd>{{ detail.renterNote }}</dd></div>
+                  <div v-if="detail.mediationConclusion"><dt>调解结论</dt><dd>{{ detail.mediationConclusion }}</dd></div>
+                  <div v-if="detail.escalateNote"><dt>上报说明</dt><dd>{{ detail.escalateNote }}</dd></div>
+                </dl>
+                <section v-if="detail.status === 'AWAITING_RENTER' && String(detail.renterId) === String(auth.user?.id)" class="panel respond-box">
+                  <div class="panel-title"><h2>回应扣留押金</h2></div>
+                  <p class="muted">物主提出扣留 ¥{{ formatAmount(detail.withholdAmount) }}。同意则立即和解划转，不同意则进入社区调解。</p>
+                  <label class="field">
+                    <span>不同意时的异议理由</span>
+                    <textarea v-model="respondNote" aria-label="不同意理由" placeholder="如不同意，请说明原因"></textarea>
+                  </label>
+                  <div class="actions">
+                    <a class="btn" @click="doRespond(false)">不同意，申请调解</a>
+                    <a class="btn primary" @click="doRespond(true)">同意，立即和解</a>
+                  </div>
+                </section>
+                <p v-if="detail.evidences?.length" class="muted">已提交举证 {{ detail.evidences.length }} 份</p>
+              </section>
+            </div>
+            <div>
+              <section class="panel">
+                <div class="panel-title"><h2>处理记录</h2></div>
+                <div v-if="detail.messages?.length" class="timeline">
+                  <p v-for="m in detail.messages" :key="m.id">
+                    {{ m.senderName }}
+                    <small>{{ formatDateTime(m.createdAt) }}</small>
+                    <span>{{ m.content }}</span>
+                  </p>
+                </div>
+                <p v-else class="muted">暂无留言</p>
+              </section>
+              <section v-if="detail.status === 'ARBITRATED'" class="panel">
+                <div class="actions">
+                  <a class="btn primary" @click="openAward(detail)">查看裁决书</a>
+                </div>
+              </section>
+            </div>
           </div>
         </div>
-      </section>
+      </div>
     </section>
 
     <!-- 裁决书 -->
@@ -307,7 +362,6 @@ onMounted(load);
               <div><dt>裁决类型</dt><dd>{{ award.type }}</dd></div>
               <div><dt>赔付出租者</dt><dd>¥{{ formatAmount(award.toLender) }}</dd></div>
               <div><dt>退回租客押金</dt><dd>¥{{ formatAmount(award.toBorrower) }}</dd></div>
-              <div><dt>租金减免</dt><dd>¥{{ formatAmount(award.rentRelief) }}</dd></div>
             </dl>
             <p><strong>裁决理由</strong><br />{{ award.reason }}</p>
             <div class="decision">
@@ -363,3 +417,42 @@ onMounted(load);
     </section>
   </main>
 </template>
+
+<style scoped>
+.modal-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 48px 16px;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.modal-panel {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  width: 100%;
+  max-width: 1000px;
+  padding: 24px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.35);
+}
+
+.modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.modal-head h2 {
+  margin: 0;
+}
+
+.respond-box {
+  margin-top: 16px;
+  border-left: 3px solid var(--color-primary, #2f6fed);
+}
+</style>

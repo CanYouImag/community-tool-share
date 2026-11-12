@@ -20,6 +20,9 @@ public record DisputeCreateRequest(
         @NotNull(message = "出租者不能为空")
         Long ownerId,
 
+        @NotNull(message = "扣留金额不能为空")
+        BigDecimal withholdAmount,
+
         @NotBlank(message = "纠纷理由不能为空")
         @Size(max = 500, message = "纠纷理由最多 500 个字符")
         String reason,

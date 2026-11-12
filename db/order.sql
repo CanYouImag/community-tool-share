@@ -33,5 +33,7 @@ INSERT IGNORE INTO t_order (id, item_id, item_title, community_id, renter_id, ow
 
 -- 押金冻结占位（UC-D2）：下单支付时租客押金转入冻结；此处以种子补齐演示闭环。
 -- 说明：完整「下单→支付→冻结押金→解冻/扣划」状态机由订单域（窦源泽）实现，此处仅让演示数据自洽。
--- 冻结需覆盖所有“待仲裁/可新发起”的种子订单押金：订单 102 押金 80（种子纠纷待仲裁）+ 订单 201 押金 60（新发起演示）= 140
-UPDATE t_wallet SET frozen_balance = frozen_balance + 140.00 WHERE user_id = 2;
+-- 冻结需覆盖三个种子订单的押金（初始均未发起纠纷，押金处于冻结、等待物主验收/扣留）：订单 101 押金 50 + 订单 102 押金 80 + 订单 201 押金 60 = 190
+-- 注意：本行在 db 初始化阶段执行，此刻演示用户钱包尚未由后端 DemoDataInitializer 创建，
+--       故实际冻结基线需在演示库中手工补齐（UC-D2 落地前由配置经理维护，见 docs/configuration-management）。
+UPDATE t_wallet SET frozen_balance = frozen_balance + 190.00 WHERE user_id = 2;

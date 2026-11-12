@@ -19,7 +19,7 @@ const page = ref(1)
 const size = ref(10)
 
 const detail = ref(null)
-const form = reactive({ verdictType: 'PARTIAL_DEDUCT', deductAmount: '', rentDiscount: '', awardReason: '' })
+const form = reactive({ verdictType: 'PARTIAL_DEDUCT', deductAmount: '', awardReason: '' })
 const errMsg = ref('')
 
 async function load() {
@@ -37,7 +37,6 @@ async function open(d) {
   errMsg.value = ''
   form.verdictType = 'PARTIAL_DEDUCT'
   form.deductAmount = ''
-  form.rentDiscount = ''
   form.awardReason = ''
   detail.value = await getDisputeDetail(d.id)
 }
@@ -59,7 +58,6 @@ async function doArbitrate() {
   }
   const payload = {
     verdictType: form.verdictType,
-    rentDiscount: form.rentDiscount === '' ? 0 : Number(form.rentDiscount),
     awardReason: form.awardReason
   }
   if (form.verdictType === 'PARTIAL_DEDUCT') {
@@ -69,7 +67,6 @@ async function doArbitrate() {
     await arbitrateDispute(detail.value.id, payload)
     form.awardReason = ''
     form.deductAmount = ''
-    form.rentDiscount = ''
     detail.value = await getDisputeDetail(detail.value.id)
   } catch (e) {
     errMsg.value = e?.message || '提交失败'
@@ -172,7 +169,6 @@ onMounted(load)
                   <div><dt>裁决类型</dt><dd>{{ detail.award.type }}</dd></div>
                   <div><dt>赔付出租者</dt><dd>¥{{ formatAmount(detail.award.toLender) }}</dd></div>
                   <div><dt>退回租客押金</dt><dd>¥{{ formatAmount(detail.award.toBorrower) }}</dd></div>
-                  <div><dt>租金减免</dt><dd>¥{{ formatAmount(detail.award.rentRelief) }}</dd></div>
                 </dl>
                 <p>
                   <strong>裁决理由</strong><br />
@@ -197,10 +193,6 @@ onMounted(load)
               <label v-if="form.verdictType === 'PARTIAL_DEDUCT'" class="field">
                 <span>扣除押金金额（划付出租者）</span>
                 <input v-model="form.deductAmount" type="number" min="0" step="0.01" aria-label="扣除押金金额" />
-              </label>
-              <label class="field">
-                <span>租金减免（可填）</span>
-                <input v-model="form.rentDiscount" type="number" min="0" step="0.01" aria-label="租金减免" />
               </label>
               <label class="field">
                 <span>裁决理由<em>*</em></span>

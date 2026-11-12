@@ -26,8 +26,6 @@ public class DisputeArbitration {
 
     private BigDecimal deductAmount;
 
-    private BigDecimal rentDiscount;
-
     private String awardText;
 
     @TableField(fill = FieldFill.INSERT)

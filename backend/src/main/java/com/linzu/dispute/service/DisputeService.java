@@ -21,6 +21,7 @@ import com.linzu.dispute.dto.DisputeMessageResponse;
 import com.linzu.dispute.dto.DisputeResponse;
 import com.linzu.dispute.dto.EscalateRequest;
 import com.linzu.dispute.dto.MediateRequest;
+import com.linzu.dispute.dto.RenterRespondRequest;
 import com.linzu.dispute.dto.ResolveRequest;
 import com.linzu.dispute.entity.Dispute;
 import com.linzu.dispute.entity.DisputeArbitration;
@@ -48,10 +49,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DisputeService {
 
+    private static final String AWAITING_RENTER = "AWAITING_RENTER";
     private static final String MEDIATING = "MEDIATING";
     private static final String PENDING_ARBITRATION = "PENDING_ARBITRATION";
     private static final String RESOLVED = "RESOLVED";
     private static final String ARBITRATED = "ARBITRATED";
+    private static final String SETTLED = "SETTLED";
 
     private static final String REFUND_ALL = "REFUND_ALL";
     private static final String PARTIAL_DEDUCT = "PARTIAL_DEDUCT";
@@ -75,13 +78,23 @@ public class DisputeService {
 
     @Transactional
     public DisputeResponse create(Long initiatorId, DisputeCreateRequest req) {
-        Long active = disputeMapper.selectCount(
+        // 仅出租者（物主）可提出扣留押金
+        if (!req.ownerId().equals(initiatorId)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN);
+        }
+        // 一个订单一生只能发起一次纠纷：无论进行中（待回应/调解中/待仲裁）还是已终结（和解/调解/裁决），均不可重复发起
+        Long existing = disputeMapper.selectCount(
                 Wrappers.<Dispute>lambdaQuery()
                         .eq(Dispute::getOrderId, req.orderId())
-                        .in(Dispute::getStatus, MEDIATING, PENDING_ARBITRATION)
         );
-        if (active != null && active > 0) {
+        if (existing != null && existing > 0) {
             throw new BusinessException(ErrorCode.ALREADY_DISPUTED);
+        }
+
+        BigDecimal deposit = money(req.depositAmount());
+        BigDecimal withhold = money(req.withholdAmount());
+        if (withhold.compareTo(BigDecimal.ZERO) <= 0 || withhold.compareTo(deposit) > 0) {
+            throw new BusinessException(ErrorCode.DEDUCT_EXCEEDS_DEPOSIT);
         }
 
         Dispute d = new Dispute();
@@ -91,9 +104,10 @@ public class DisputeService {
         d.setRenterId(req.renterId());
         d.setOwnerId(req.ownerId());
         d.setReason(req.reason().trim());
-        d.setDepositAmount(money(req.depositAmount()));
+        d.setDepositAmount(deposit);
         d.setRentAmount(money(req.rentAmount()));
-        d.setStatus(MEDIATING);
+        d.setWithholdAmount(withhold);
+        d.setStatus(AWAITING_RENTER);
         disputeMapper.insert(d);
 
         if (req.evidenceUrls() != null) {
@@ -124,6 +138,41 @@ public class DisputeService {
                         .orderByDesc(Dispute::getId)
         );
         return list.stream().map(this::toResponse).toList();
+    }
+
+    // ===== 租客回应物主扣留押金（同意立即和解 / 不同意进入调解） =====
+
+    @Transactional
+    public DisputeResponse respond(Long responderId, Long disputeId, RenterRespondRequest req) {
+        Dispute d = requireDispute(disputeId);
+        if (!d.getRenterId().equals(responderId)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN);
+        }
+        if (!AWAITING_RENTER.equals(d.getStatus())) {
+            throw new BusinessException(ErrorCode.DISPUTE_STATE_INVALID);
+        }
+
+        BigDecimal deposit = money(d.getDepositAmount());
+        BigDecimal withhold = money(d.getWithholdAmount());
+        String note = req.note() == null ? null : req.note().trim();
+
+        if (Boolean.TRUE.equals(req.agree())) {
+            // 同意：立即划转和解（扣留部分给物主，余下退回租客）
+            executeFundTransfer(d, withhold, deposit.subtract(withhold), "和解");
+            d.setRenterNote(note);
+            d.setMediationConclusion("租客同意物主扣留押金，已和解");
+            d.setStatus(SETTLED);
+            disputeMapper.updateById(d);
+            auditLogService.record(responderId, "DISPUTE_SETTLE", "DISPUTE", disputeId,
+                    "租客同意扣留押金，纠纷和解");
+        } else {
+            d.setRenterNote(note);
+            d.setStatus(MEDIATING);
+            disputeMapper.updateById(d);
+            auditLogService.record(responderId, "DISPUTE_DISAGREE", "DISPUTE", disputeId,
+                    "租客不同意扣留押金，进入调解");
+        }
+        return toResponse(d);
     }
 
     // ===== 管理员队列（调解工作台 / 仲裁中心）=====
@@ -185,6 +234,7 @@ public class DisputeService {
                 d.getReason(), money(d.getDepositAmount()), money(d.getRentAmount()),
                 d.getStatus(), stageOf(d.getStatus()),
                 d.getMediationConclusion(), d.getEscalateNote(),
+                money(d.getWithholdAmount()), d.getRenterNote(),
                 evidences, messages, award,
                 d.getCreatedAt(), d.getUpdatedAt()
         );
@@ -266,7 +316,6 @@ public class DisputeService {
 
         BigDecimal deposit = money(d.getDepositAmount());
         BigDecimal deduct = money(req.deductAmount());
-        BigDecimal relief = money(req.rentDiscount());
         String verdictType = req.verdictType();
 
         BigDecimal toLender;
@@ -291,21 +340,20 @@ public class DisputeService {
         }
 
         // BR-06/BR-21：资金划转（依赖订单域的押金冻结，见 UC-D2）
-        executeFundTransfer(d, toLender, toBorrower, relief);
+        executeFundTransfer(d, toLender, toBorrower, "仲裁");
 
         DisputeArbitration arb = new DisputeArbitration();
         arb.setDisputeId(disputeId);
         arb.setArbitratorId(operatorId);
         arb.setVerdictType(verdictType);
         arb.setDeductAmount(deduct);
-        arb.setRentDiscount(relief);
         arb.setAwardText(req.awardReason().trim());
         arbitrationMapper.insert(arb);
 
         d.setStatus(ARBITRATED);
         disputeMapper.updateById(d);
         auditLogService.record(operatorId, "ARBITRATE", "DISPUTE", disputeId,
-                "仲裁裁决：" + verdictType + "，扣除 ¥" + deduct + "，租金减免 ¥" + relief);
+                "仲裁裁决：" + verdictType + "，扣除 ¥" + deduct);
 
         return toAwardResponse(arb, d);
     }
@@ -324,17 +372,14 @@ public class DisputeService {
 
     // ===== 内部工具 =====
 
-    private void executeFundTransfer(Dispute d, BigDecimal toLender, BigDecimal toBorrower, BigDecimal relief) {
-        // 押金冻结在租客钱包；按裁决解冻退回 / 扣除划付出租者；租金减免差额退回租客
+    private void executeFundTransfer(Dispute d, BigDecimal toLender, BigDecimal toBorrower, String scene) {
+        // 押金冻结在租客钱包；按裁决/和解解冻退回 / 扣除划付出租者
         if (toLender.compareTo(BigDecimal.ZERO) > 0) {
-            walletService.consumeFrozen(d.getRenterId(), toLender, "DISPUTE", d.getId(), "仲裁扣除押金划付出租者");
-            walletService.income(d.getOwnerId(), toLender, "DISPUTE", d.getId(), "仲裁押金收入");
+            walletService.consumeFrozen(d.getRenterId(), toLender, "DISPUTE", d.getId(), scene + "扣除押金划付出租者");
+            walletService.income(d.getOwnerId(), toLender, "DISPUTE", d.getId(), scene + "押金收入");
         }
         if (toBorrower.compareTo(BigDecimal.ZERO) > 0) {
-            walletService.unfreeze(d.getRenterId(), toBorrower, "DISPUTE", d.getId(), "仲裁退回押金");
-        }
-        if (relief.compareTo(BigDecimal.ZERO) > 0) {
-            walletService.refund(d.getRenterId(), relief, "DISPUTE", d.getId(), "仲裁租金减免");
+            walletService.unfreeze(d.getRenterId(), toBorrower, "DISPUTE", d.getId(), scene + "退回押金");
         }
     }
 
@@ -423,7 +468,6 @@ public class DisputeService {
                 verdictLabel(arb.getVerdictType()),
                 toLender,
                 toBorrower,
-                money(arb.getRentDiscount()),
                 arb.getAwardText(),
                 arb.getCreatedAt(),
                 userName(arb.getArbitratorId())
@@ -437,6 +481,7 @@ public class DisputeService {
                 d.getRenterId(), userName(d.getRenterId()),
                 d.getOwnerId(), userName(d.getOwnerId()),
                 d.getReason(), money(d.getDepositAmount()), money(d.getRentAmount()),
+                money(d.getWithholdAmount()), d.getRenterNote(),
                 d.getStatus(), stageOf(d.getStatus()),
                 d.getCreatedAt(), d.getUpdatedAt()
         );

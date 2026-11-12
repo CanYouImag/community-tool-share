@@ -172,7 +172,7 @@ watch(
         <hr class="rule" />
         <div class="actions">
           <button type="button" class="btn primary" @click="setStage('return')">发起归还</button>
-          <router-link class="btn" :to="{ name: 'dispute', hash: '#new' }">发起纠纷</router-link>
+          <router-link class="btn" :to="{ name: 'dispute', hash: '#new' }">提出扣留押金</router-link>
         </div>
         <details class="inline-note">
           <summary>逾期时的提示</summary>
@@ -202,7 +202,7 @@ watch(
                 确认归还并验收
               </button>
               <router-link class="btn" :to="{ name: 'dispute', hash: '#new' }"
-                >发现损坏</router-link
+                >提出扣留押金</router-link
               >
             </div>
           </div>
@@ -215,14 +215,14 @@ watch(
       <section class="panel">
         <h2>出租者验收物品</h2>
         <hr class="rule" />
-        <p>出租者请核对归还物品的完好情况。验收正常将结算并解冻押金；发现异常可发起纠纷。</p>
+        <p>出租者请核对归还物品的完好情况。验收正常将结算并解冻押金；发现异常可提出扣留押金。</p>
         <hr class="rule" />
         <div class="actions">
           <button type="button" class="btn primary" @click="setStage('complete')">
             验收正常，结算完成
           </button>
           <router-link class="btn" :to="{ name: 'dispute', hash: '#new' }"
-            >验收异常，发起纠纷</router-link
+            >验收异常，提出扣留押金</router-link
           >
         </div>
         <details class="inline-note">

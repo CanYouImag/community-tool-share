@@ -12,7 +12,6 @@ public record AwardResponse(
         String type,
         BigDecimal toLender,
         BigDecimal toBorrower,
-        BigDecimal rentRelief,
         String reason,
         LocalDateTime time,
         String arbitrator

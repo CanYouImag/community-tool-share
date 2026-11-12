@@ -13,6 +13,7 @@ import com.linzu.dispute.dto.DisputeMessageResponse;
 import com.linzu.dispute.dto.DisputeResponse;
 import com.linzu.dispute.dto.EscalateRequest;
 import com.linzu.dispute.dto.MediateRequest;
+import com.linzu.dispute.dto.RenterRespondRequest;
 import com.linzu.dispute.dto.ResolveRequest;
 import com.linzu.dispute.service.DisputeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,10 +38,16 @@ public class DisputeController {
 
     private final DisputeService disputeService;
 
-    @Operation(summary = "发起纠纷（UC-F1）")
+    @Operation(summary = "物主提出扣留押金（UC-F1）")
     @PostMapping
     public Result<DisputeResponse> create(@Valid @RequestBody DisputeCreateRequest request) {
         return Result.ok(disputeService.create(AuthContext.requireUserId(), request));
+    }
+
+    @Operation(summary = "租客回应物主扣留押金（同意/不同意）")
+    @PostMapping("/{id}/respond")
+    public Result<DisputeResponse> respond(@PathVariable Long id, @Valid @RequestBody RenterRespondRequest request) {
+        return Result.ok(disputeService.respond(AuthContext.requireUserId(), id, request));
     }
 
     @Operation(summary = "我的纠纷（用户视角）")

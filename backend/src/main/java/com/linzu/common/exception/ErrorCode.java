@@ -23,7 +23,7 @@ public enum ErrorCode {
     ALREADY_IN_COMMUNITY(1012, "已是该社区成员", HttpStatus.BAD_REQUEST),
     JOIN_APPLY_EXISTS(1013, "已有待处理的加入申请", HttpStatus.BAD_REQUEST),
     COMMUNITY_HAS_ACTIVE_ORDER(1014, "该社区下存在进行中订单，暂不能操作", HttpStatus.BAD_REQUEST),
-    ALREADY_DISPUTED(1015, "该订单已有进行中的纠纷", HttpStatus.BAD_REQUEST),
+    ALREADY_DISPUTED(1015, "该订单已发起过纠纷，不能重复发起", HttpStatus.BAD_REQUEST),
     DISPUTE_STATE_INVALID(1016, "纠纷状态不允许该操作", HttpStatus.BAD_REQUEST),
     ARBITRATION_EXISTS(1017, "该纠纷已裁决", HttpStatus.BAD_REQUEST),
     DEDUCT_EXCEEDS_DEPOSIT(1018, "扣除金额不能超过押金", HttpStatus.BAD_REQUEST),

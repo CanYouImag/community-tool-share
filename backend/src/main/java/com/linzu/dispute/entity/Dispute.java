@@ -38,8 +38,14 @@ public class Dispute {
 
     private BigDecimal rentAmount;
 
-    /** MEDIATING / PENDING_ARBITRATION / RESOLVED / ARBITRATED */
+    /** AWAITING_RENTER / MEDIATING / PENDING_ARBITRATION / RESOLVED / ARBITRATED / SETTLED */
     private String status;
+
+    /** 物主提出扣留金额 */
+    private BigDecimal withholdAmount;
+
+    /** 租客回应说明（不同意时的异议理由） */
+    private String renterNote;
 
     private String mediationConclusion;
 

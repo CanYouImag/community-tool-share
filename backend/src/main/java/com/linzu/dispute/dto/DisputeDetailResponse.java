@@ -22,6 +22,8 @@ public record DisputeDetailResponse(
         String stage,
         String mediationConclusion,
         String escalateNote,
+        BigDecimal withholdAmount,
+        String renterNote,
         List<DisputeEvidenceResponse> evidences,
         List<DisputeMessageResponse> messages,
         AwardResponse award,

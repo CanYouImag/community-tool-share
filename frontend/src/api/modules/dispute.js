@@ -5,6 +5,9 @@ import http from '@/api/request';
 // 发起纠纷（UC-F1）
 export const submitDispute = (payload) => http.post('/disputes', payload);
 
+// 租客回应物主扣留押金（同意/不同意）
+export const respondDispute = (id, payload) => http.post(`/disputes/${id}/respond`, payload);
+
 // 我的纠纷列表（用户视角）
 export const getMyDisputes = () => http.get('/disputes/mine');
 

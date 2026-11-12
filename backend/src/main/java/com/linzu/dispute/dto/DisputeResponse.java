@@ -17,6 +17,8 @@ public record DisputeResponse(
         String reason,
         BigDecimal deposit,
         BigDecimal rent,
+        BigDecimal withholdAmount,
+        String renterNote,
         String status,
         String stage,
         LocalDateTime createdAt,

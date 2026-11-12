@@ -84,7 +84,7 @@ onMounted(load);
   <main class="public-main">
     <header class="page-head">
       <h1>我的订单</h1>
-      <router-link class="btn primary" :to="{ name: 'dispute' }">发起纠纷 / 举报</router-link>
+      <router-link class="btn primary" :to="{ name: 'dispute' }">提出扣留押金 / 举报</router-link>
     </header>
 
     <ViewTabs

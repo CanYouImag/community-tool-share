@@ -105,10 +105,12 @@ CREATE TABLE IF NOT EXISTS t_dispute (
     initiator_id BIGINT NOT NULL COMMENT '发起纠纷的用户 ID',
     renter_id BIGINT NOT NULL COMMENT '租客用户 ID（押金冻结在其钱包）',
     owner_id BIGINT NOT NULL COMMENT '出租者用户 ID',
-    reason VARCHAR(500) NOT NULL COMMENT '纠纷理由',
+    reason VARCHAR(500) NOT NULL COMMENT '物主提出扣留理由',
     deposit_amount DECIMAL(12,2) NOT NULL DEFAULT 0 COMMENT '押金快照',
     rent_amount DECIMAL(12,2) NOT NULL DEFAULT 0 COMMENT '租金快照',
-    status VARCHAR(32) NOT NULL DEFAULT 'MEDIATING' COMMENT 'MEDIATING/PENDING_ARBITRATION/RESOLVED/ARBITRATED',
+    withhold_amount DECIMAL(12,2) NOT NULL DEFAULT 0 COMMENT '物主提出扣留金额',
+    renter_note VARCHAR(500) DEFAULT NULL COMMENT '租客回应说明（不同意时的异议理由）',
+    status VARCHAR(32) NOT NULL DEFAULT 'AWAITING_RENTER' COMMENT 'AWAITING_RENTER/MEDIATING/PENDING_ARBITRATION/RESOLVED/ARBITRATED/SETTLED',
     mediation_conclusion VARCHAR(500) DEFAULT NULL COMMENT '调解结论（UC-F3）',
     escalate_note VARCHAR(500) DEFAULT NULL COMMENT '上报仲裁说明（UC-F4）',
     escalated_at DATETIME DEFAULT NULL COMMENT '上报仲裁时间',
@@ -151,7 +153,6 @@ CREATE TABLE IF NOT EXISTS t_dispute_arbitration (
     arbitrator_id BIGINT NOT NULL COMMENT '裁决人（系统管理员）用户 ID',
     verdict_type VARCHAR(32) NOT NULL COMMENT 'REFUND_ALL/PARTIAL_DEDUCT/DEDUCT_ALL',
     deduct_amount DECIMAL(12,2) NOT NULL DEFAULT 0 COMMENT '扣除金额（部分扣除时）',
-    rent_discount DECIMAL(12,2) NOT NULL DEFAULT 0 COMMENT '租金减免',
     award_text TEXT NOT NULL COMMENT '裁决书文本',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
@@ -183,18 +184,8 @@ CREATE TABLE IF NOT EXISTS t_report (
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '举报';
 
 -- ===== 演示种子数据：纠纷与举报（order_id 为占位订单号，订单域就绪后替换为真实订单）=====
-INSERT IGNORE INTO t_dispute (id, order_id, community_id, initiator_id, renter_id, owner_id, reason, deposit_amount, rent_amount, status, mediation_conclusion, escalate_note, escalated_at) VALUES
-    (1, 101, 1, 2, 2, 1, '租借的电钻归还后发现有磕碰损坏，双方对责任归属有分歧。', 50.00, 30.00, 'MEDIATING', NULL, NULL, NULL),
-    (2, 102, 2, 2, 2, 1, '租借的折叠梯交接时缺少一个防滑脚垫，调解未果申请平台仲裁。', 80.00, 40.00, 'PENDING_ARBITRATION', NULL, '双方对缺失配件责任各执一词，调解未果，转平台仲裁。', '2026-11-11 12:00:00');
-
--- 调解留言（纠纷 1，展示调解对话）
-INSERT IGNORE INTO t_dispute_message (id, dispute_id, sender_id, sender_role, content) VALUES
-    (1, 1, 2, 'USER', '电钻归还时外壳就有一条裂缝，我在取货时就拍照留证了。'),
-    (2, 1, 1, 'PLATFORM_ADMIN', '请双方上传取货、归还时的照片，我先核对证据。');
-
--- 纠纷举证（纠纷 1）
-INSERT IGNORE INTO t_dispute_evidence (id, dispute_id, image_url, evidence_type, uploaded_by) VALUES
-    (1, 1, 'https://example.com/evidence/pickup-drill.jpg', 'PICKUP', 2);
+-- 说明：初始不预置纠纷——三个种子订单（101/102/201）押金均已冻结、尚未发起纠纷，
+--       物主可从「提出扣留押金」从零发起，便于完整演示「提出 → 租客回应 → 调解 → 仲裁」闭环。
 
 -- 举报（待处理）
 INSERT IGNORE INTO t_report (id, reporter_id, community_id, target_type, target_id, reason_type, description) VALUES

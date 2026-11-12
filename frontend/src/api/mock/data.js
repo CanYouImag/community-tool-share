@@ -461,7 +461,6 @@ export const award = {
   type: '部分扣除',
   toLender: 50.0,
   toBorrower: 150.0,
-  rentRelief: 0.0,
   reason: '根据取还存证及双方说明，认定归还时新增损坏，维修补偿金额为 ¥50.00。',
   time: '2026-10-16 14:30',
   arbitrator: '系统管理员',
