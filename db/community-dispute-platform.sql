@@ -78,9 +78,23 @@ CREATE TABLE IF NOT EXISTS t_community_join_apply (
 
 -- ===== 演示种子数据（幂等，可重复执行）=====
 INSERT IGNORE INTO t_community (id, name, intro, cover_url, auto_approve, member_count, item_count, status) VALUES
-    (1, '青禾社区', '取物和归还时请核对配件并拍照。', NULL, 0, 0, 0, 'ACTIVE'),
-    (2, '梧桐里社区', '欢迎新邻居加入，共享闲置工具。', NULL, 0, 0, 0, 'ACTIVE'),
+    (1, '青禾社区', '取物和归还时请核对配件并拍照。', NULL, 0, 1, 0, 'ACTIVE'),
+    (2, '梧桐里社区', '欢迎新邻居加入，共享闲置工具。', NULL, 0, 1, 0, 'ACTIVE'),
     (3, '松柏社区', '本周六社区置换活动，欢迎参加。', NULL, 1, 0, 0, 'ACTIVE');
+
+-- 社区成员：admin(id=1) 为青禾社区管理员，Starling(id=2) 为梧桐里成员
+INSERT IGNORE INTO t_community_member (id, community_id, user_id, role, status) VALUES
+    (1, 1, 1, 'ADMIN', 'ACTIVE'),
+    (2, 2, 2, 'MEMBER', 'ACTIVE');
+
+-- 社区公告（青禾社区）
+INSERT IGNORE INTO t_community_announcement (id, community_id, title, content, created_by) VALUES
+    (1, 1, '青禾社区公约', '借用工具请提前一天预约，归还时当面清点配件。', 1),
+    (2, 1, '周末工具共享日', '本周六下午 2 点在社区活动室举办工具共享与维修小课堂。', 1);
+
+-- 入社申请：Starling 申请加入青禾社区（待审核）
+INSERT IGNORE INTO t_community_join_apply (id, community_id, user_id, apply_reason, status) VALUES
+    (1, 1, 2, '新搬来青禾小区，想借用家用工具。', 'PENDING');
 
 -- ===== 纠纷与举报 =====
 
@@ -167,6 +181,25 @@ CREATE TABLE IF NOT EXISTS t_report (
     KEY idx_report_community (community_id, status),
     KEY idx_report_target (target_type, target_id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '举报';
+
+-- ===== 演示种子数据：纠纷与举报（order_id 为占位订单号，订单域就绪后替换为真实订单）=====
+INSERT IGNORE INTO t_dispute (id, order_id, community_id, initiator_id, renter_id, owner_id, reason, deposit_amount, rent_amount, status, mediation_conclusion, escalate_note, escalated_at) VALUES
+    (1, 101, 1, 2, 2, 1, '租借的电钻归还后发现有磕碰损坏，双方对责任归属有分歧。', 50.00, 30.00, 'MEDIATING', NULL, NULL, NULL),
+    (2, 102, 2, 2, 2, 1, '租借的折叠梯交接时缺少一个防滑脚垫，调解未果申请平台仲裁。', 80.00, 40.00, 'PENDING_ARBITRATION', NULL, '双方对缺失配件责任各执一词，调解未果，转平台仲裁。', '2026-11-11 12:00:00');
+
+-- 调解留言（纠纷 1，展示调解对话）
+INSERT IGNORE INTO t_dispute_message (id, dispute_id, sender_id, sender_role, content) VALUES
+    (1, 1, 2, 'USER', '电钻归还时外壳就有一条裂缝，我在取货时就拍照留证了。'),
+    (2, 1, 1, 'PLATFORM_ADMIN', '请双方上传取货、归还时的照片，我先核对证据。');
+
+-- 纠纷举证（纠纷 1）
+INSERT IGNORE INTO t_dispute_evidence (id, dispute_id, image_url, evidence_type, uploaded_by) VALUES
+    (1, 1, 'https://example.com/evidence/pickup-drill.jpg', 'PICKUP', 2);
+
+-- 举报（待处理）
+INSERT IGNORE INTO t_report (id, reporter_id, community_id, target_type, target_id, reason_type, description) VALUES
+    (1, 2, 1, 'ITEM', 101, 'FALSE_INFO', '该电钻详情页标注功率 800W，实际铭牌仅 500W，涉嫌虚假描述。'),
+    (2, 2, 1, 'ITEM', 102, 'ILLEGAL_CONTENT', '该物品详情图片包含违规内容，请平台核实下架。');
 
 -- ===== 平台治理 =====
 
