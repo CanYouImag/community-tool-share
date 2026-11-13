@@ -30,6 +30,7 @@ venv/
 .vscode/
 *.swp
 *~
+~$*
 
 # ===== 操作系统 =====
 .DS_Store

@@ -1,8 +1,16 @@
 # 配置库索引（「邻租」社区闲置工具共享与租赁平台）
 
+| 文档信息 | 内容 |
+| --- | --- |
+| 文档名称 | 「邻租」配置库索引 |
+| 文档版本 | V1.0 |
+| 作者 | 钟姝伶 |
+| 所属基线 | —（随各基线更新） |
+| 最后更新 | 2026-11-13 |
+
 > 配置经理：钟姝伶
 > 本文档是「邻租」配置库的目录索引，说明各配置项的存放位置、版本与所属基线。
-> 配置库以文件目录形式提交，目录结构遵照《社区闲置物品租赁系统-配置管理计划》第 3.1 节「配置标识」。
+> 配置库以文件目录形式提交，目录结构遵照《03-配置管理计划》第 3.1 节「配置标识」。
 
 ## 一、目录结构
 
@@ -11,7 +19,7 @@ community-tool-share/
 ├─ README.md                       # 项目说明、启动方式、测试账号
 ├─ backend/                        # 后端源码（Java 17 · Spring Boot 3.3.5 · MyBatis-Plus）
 ├─ frontend/                       # 前端源码（Vue 3 · Vite 5 · Pinia · Axios）
-├─ db/                             # 数据库脚本（user-wallet.sql / order.sql / community-dispute-platform.sql）
+├─ db/                             # 数据库脚本（user-wallet.sql / community-dispute-platform.sql / order.sql / init.sql）
 ├─ docker-compose.yml              # 一键启动 MySQL / 后端 / 前端
 ├─ .github/workflows/ci.yml        # CI：后端打包 + 前端构建
 ├─ scripts/start.sh                # 辅助启动脚本
@@ -59,4 +67,4 @@ community-tool-share/
 | 测试基线-v1.0 | 待建立 | — | 待测试经理常子衡交付测试计划/设计 |
 | 发布基线-v1.0 | 待建立 | — | 待测试报告 + 用户手册 + 全量工件 |
 
-> 详细变更历史见 `docs/03-construction/configuration-management/基线记录与变更记录.md`。
+> 详细变更历史见 `docs/03-construction/configuration-management/03-基线记录与变更记录.md`。
