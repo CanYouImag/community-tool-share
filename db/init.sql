@@ -11,6 +11,8 @@ CREATE DATABASE IF NOT EXISTS linzu DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb
 
 USE linzu;
 
+SET NAMES utf8mb4;
+
 -- =====================================================================
 -- 用户域（user）
 -- =====================================================================

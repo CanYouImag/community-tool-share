@@ -1,5 +1,7 @@
 -- 邻租：物品域建表脚本（C1-C7）
 -- 说明：与 db/init.sql 基线保持同步；增量执行方式：mysql -uroot -p < db/item.sql
+SET NAMES utf8mb4;
+
 USE linzu;
 
 CREATE TABLE IF NOT EXISTS t_item_category (

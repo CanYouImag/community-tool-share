@@ -2,6 +2,8 @@
 -- 说明：与 db/init.sql 基线保持同步；增量执行方式：mysql -uroot -p < db/order.sql
 -- 状态机：PENDING_PAYMENT → PENDING_ACCEPT → PENDING_PICKUP → IN_USE →
 --         PENDING_RETURN → PENDING_INSPECT → COMPLETED / CANCELLED / DISPUTED
+SET NAMES utf8mb4;
+
 USE linzu;
 
 CREATE TABLE IF NOT EXISTS t_order (
