@@ -15,5 +15,6 @@ public record UserProfileResponse(
     String realNameStatus,
     String realName,
     String idCardMasked,
+    String realNameRejectReason,
     LocalDateTime createdAt
 ) {}

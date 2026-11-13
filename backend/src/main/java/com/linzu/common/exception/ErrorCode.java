@@ -40,6 +40,7 @@ public enum ErrorCode {
     PICKUP_CODE_ERROR(3009, "取物码不正确", HttpStatus.BAD_REQUEST),
     DISPUTE_STATE_NOT_ALLOWED(3010, "订单当前不在纠纷中", HttpStatus.CONFLICT),
     CATEGORY_NAME_EXISTS(3011, "分类名称已存在", HttpStatus.BAD_REQUEST),
+    REAL_NAME_NOT_FOUND(3012, "实名认证申请不存在", HttpStatus.NOT_FOUND),
 
     SYSTEM_ERROR(5000, "系统错误", HttpStatus.INTERNAL_SERVER_ERROR);
 

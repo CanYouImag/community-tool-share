@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
   servlet:
     encoding:
       charset: UTF-8
@@ -76,5 +76,5 @@ app:
     admin-username: admin
     admin-password: 'admin123'
     admin-nickname: 平台管理员
-    # 演示阶段实名认证直接通过；接入管理端审核后改为 false
-    auto-verify-real-name: true
+    # 默认走管理员审核；快速演示可设 AUTO_VERIFY_REAL_NAME=true 直接通过
+    auto-verify-real-name: ${AUTO_VERIFY_REAL_NAME:false}
