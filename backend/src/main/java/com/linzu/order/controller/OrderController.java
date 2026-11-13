@@ -5,7 +5,9 @@ import com.linzu.common.api.Result;
 import com.linzu.common.security.AuthContext;
 import com.linzu.order.dto.CreateOrderRequest;
 import com.linzu.order.dto.OrderCancelRequest;
+import com.linzu.order.dto.OrderEvidenceResponse;
 import com.linzu.order.dto.OrderInspectRequest;
+import com.linzu.order.dto.OrderReturnRequest;
 import com.linzu.order.dto.OrderMessageResponse;
 import com.linzu.order.dto.OrderPickupRequest;
 import com.linzu.order.dto.OrderResponse;
@@ -90,14 +92,34 @@ public class OrderController {
         @Valid @RequestBody OrderPickupRequest request
     ) {
         return Result.ok(
-            orderService.pickup(AuthContext.requireUserId(), id, request.code())
+            orderService.pickup(
+                AuthContext.requireUserId(),
+                id,
+                request.code(),
+                request.photoUrls()
+            )
         );
     }
 
-    @Operation(summary = "发起归还（D5）：使用中 → 待归还")
+    @Operation(summary = "发起归还（D5）：使用中 → 待归还，需上传归还凭证")
     @PostMapping("/{id}/return")
-    public Result<OrderResponse> requestReturn(@PathVariable Long id) {
-        return Result.ok(orderService.requestReturn(AuthContext.requireUserId(), id));
+    public Result<OrderResponse> requestReturn(
+        @PathVariable Long id,
+        @Valid @RequestBody OrderReturnRequest request
+    ) {
+        return Result.ok(
+            orderService.requestReturn(
+                AuthContext.requireUserId(),
+                id,
+                request.photoUrls()
+            )
+        );
+    }
+
+    @Operation(summary = "订单取还物凭证")
+    @GetMapping("/{id}/evidences")
+    public Result<List<OrderEvidenceResponse>> evidences(@PathVariable Long id) {
+        return Result.ok(orderService.evidences(AuthContext.requireUserId(), id));
     }
 
     @Operation(summary = "确认收到归还（D5）：待归还 → 待验收")

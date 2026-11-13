@@ -49,6 +49,12 @@ public class Order {
     /** 平台佣金，结算时从租金中扣除 */
     private BigDecimal commissionAmount;
 
+    private Integer overdueDays;
+
+    private BigDecimal overdueFee;
+
+    private Integer overduePenaltyApplied;
+
     /** PENDING_PAYMENT、PENDING_ACCEPT、PENDING_PICKUP、IN_USE、PENDING_RETURN、PENDING_INSPECT、COMPLETED、CANCELLED、DISPUTED */
     private String status;
 

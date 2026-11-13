@@ -36,17 +36,24 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
         }
 
         String path = request.getRequestURI();
-        if (!path.startsWith("/api/") || WHITE_LIST.contains(path) || isPublicBrowse(request, path)) {
+        if (!path.startsWith("/api/") || WHITE_LIST.contains(path)) {
             return true;
         }
 
         String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+        boolean publicBrowse = isPublicBrowse(request, path);
+        if (publicBrowse && (authorization == null || !authorization.startsWith("Bearer "))) {
+            return true;
+        }
         if (authorization == null || !authorization.startsWith("Bearer ")) {
             throw new BusinessException(ErrorCode.UNAUTHORIZED);
         }
 
         String token = authorization.substring(7).trim();
         if (token.isEmpty()) {
+            if (publicBrowse) {
+                return true;
+            }
             throw new BusinessException(ErrorCode.UNAUTHORIZED);
         }
 
@@ -54,6 +61,9 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
             AuthContext.set(new AuthUser(jwtUtil.getUserId(token), jwtUtil.getRole(token)));
             return true;
         } catch (JwtException | IllegalArgumentException e) {
+            if (publicBrowse) {
+                return true;
+            }
             throw new BusinessException(ErrorCode.UNAUTHORIZED);
         }
     }
@@ -83,6 +93,9 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
                 return true;
             }
             if (path.matches(base + "/\\d+")) {
+                return true;
+            }
+            if (path.matches(base + "/\\d+/evaluations")) {
                 return true;
             }
         }

@@ -24,6 +24,7 @@ public class OrderTimeoutJob {
         try {
             orderService.expirePayments();
             orderService.expireAcceptsAndPickups();
+            orderService.markOverdueOrders();
             orderService.autoCompleteStaleOrders();
         } catch (Exception e) {
             log.error("订单超时任务执行失败", e);

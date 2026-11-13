@@ -6,7 +6,10 @@ import {
   acceptOrder,
   cancelOrder,
   confirmReturn,
+  createOrderEvaluation,
   getOrder,
+  getOrderEvaluations,
+  getOrderEvidences,
   getOrderMessages,
   inspectOrder,
   payOrder,
@@ -15,6 +18,7 @@ import {
   rejectOrder,
   returnOrder,
 } from '@/api/modules/order';
+import { uploadItemImage } from '@/api/modules/item';
 import { getWallet } from '@/api/modules/wallet';
 import { useAuthStore } from '@/store/auth';
 import { formatDateTime, formatMoney } from '@/utils/format';
@@ -30,6 +34,14 @@ const error = ref('');
 const actionError = ref('');
 const newMessage = ref('');
 const pickupCode = ref('');
+const evidences = ref([]);
+const evaluations = ref([]);
+const pickupFiles = ref([]);
+const returnFiles = ref([]);
+const rating = ref(5);
+const evaluationContent = ref('');
+const evaluationMessage = ref('');
+const evidenceBusy = ref(false);
 
 const statusLabels = {
   PENDING_PAYMENT: '待支付',
@@ -64,6 +76,16 @@ async function load() {
     const id = route.params.id;
     order.value = await getOrder(id);
     messages.value = await getOrderMessages(id);
+    try {
+      evidences.value = await getOrderEvidences(id);
+    } catch {
+      evidences.value = [];
+    }
+    try {
+      evaluations.value = await getOrderEvaluations(id);
+    } catch {
+      evaluations.value = [];
+    }
     try {
       wallet.value = await getWallet();
     } catch {
@@ -100,19 +122,56 @@ function doReject() {
   return run(() => rejectOrder(order.value.id, reason));
 }
 
-function doPickup() {
+async function uploadFiles(files) {
+  const urls = [];
+  for (const file of Array.from(files || [])) {
+    const data = await uploadItemImage(file);
+    if (data?.url) urls.push(data.url);
+  }
+  return urls;
+}
+
+async function doPickup() {
   if (!pickupCode.value.trim()) {
     actionError.value = '请输入租客出示的取物码';
     return;
   }
-  return run(async () => {
-    await pickupOrder(order.value.id, pickupCode.value.trim());
+  if (!pickupFiles.value.length) {
+    actionError.value = '请至少上传 1 张取物凭证';
+    return;
+  }
+  evidenceBusy.value = true;
+  actionError.value = '';
+  try {
+    const urls = await uploadFiles(pickupFiles.value);
+    await pickupOrder(order.value.id, pickupCode.value.trim(), urls);
     pickupCode.value = '';
-  });
+    pickupFiles.value = [];
+    await load();
+  } catch (err) {
+    actionError.value = err.message || '取物交接失败';
+  } finally {
+    evidenceBusy.value = false;
+  }
 }
 
-function doReturn() {
-  return run(() => returnOrder(order.value.id));
+async function doReturn() {
+  if (!returnFiles.value.length) {
+    actionError.value = '请至少上传 1 张归还凭证';
+    return;
+  }
+  evidenceBusy.value = true;
+  actionError.value = '';
+  try {
+    const urls = await uploadFiles(returnFiles.value);
+    await returnOrder(order.value.id, urls);
+    returnFiles.value = [];
+    await load();
+  } catch (err) {
+    actionError.value = err.message || '归还失败';
+  } finally {
+    evidenceBusy.value = false;
+  }
 }
 
 function doConfirmReturn() {
@@ -147,6 +206,22 @@ async function sendMessage() {
   }
 }
 
+async function submitEvaluation() {
+  evaluationMessage.value = '';
+  try {
+    await createOrderEvaluation(order.value.id, {
+      rating: Number(rating.value),
+      content: evaluationContent.value.trim() || null,
+      imageUrls: [],
+    });
+    evaluationContent.value = '';
+    evaluationMessage.value = '评价已提交，被评价人信用分已按规则更新。';
+    evaluations.value = await getOrderEvaluations(order.value.id);
+  } catch (err) {
+    evaluationMessage.value = err.message || '评价提交失败';
+  }
+}
+
 onMounted(load);
 </script>
 
@@ -170,7 +245,12 @@ onMounted(load);
           <h2>{{ order.itemTitle }}</h2>
           <span class="badge">{{ statusLabel }}</span>
         </div>
-        <p class="muted">订单号 {{ order.orderNo }}</p>
+        <p class="muted">
+          订单号 {{ order.orderNo }}
+          <span v-if="order.overdueDays > 0" class="form-message error">
+            逾期 {{ order.overdueDays }} 天
+          </span>
+        </p>
 
         <dl class="line-list">
           <div>
@@ -240,13 +320,47 @@ onMounted(load);
               maxlength="6"
               placeholder="输入租客出示的取物码"
             />
-            <button class="btn primary" type="button" @click="doPickup">核销并交接</button>
+            <label class="field">
+              <span>取物凭证（至少 1 张）</span>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                @change="pickupFiles = Array.from($event.target.files || [])"
+              />
+            </label>
+            <button
+              class="btn primary"
+              type="button"
+              :disabled="evidenceBusy"
+              @click="doPickup"
+            >
+              {{ evidenceBusy ? '上传中…' : '核销并交接' }}
+            </button>
           </div>
           <p v-else class="muted">请向出租者出示取物码，由出租者核销。</p>
         </template>
 
-        <div v-if="order.status === 'IN_USE' && isRenter" class="actions">
-          <button class="btn primary" type="button" @click="doReturn">发起归还</button>
+        <div v-if="order.status === 'IN_USE' && isRenter">
+          <label class="field">
+            <span>归还凭证（至少 1 张）</span>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              @change="returnFiles = Array.from($event.target.files || [])"
+            />
+          </label>
+          <div class="actions">
+            <button
+              class="btn primary"
+              type="button"
+              :disabled="evidenceBusy"
+              @click="doReturn"
+            >
+              {{ evidenceBusy ? '上传中…' : '发起归还' }}
+            </button>
+          </div>
         </div>
 
         <div v-if="order.status === 'PENDING_RETURN' && isLessor" class="actions">
@@ -272,6 +386,49 @@ onMounted(load);
         <p v-if="order.status === 'DISPUTED'" class="form-message error">
           订单已进入纠纷流程，请到纠纷页面查看处理进度。
         </p>
+
+        <template v-if="order.status === 'COMPLETED'">
+          <hr class="rule" />
+          <h3>订单评价</h3>
+          <p v-if="!evaluations.length" class="muted">暂无评价。</p>
+          <article v-for="e in evaluations" :key="e.id" class="message">
+            <header>
+              {{ e.evaluatorNickname || `#${e.evaluatorId}` }} · {{ e.rating }} 星
+            </header>
+            {{ e.content || '未填写文字评价' }}
+          </article>
+          <form @submit.prevent="submitEvaluation">
+            <label class="field">
+              <span>评分</span>
+              <select v-model.number="rating">
+                <option :value="5">5 星</option>
+                <option :value="4">4 星</option>
+                <option :value="3">3 星</option>
+                <option :value="2">2 星</option>
+                <option :value="1">1 星</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>评价内容</span>
+              <textarea v-model="evaluationContent" maxlength="500"></textarea>
+            </label>
+            <p v-if="evaluationMessage" class="form-message">{{ evaluationMessage }}</p>
+            <div class="actions">
+              <button class="btn primary" type="submit">提交评价</button>
+            </div>
+          </form>
+        </template>
+
+        <template v-if="evidences.length">
+          <hr class="rule" />
+          <h3>取还物凭证</h3>
+          <div class="thumbs">
+            <figure v-for="e in evidences" :key="e.id">
+              <img class="art small" :src="e.imageUrl" :alt="`${e.stage} 凭证`" />
+              <figcaption>{{ e.stage }}</figcaption>
+            </figure>
+          </div>
+        </template>
       </section>
 
       <div class="two">
@@ -295,6 +452,10 @@ onMounted(load);
             <div>
               <dt>订单押金</dt>
               <dd>{{ formatMoney(order.depositAmount) }}</dd>
+            </div>
+            <div v-if="order.overdueDays > 0">
+              <dt>逾期天数 / 逾期费</dt>
+              <dd>{{ order.overdueDays }} 天 / {{ formatMoney(order.overdueFee) }}</dd>
             </div>
             <div>
               <dt>当前可用余额</dt>
