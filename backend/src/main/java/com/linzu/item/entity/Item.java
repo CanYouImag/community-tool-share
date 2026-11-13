@@ -28,9 +28,8 @@ public class Item {
 
     private String description;
 
-    /** 成色说明（自由文本，需求基线 UC-C5）；列名避开 MySQL 保留字 condition */
-    @TableField("condition_desc")
-    private String condition;
+    /** 成色说明（自由文本，需求基线 UC-C5）；列名 condition_desc，字段名 conditionDesc 避开 MySQL 保留字 */
+    private String conditionDesc;
 
     /**
      * 日租金

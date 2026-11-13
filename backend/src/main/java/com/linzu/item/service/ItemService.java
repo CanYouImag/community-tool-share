@@ -432,7 +432,7 @@ public class ItemService {
         item.setDescription(
             StringUtils.hasText(request.description()) ? request.description().trim() : null
         );
-        item.setCondition(request.condition().trim());
+        item.setConditionDesc(request.condition().trim());
         item.setRentPerDay(request.rentPerDay().setScale(2, RoundingMode.HALF_UP));
         item.setDeposit(request.deposit().setScale(2, RoundingMode.HALF_UP));
         item.setCommunityId(request.communityId());
@@ -509,7 +509,7 @@ public class ItemService {
             resolveCommunityName(item.getCommunityId()),
             item.getTitle(),
             item.getDescription(),
-            item.getCondition(),
+            item.getConditionDesc(),
             item.getRentPerDay(),
             item.getDeposit(),
             item.getLocation(),
