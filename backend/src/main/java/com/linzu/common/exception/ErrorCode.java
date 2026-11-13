@@ -61,6 +61,7 @@ public enum ErrorCode {
     COMMUNITY_ANNOUNCEMENT_NOT_FOUND(3015, "公告不存在", HttpStatus.NOT_FOUND),
     DISPUTE_NOT_FOUND(3016, "纠纷不存在", HttpStatus.NOT_FOUND),
     REPORT_NOT_FOUND(3017, "举报不存在", HttpStatus.NOT_FOUND),
+    REAL_NAME_NOT_FOUND(3018, "实名认证申请不存在", HttpStatus.NOT_FOUND),
 
     SYSTEM_ERROR(5000, "系统错误", HttpStatus.INTERNAL_SERVER_ERROR);
 

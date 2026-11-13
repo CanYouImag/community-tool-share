@@ -62,7 +62,8 @@ public class DemoDataInitializer implements CommandLineRunner {
             "演示用户",
             "220101199001011232",
             new BigDecimal("500.00"),
-            BigDecimal.ZERO
+            BigDecimal.ZERO,
+            "VERIFIED"
         );
         seedUser(
             adminUsername,
@@ -73,9 +74,11 @@ public class DemoDataInitializer implements CommandLineRunner {
             "平台管理员",
             "220101199001011240",
             BigDecimal.ZERO,
-            BigDecimal.ZERO
+            BigDecimal.ZERO,
+            "VERIFIED"
         );
         // 租客演示账号：与 Starling（物主）配对，用于演示订单与纠纷（两笔演示订单押金各 50，共 100 已冻结）
+        // 保持 shuling 为 3 号用户，与 db/community-dispute-platform.sql 的种子数据一致。
         seedUser(
             "shuling",
             "123456",
@@ -85,7 +88,21 @@ public class DemoDataInitializer implements CommandLineRunner {
             "钟姝伶",
             "220101199001011250",
             new BigDecimal("200.00"),
-            new BigDecimal("100.00")
+            new BigDecimal("100.00"),
+            "VERIFIED"
+        );
+        // 给平台管理端留一条待审核实名认证，方便答辩演示审核通过/驳回。
+        seedUser(
+            "pending",
+            "123456",
+            "待审核用户",
+            "REGISTERED",
+            "13600000000",
+            "待审核用户",
+            "11010519491231002X",
+            new BigDecimal("100.00"),
+            BigDecimal.ZERO,
+            "PENDING"
         );
     }
 
@@ -98,7 +115,8 @@ public class DemoDataInitializer implements CommandLineRunner {
         String realName,
         String idCardNo,
         BigDecimal balance,
-        BigDecimal frozenBalance
+        BigDecimal frozenBalance,
+        String realNameStatus
     ) {
         Long exists = userMapper.selectCount(
             Wrappers
@@ -126,7 +144,7 @@ public class DemoDataInitializer implements CommandLineRunner {
         userRealName.setUserId(user.getId());
         userRealName.setRealName(realName);
         userRealName.setIdCardNo(idCardCipher.encrypt(idCardNo));
-        userRealName.setStatus("VERIFIED");
+        userRealName.setStatus(realNameStatus);
         userRealNameMapper.insert(userRealName);
 
         Wallet wallet = new Wallet();
@@ -138,10 +156,11 @@ public class DemoDataInitializer implements CommandLineRunner {
         walletMapper.insert(wallet);
 
         log.info(
-            "已创建演示账号：{} / {}（角色 {}，钱包余额 {}）",
+            "已创建演示账号：{} / {}（角色 {}，实名状态 {}，钱包余额 {}）",
             loginName,
             rawPassword,
             role,
+            realNameStatus,
             balance
         );
     }

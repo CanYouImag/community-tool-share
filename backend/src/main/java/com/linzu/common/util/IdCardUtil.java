@@ -41,6 +41,17 @@ public final class IdCardUtil {
         return idCardNo == null ? null : idCardNo.trim().toUpperCase(Locale.ROOT);
     }
 
+    /**
+     * 身份证号脱敏：保留前 6 位和后 4 位，中间固定 8 个星号。
+     */
+    public static String mask(String idCardNo) {
+        String value = normalize(idCardNo);
+        if (value == null || value.length() < 10) {
+            return value;
+        }
+        return value.substring(0, 6) + "********" + value.substring(value.length() - 4);
+    }
+
     public static boolean isValid(String idCardNo) {
         String value = normalize(idCardNo);
         if (value == null || !value.matches("^\\d{17}[\\dX]$")) {

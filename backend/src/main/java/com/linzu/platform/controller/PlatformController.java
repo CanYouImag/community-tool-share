@@ -7,12 +7,10 @@ import com.linzu.common.security.PermissionCodes;
 import com.linzu.common.security.RequirePermission;
 import com.linzu.platform.dto.AppointAdminRequest;
 import com.linzu.platform.dto.AuditLogResponse;
-import com.linzu.platform.dto.BanUserRequest;
 import com.linzu.platform.dto.CommunityAdminResponse;
 import com.linzu.platform.dto.CommunityCreateRequest;
 import com.linzu.platform.dto.CommunityUpdateRequest;
 import com.linzu.platform.dto.ConfigUpdateRequest;
-import com.linzu.platform.dto.UserAdminResponse;
 import com.linzu.platform.service.AuditLogService;
 import com.linzu.platform.service.PlatformService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -86,35 +84,7 @@ public class PlatformController {
         return Result.ok(platformService.dismissAdmin(AuthContext.requireUserId(), id, userId));
     }
 
-    // ===== UC-G3 封禁/解封账号 =====
-
-    @Operation(summary = "用户列表（UC-G3 账号管理）")
-    @GetMapping("/users")
-    @RequirePermission(PermissionCodes.PLATFORM_BAN)
-    public Result<PageResult<UserAdminResponse>> users(
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String status,
-            @RequestParam(defaultValue = "1") long page,
-            @RequestParam(defaultValue = "20") long size
-    ) {
-        return Result.ok(platformService.listUsers(keyword, status, page, size));
-    }
-
-    @Operation(summary = "封禁账号（UC-G3）")
-    @PostMapping("/users/{userId}/ban")
-    @RequirePermission(PermissionCodes.PLATFORM_BAN)
-    public Result<Void> banUser(@PathVariable Long userId, @Valid @RequestBody BanUserRequest request) {
-        platformService.banUser(AuthContext.requireUserId(), userId, request.reason());
-        return Result.ok();
-    }
-
-    @Operation(summary = "解封账号（UC-G3）")
-    @PostMapping("/users/{userId}/unban")
-    @RequirePermission(PermissionCodes.PLATFORM_BAN)
-    public Result<Void> unbanUser(@PathVariable Long userId, @Valid @RequestBody BanUserRequest request) {
-        platformService.unbanUser(AuthContext.requireUserId(), userId, request.reason());
-        return Result.ok();
-    }
+    // UC-G3 用户管理由 AdminUserController 统一提供（含用户搜索、封禁/解封、实名审核）。
 
     // ===== UC-G4 平台参数配置 =====
 

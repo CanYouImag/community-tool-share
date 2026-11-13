@@ -451,6 +451,10 @@ onMounted(load);
                 认证材料已提交，等待平台审核。
               </p>
 
+              <p v-if="user?.realNameStatus === 'REJECTED'" class="form-message error">
+                上次认证未通过：{{ user?.realNameRejectReason || '请核对信息后重新提交' }}
+              </p>
+
               <form v-if="canSubmitRealName" @submit.prevent="submitRealName">
                 <hr class="rule" />
                 <label class="field">
