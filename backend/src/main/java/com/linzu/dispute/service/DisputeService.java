@@ -31,6 +31,10 @@ import com.linzu.dispute.mapper.DisputeArbitrationMapper;
 import com.linzu.dispute.mapper.DisputeEvidenceMapper;
 import com.linzu.dispute.mapper.DisputeMapper;
 import com.linzu.dispute.mapper.DisputeMessageMapper;
+import com.linzu.order.entity.Order;
+import com.linzu.order.enums.OrderStatus;
+import com.linzu.order.mapper.OrderMapper;
+import com.linzu.order.service.OrderService;
 import com.linzu.platform.service.AuditLogService;
 import com.linzu.user.entity.User;
 import com.linzu.user.mapper.UserMapper;
@@ -72,15 +76,30 @@ public class DisputeService {
     private final CommunityMemberMapper communityMemberMapper;
     private final CommunityService communityService;
     private final WalletService walletService;
+    private final OrderMapper orderMapper;
+    private final OrderService orderService;
     private final AuditLogService auditLogService;
 
     // ===== UC-F1 发起纠纷 =====
 
     @Transactional
     public DisputeResponse create(Long initiatorId, DisputeCreateRequest req) {
+        Order order = orderMapper.selectById(req.orderId());
+        if (order == null) {
+            throw new BusinessException(ErrorCode.ORDER_NOT_FOUND);
+        }
         // 仅出租者（物主）可提出扣留押金
-        if (!req.ownerId().equals(initiatorId)) {
+        if (!order.getLessorId().equals(initiatorId)) {
             throw new BusinessException(ErrorCode.FORBIDDEN);
+        }
+        String orderStatus = order.getStatus();
+        if (
+            !OrderStatus.IN_USE.name().equals(orderStatus) &&
+            !OrderStatus.PENDING_RETURN.name().equals(orderStatus) &&
+            !OrderStatus.PENDING_INSPECT.name().equals(orderStatus) &&
+            !OrderStatus.DISPUTED.name().equals(orderStatus)
+        ) {
+            throw new BusinessException(ErrorCode.DISPUTE_STATE_INVALID, "当前订单状态不能发起纠纷");
         }
         // 一个订单一生只能发起一次纠纷：无论进行中（待回应/调解中/待仲裁）还是已终结（和解/调解/裁决），均不可重复发起
         Long existing = disputeMapper.selectCount(
@@ -91,21 +110,21 @@ public class DisputeService {
             throw new BusinessException(ErrorCode.ALREADY_DISPUTED);
         }
 
-        BigDecimal deposit = money(req.depositAmount());
+        BigDecimal deposit = money(order.getDepositAmount());
         BigDecimal withhold = money(req.withholdAmount());
         if (withhold.compareTo(BigDecimal.ZERO) <= 0 || withhold.compareTo(deposit) > 0) {
             throw new BusinessException(ErrorCode.DEDUCT_EXCEEDS_DEPOSIT);
         }
 
         Dispute d = new Dispute();
-        d.setOrderId(req.orderId());
-        d.setCommunityId(req.communityId());
+        d.setOrderId(order.getId());
+        d.setCommunityId(order.getCommunityId());
         d.setInitiatorId(initiatorId);
-        d.setRenterId(req.renterId());
-        d.setOwnerId(req.ownerId());
+        d.setRenterId(order.getRenterId());
+        d.setOwnerId(order.getLessorId());
         d.setReason(req.reason().trim());
         d.setDepositAmount(deposit);
-        d.setRentAmount(money(req.rentAmount()));
+        d.setRentAmount(money(order.getRentAmount()));
         d.setWithholdAmount(withhold);
         d.setStatus(AWAITING_RENTER);
         disputeMapper.insert(d);
@@ -157,8 +176,8 @@ public class DisputeService {
         String note = req.note() == null ? null : req.note().trim();
 
         if (Boolean.TRUE.equals(req.agree())) {
-            // 同意：立即划转和解（扣留部分给物主，余下退回租客）
-            executeFundTransfer(d, withhold, deposit.subtract(withhold), "和解");
+            // 同意：立即结算订单，扣留部分给物主，余下退回租客
+            orderService.settleDisputeOrder(d.getOrderId(), withhold);
             d.setRenterNote(note);
             d.setMediationConclusion("租客同意物主扣留押金，已和解");
             d.setStatus(SETTLED);
@@ -273,15 +292,18 @@ public class DisputeService {
         d.setStatus(RESOLVED);
         disputeMapper.updateById(d);
 
-        // UC-F3 后置：调解成功解除押金冻结，全额退回租客（协商一致，无惩罚性扣除）
         BigDecimal deposit = money(d.getDepositAmount());
-        if (deposit.compareTo(BigDecimal.ZERO) > 0) {
-            walletService.unfreeze(d.getRenterId(), deposit, "DISPUTE", disputeId, "调解成功退回押金");
+        BigDecimal deduct = req.deductAmount() == null
+                ? money(d.getWithholdAmount())
+                : money(req.deductAmount());
+        if (deduct.compareTo(deposit) > 0) {
+            throw new BusinessException(ErrorCode.DEDUCT_EXCEEDS_DEPOSIT);
         }
-        // TODO: 订单状态恢复（恢复纠纷前阶段）待订单域状态机就绪后接入
+        // 按调解方案结算：扣除部分给物主，剩余押金退回租客，订单进入完成态。
+        orderService.settleDisputeOrder(d.getOrderId(), deduct);
 
         auditLogService.record(operatorId, "RESOLVE_DISPUTE", "DISPUTE", disputeId,
-                "标记调解成功：" + req.conclusion().trim());
+                "标记调解成功：" + req.conclusion().trim() + "，扣除 " + deduct);
     }
 
     // ===== UC-F4 上报仲裁 =====
@@ -339,8 +361,8 @@ public class DisputeService {
             default -> throw new BusinessException(ErrorCode.PARAM_ERROR, "未知裁决类型");
         }
 
-        // BR-06/BR-21：资金划转（依赖订单域的押金冻结，见 UC-D2）
-        executeFundTransfer(d, toLender, toBorrower, "仲裁");
+        // BR-06/BR-21：结算订单并按裁决金额分配押金
+        orderService.settleDisputeOrder(d.getOrderId(), toLender);
 
         DisputeArbitration arb = new DisputeArbitration();
         arb.setDisputeId(disputeId);

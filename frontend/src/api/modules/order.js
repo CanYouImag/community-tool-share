@@ -19,9 +19,11 @@ export const acceptOrder = (id) => http.post(`/v1/orders/${id}/accept`);
 export const rejectOrder = (id, reason) =>
   http.post(`/v1/orders/${id}/reject`, { reason });
 
-export const pickupOrder = (id, code) => http.post(`/v1/orders/${id}/pickup`, { code });
+export const pickupOrder = (id, code, photoUrls) =>
+  http.post(`/v1/orders/${id}/pickup`, { code, photoUrls });
 
-export const returnOrder = (id) => http.post(`/v1/orders/${id}/return`);
+export const returnOrder = (id, photoUrls) =>
+  http.post(`/v1/orders/${id}/return`, { photoUrls });
 
 export const confirmReturn = (id) => http.post(`/v1/orders/${id}/confirm-return`);
 
@@ -30,6 +32,15 @@ export const inspectOrder = (id, pass, reason = '') =>
 
 export const cancelOrder = (id, reason) =>
   http.post(`/v1/orders/${id}/cancel`, { reason });
+
+export const getOrderEvidences = (id) => http.get(`/v1/orders/${id}/evidences`);
+
+export const getOrderEvaluations = (id) => http.get(`/v1/orders/${id}/evaluations`);
+
+export const createOrderEvaluation = (id, data) =>
+  http.post(`/v1/orders/${id}/evaluations`, data);
+
+export const getItemEvaluations = (id) => http.get(`/v1/items/${id}/evaluations`);
 
 // 发起纠纷时选择「我是物主（出租者）」的订单（完整订单域，role=lessor）
 export const getMyOrders = () => http.get('/orders', { params: { role: 'lessor', size: 100 } });

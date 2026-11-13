@@ -20,6 +20,7 @@ import com.linzu.order.dto.CreateOrderRequest;
 import com.linzu.order.dto.OrderResponse;
 import com.linzu.order.entity.Order;
 import com.linzu.order.enums.OrderStatus;
+import com.linzu.order.mapper.OrderEvidenceMapper;
 import com.linzu.order.mapper.OrderMapper;
 import com.linzu.order.mapper.OrderMessageMapper;
 import com.linzu.platform.entity.PlatformConfig;
@@ -46,6 +47,8 @@ class OrderServiceTest {
     @Mock
     private OrderMessageMapper orderMessageMapper;
     @Mock
+    private OrderEvidenceMapper orderEvidenceMapper;
+    @Mock
     private ItemMapper itemMapper;
     @Mock
     private ItemImageMapper itemImageMapper;
@@ -65,6 +68,7 @@ class OrderServiceTest {
         orderService = new OrderService(
             orderMapper,
             orderMessageMapper,
+            orderEvidenceMapper,
             itemMapper,
             itemImageMapper,
             userMapper,
@@ -167,6 +171,28 @@ class OrderServiceTest {
 
         assertEquals(OrderStatus.COMPLETED.name(), order.getStatus());
         verify(orderMapper).update(eq(order), any());
+    }
+
+    @Test
+    void inspectChargesOverdueFeeAndDeductsCreditOnce() {
+        Order order = order(8L, OrderStatus.PENDING_INSPECT);
+        order.setDays(1);
+        order.setDepositAmount(new BigDecimal("50.00"));
+        order.setEndDate(LocalDate.now().minusDays(2));
+        User renter = user(20L, "CERTIFIED", 100);
+        when(orderMapper.selectById(8L)).thenReturn(order);
+        when(platformConfigMapper.selectOne(any())).thenReturn(config("0.10"));
+        when(orderMapper.update(any(Order.class), any())).thenReturn(1);
+        when(userMapper.selectById(10L)).thenReturn(user(10L, "CERTIFIED", 100));
+        when(userMapper.selectById(20L)).thenReturn(renter);
+        when(userMapper.updateById(renter)).thenReturn(1);
+
+        orderService.inspect(10L, 8L, true, null);
+
+        assertEquals(2, order.getOverdueDays());
+        assertEquals(new BigDecimal("50.00"), order.getOverdueFee());
+        assertEquals(95, renter.getCreditScore());
+        assertEquals(1, order.getOverduePenaltyApplied());
     }
 
     @Test

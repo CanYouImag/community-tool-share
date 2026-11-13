@@ -22,6 +22,7 @@ const size = ref(10)
 const detail = ref(null)
 const mediateText = ref('')
 const resolveText = ref('')
+const resolveDeduct = ref(0)
 const escalateText = ref('')
 const errMsg = ref('')
 
@@ -40,6 +41,7 @@ async function open(d) {
   errMsg.value = ''
   mediateText.value = ''
   resolveText.value = ''
+  resolveDeduct.value = Number(d.withholdAmount || 0)
   escalateText.value = ''
   detail.value = await getDisputeDetail(d.id)
 }
@@ -70,7 +72,10 @@ async function doResolve() {
     return
   }
   try {
-    await resolveDispute(detail.value.id, { conclusion: resolveText.value })
+    await resolveDispute(detail.value.id, {
+      conclusion: resolveText.value,
+      deductAmount: Number(resolveDeduct.value || 0),
+    })
     resolveText.value = ''
     detail.value = await getDisputeDetail(detail.value.id)
   } catch (e) {
@@ -211,6 +216,10 @@ onMounted(load)
               <label class="field">
                 <span>调解结论（达成一致时填写）</span>
                 <textarea v-model="resolveText" aria-label="调解结论"></textarea>
+              </label>
+              <label class="field">
+                <span>扣除给物主的押金金额</span>
+                <input v-model.number="resolveDeduct" type="number" min="0" step="0.01" />
               </label>
               <div class="actions">
                 <a class="btn" @click="doResolve">标记调解成功</a>

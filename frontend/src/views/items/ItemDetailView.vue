@@ -3,7 +3,7 @@ import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 import { favoriteItem, getItem, unfavoriteItem } from '@/api/modules/item';
-import { createOrder } from '@/api/modules/order';
+import { createOrder, getItemEvaluations } from '@/api/modules/order';
 import ItemAvailabilityCalendar from '@/components/ItemAvailabilityCalendar.vue';
 import { useUserStore } from '@/store/user';
 import { formatDate, formatMoney, formatRating } from '@/utils/format';
@@ -14,6 +14,7 @@ const router = useRouter();
 const returnToList = computed(() => ({ name: 'items', query: pickItemListQuery(route.query) }));
 const user = useUserStore();
 const item = ref(null);
+const reviews = ref([]);
 const loading = ref(true);
 const error = ref('');
 const favoriteSaving = ref(false);
@@ -75,6 +76,11 @@ const images = computed(() => {
   return item.value?.image ? [item.value.image] : [];
 });
 const selectedImage = computed(() => images.value[selectedImageIndex.value] || images.value[0]);
+const averageRating = computed(() => {
+  if (!reviews.value.length) return null;
+  const total = reviews.value.reduce((sum, review) => sum + Number(review.rating || 0), 0);
+  return total / reviews.value.length;
+});
 
 watch(selectedImage, () => {
   imageFailed.value = false;
@@ -130,6 +136,14 @@ watch(
       const data = await getItem(id);
       if (!cancelled) {
         item.value = data;
+      }
+      try {
+        const dataReviews = await getItemEvaluations(id);
+        if (!cancelled) {
+          reviews.value = Array.isArray(dataReviews) ? dataReviews : [];
+        }
+      } catch {
+        if (!cancelled) reviews.value = [];
       }
     } catch (err) {
       if (!cancelled) {
@@ -216,7 +230,7 @@ watch(
           </div>
           <div>
             <dt>物品评分</dt>
-            <dd>{{ formatRating(item.rating) }}</dd>
+            <dd>{{ formatRating(averageRating) }}</dd>
           </div>
           <div>
             <dt>押金</dt>
@@ -322,16 +336,16 @@ watch(
       <section class="panel" aria-labelledby="item-reviews-heading">
         <div class="panel-title">
           <h2 id="item-reviews-heading">租用评价</h2>
-          <small>共 {{ item.reviews?.length || 0 }} 条</small>
+          <small>共 {{ reviews.length }} 条</small>
         </div>
-        <p v-if="!item.reviews?.length" class="muted">暂无租用评价。</p>
-        <article v-for="review in item.reviews" :key="review.id" class="rental-review">
+        <p v-if="!reviews.length" class="muted">暂无租用评价。</p>
+        <article v-for="review in reviews" :key="review.id" class="rental-review">
           <div class="review-heading">
-            <strong>{{ review.authorName }}</strong>
+            <strong>{{ review.evaluatorNickname || `用户 #${review.evaluatorId}` }}</strong>
             <span>{{ formatRating(review.rating) }}</span>
           </div>
           <time class="muted" :datetime="review.createdAt">{{ formatDate(review.createdAt) }}</time>
-          <p>{{ review.comment }}</p>
+          <p>{{ review.content || '未填写文字评价' }}</p>
         </article>
       </section>
     </div>

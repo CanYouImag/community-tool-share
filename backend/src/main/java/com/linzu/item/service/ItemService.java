@@ -6,7 +6,9 @@ import com.linzu.common.api.PageResult;
 import com.linzu.common.exception.BusinessException;
 import com.linzu.common.exception.ErrorCode;
 import com.linzu.community.entity.Community;
+import com.linzu.community.entity.CommunityMember;
 import com.linzu.community.mapper.CommunityMapper;
+import com.linzu.community.mapper.CommunityMemberMapper;
 import com.linzu.item.dto.CategoryRequest;
 import com.linzu.item.dto.CategoryResponse;
 import com.linzu.item.dto.ItemResponse;
@@ -50,6 +52,7 @@ public class ItemService {
     private final ItemFavoriteMapper favoriteMapper;
     private final UserService userService;
     private final CommunityMapper communityMapper;
+    private final CommunityMemberMapper communityMemberMapper;
 
     // ==================== 分类（UC-C1） ====================
 
@@ -122,10 +125,15 @@ public class ItemService {
         long safeSize = Math.min(50, Math.max(1, size));
         String kw = StringUtils.hasText(keyword) ? keyword.trim() : null;
 
+        List<Long> allowedCommunities = allowedCommunityIds(viewerId);
+        if (allowedCommunities != null && allowedCommunities.isEmpty()) {
+            return new PageResult<>(List.of(), 0, safePage, safeSize);
+        }
         var wrapper = Wrappers.<Item>lambdaQuery()
             .eq(Item::getStatus, ItemStatus.LISTED.name())
             .eq(categoryId != null, Item::getCategoryId, categoryId)
             .eq(communityId != null, Item::getCommunityId, communityId)
+            .in(allowedCommunities != null, Item::getCommunityId, allowedCommunities)
             .ge(minPrice != null, Item::getRentPerDay, minPrice)
             .le(maxPrice != null, Item::getRentPerDay, maxPrice)
             .orderByDesc(Item::getIsPinned);
@@ -162,6 +170,15 @@ public class ItemService {
             viewerId != null && "PLATFORM_ADMIN".equals(userService.requireUser(viewerId).getRole());
         if (!ItemStatus.LISTED.name().equals(item.getStatus()) && !isOwner && !isAdmin) {
             throw new BusinessException(ErrorCode.ITEM_NOT_AVAILABLE);
+        }
+        if (
+            viewerId != null &&
+            !isOwner &&
+            !isAdmin &&
+            item.getCommunityId() != null &&
+            !isCommunityMember(viewerId, item.getCommunityId())
+        ) {
+            throw new BusinessException(ErrorCode.FORBIDDEN, "仅本社区居民可以查看该物品");
         }
 
         item.setViewCount(item.getViewCount() == null ? 1 : item.getViewCount() + 1);
@@ -503,6 +520,38 @@ public class ItemService {
         }
         Community community = communityMapper.selectById(communityId);
         return community == null ? null : community.getName();
+    }
+
+    private List<Long> allowedCommunityIds(Long viewerId) {
+        if (viewerId == null) {
+            return null;
+        }
+        User viewer = userService.requireUser(viewerId);
+        if ("PLATFORM_ADMIN".equals(viewer.getRole())) {
+            return null;
+        }
+        return communityMemberMapper
+            .selectList(
+                Wrappers
+                    .<CommunityMember>lambdaQuery()
+                    .eq(CommunityMember::getUserId, viewerId)
+                    .eq(CommunityMember::getStatus, "ACTIVE")
+            )
+            .stream()
+            .map(CommunityMember::getCommunityId)
+            .distinct()
+            .toList();
+    }
+
+    private boolean isCommunityMember(Long userId, Long communityId) {
+        Long count = communityMemberMapper.selectCount(
+            Wrappers
+                .<CommunityMember>lambdaQuery()
+                .eq(CommunityMember::getUserId, userId)
+                .eq(CommunityMember::getCommunityId, communityId)
+                .eq(CommunityMember::getStatus, "ACTIVE")
+        );
+        return count != null && count > 0;
     }
 
     private boolean isFavorite(Long userId, Long itemId) {

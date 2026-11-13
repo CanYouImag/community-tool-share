@@ -13,11 +13,14 @@ import com.linzu.item.enums.ItemStatus;
 import com.linzu.item.mapper.ItemImageMapper;
 import com.linzu.item.mapper.ItemMapper;
 import com.linzu.order.dto.CreateOrderRequest;
+import com.linzu.order.dto.OrderEvidenceResponse;
 import com.linzu.order.dto.OrderMessageResponse;
 import com.linzu.order.dto.OrderResponse;
 import com.linzu.order.entity.Order;
+import com.linzu.order.entity.OrderEvidence;
 import com.linzu.order.entity.OrderMessage;
 import com.linzu.order.enums.OrderStatus;
+import com.linzu.order.mapper.OrderEvidenceMapper;
 import com.linzu.order.mapper.OrderMapper;
 import com.linzu.order.mapper.OrderMessageMapper;
 import com.linzu.platform.entity.PlatformConfig;
@@ -61,6 +64,7 @@ public class OrderService {
 
     private final OrderMapper orderMapper;
     private final OrderMessageMapper orderMessageMapper;
+    private final OrderEvidenceMapper orderEvidenceMapper;
     private final ItemMapper itemMapper;
     private final ItemImageMapper itemImageMapper;
     private final UserMapper userMapper;
@@ -207,7 +211,12 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponse pickup(Long lessorId, Long orderId, String code) {
+    public OrderResponse pickup(
+        Long lessorId,
+        Long orderId,
+        String code,
+        List<String> photoUrls
+    ) {
         Order order = requireOrder(orderId);
         requireParticipant(order, lessorId);
         if (!OrderStatus.PENDING_PICKUP.name().equals(order.getStatus())) {
@@ -217,6 +226,7 @@ public class OrderService {
             || !order.getPickupCode().equals(code == null ? "" : code.trim())) {
             throw new BusinessException(ErrorCode.PICKUP_CODE_ERROR);
         }
+        saveEvidence(orderId, "PICKUP", photoUrls, lessorId);
         order.setStatus(OrderStatus.IN_USE.name());
         order.setPickupAt(LocalDateTime.now());
         order.setPickupCode(null);
@@ -225,14 +235,20 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponse requestReturn(Long renterId, Long orderId) {
+    public OrderResponse requestReturn(
+        Long renterId,
+        Long orderId,
+        List<String> photoUrls
+    ) {
         Order order = requireOrder(orderId);
         requireParticipant(order, renterId);
         if (!OrderStatus.IN_USE.name().equals(order.getStatus())) {
             throw new BusinessException(ErrorCode.ORDER_STATE_NOT_ALLOWED, "订单不在使用中状态");
         }
+        saveEvidence(orderId, "RETURN", photoUrls, renterId);
         order.setStatus(OrderStatus.PENDING_RETURN.name());
         order.setReturnAt(LocalDateTime.now());
+        order.setOverdueDays(calculateOverdueDays(order));
         updateWithStatusGuard(order, OrderStatus.IN_USE);
         return toResponse(order, renterId);
     }
@@ -286,13 +302,40 @@ public class OrderService {
                 "订单结算：租金入账（佣金 " + commission + "）"
             );
         }
-        if (deposit.compareTo(BigDecimal.ZERO) > 0) {
-            walletService.unfreeze(
-                order.getRenterId(), deposit, REF_TYPE_ORDER, order.getId(), "订单结算：押金退还"
+
+        int overdueDays = order.getOverdueDays() == null
+            ? calculateOverdueDays(order)
+            : Math.max(0, order.getOverdueDays());
+        BigDecimal dailyRent = order.getDays() == null || order.getDays() <= 0
+            ? rent
+            : rent.divide(BigDecimal.valueOf(order.getDays()), 4, RoundingMode.HALF_UP);
+        BigDecimal overdueFee = dailyRent
+            .multiply(BigDecimal.valueOf(overdueDays))
+            .multiply(new BigDecimal("1.5"))
+            .setScale(2, RoundingMode.HALF_UP);
+        BigDecimal chargedOverdue = overdueFee.min(deposit.max(BigDecimal.ZERO));
+        if (chargedOverdue.compareTo(BigDecimal.ZERO) > 0) {
+            walletService.consumeFrozen(
+                order.getRenterId(), chargedOverdue, REF_TYPE_ORDER, order.getId(),
+                "订单结算：逾期费（" + overdueDays + " 天，1.5 倍日租金）"
+            );
+            walletService.income(
+                order.getLessorId(), chargedOverdue, REF_TYPE_ORDER, order.getId(),
+                "订单结算：逾期费补偿"
             );
         }
+        BigDecimal depositRemain = deposit.subtract(chargedOverdue);
+        if (depositRemain.compareTo(BigDecimal.ZERO) > 0) {
+            walletService.unfreeze(
+                order.getRenterId(), depositRemain, REF_TYPE_ORDER, order.getId(),
+                "订单结算：押金退还"
+            );
+        }
+        applyOverdueCreditPenalty(order, overdueDays);
 
         order.setCommissionAmount(commission);
+        order.setOverdueDays(overdueDays);
+        order.setOverdueFee(chargedOverdue);
         order.setStatus(OrderStatus.COMPLETED.name());
         order.setCompletedAt(LocalDateTime.now());
     }
@@ -375,6 +418,29 @@ public class OrderService {
         }
     }
 
+    @Transactional
+    public void markOverdueOrders() {
+        LocalDate today = LocalDate.now();
+        List<Order> orders = orderMapper.selectList(
+            Wrappers
+                .<Order>lambdaQuery()
+                .in(Order::getStatus, OrderStatus.IN_USE.name(), OrderStatus.PENDING_RETURN.name())
+                .lt(Order::getEndDate, today)
+        );
+        for (Order order : orders) {
+            int overdueDays = calculateOverdueDays(order);
+            if (order.getOverdueDays() == null || order.getOverdueDays() != overdueDays) {
+                orderMapper.update(
+                    null,
+                    Wrappers
+                        .<Order>lambdaUpdate()
+                        .eq(Order::getId, order.getId())
+                        .set(Order::getOverdueDays, overdueDays)
+                );
+            }
+        }
+    }
+
     private void cancelExpired(OrderStatus status, LocalDateTime deadline, String reason) {
         List<Order> orders = orderMapper.selectList(
             Wrappers.<Order>lambdaQuery()
@@ -407,33 +473,67 @@ public class OrderService {
         if (target == OrderStatus.CANCELLED) {
             cancelAndRefund(order, OrderStatus.DISPUTED, "平台调解：" + nullSafe(reason));
         } else {
-            settle(order);
-            BigDecimal deposit = order.getDepositAmount();
-            BigDecimal deduct = deductAmount == null
-                ? BigDecimal.ZERO
-                : deductAmount.setScale(2, RoundingMode.HALF_UP);
-            if (deduct.compareTo(BigDecimal.ZERO) > 0) {
-                if (deduct.compareTo(deposit) > 0) {
-                    throw new BusinessException(ErrorCode.PARAM_ERROR, "扣款金额不能超过押金");
-                }
-                walletService.consumeFrozen(
-                    order.getRenterId(), deduct, REF_TYPE_ORDER, order.getId(), "纠纷调解：押金扣除"
-                );
-                walletService.income(
-                    order.getLessorId(), deduct, REF_TYPE_ORDER, order.getId(), "纠纷调解：押金赔偿入账"
-                );
-                BigDecimal remain = deposit.subtract(deduct);
-                if (remain.compareTo(BigDecimal.ZERO) > 0) {
-                    walletService.unfreeze(
-                        order.getRenterId(), remain, REF_TYPE_ORDER, order.getId(),
-                        "纠纷调解：剩余押金退还"
-                    );
-                }
-            }
-            order.setCompletedAt(LocalDateTime.now());
+            settleDisputeOrder(orderId, deductAmount);
+            order = requireOrder(orderId);
         }
-        updateWithStatusGuard(order, OrderStatus.DISPUTED);
         return toResponse(order, null);
+    }
+
+    /**
+     * 纠纷调解/仲裁后的订单终态结算：租金按佣金规则结算，押金按 ownerDeposit 分给出租方，余额退回租客。
+     */
+    @Transactional
+    public void settleDisputeOrder(Long orderId, BigDecimal ownerDeposit) {
+        Order order = requireOrder(orderId);
+        OrderStatus current = OrderStatus.valueOf(order.getStatus());
+        if (
+            current != OrderStatus.IN_USE &&
+            current != OrderStatus.PENDING_RETURN &&
+            current != OrderStatus.PENDING_INSPECT &&
+            current != OrderStatus.DISPUTED
+        ) {
+            throw new BusinessException(ErrorCode.ORDER_STATE_NOT_ALLOWED);
+        }
+
+        BigDecimal rent = order.getRentAmount();
+        BigDecimal deposit = order.getDepositAmount();
+        BigDecimal toOwner = ownerDeposit == null
+            ? BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP)
+            : ownerDeposit.max(BigDecimal.ZERO).min(deposit).setScale(2, RoundingMode.HALF_UP);
+
+        walletService.consumeFrozen(
+            order.getRenterId(), rent, REF_TYPE_ORDER, order.getId(), "纠纷结算：租金划扣"
+        );
+        BigDecimal commission = rent
+            .multiply(currentCommissionRate())
+            .setScale(2, RoundingMode.HALF_UP);
+        BigDecimal income = rent.subtract(commission);
+        if (income.compareTo(BigDecimal.ZERO) > 0) {
+            walletService.income(
+                order.getLessorId(), income, REF_TYPE_ORDER, order.getId(),
+                "纠纷结算：租金入账（佣金 " + commission + "）"
+            );
+        }
+        if (toOwner.compareTo(BigDecimal.ZERO) > 0) {
+            walletService.consumeFrozen(
+                order.getRenterId(), toOwner, REF_TYPE_ORDER, order.getId(), "纠纷结算：押金扣除"
+            );
+            walletService.income(
+                order.getLessorId(), toOwner, REF_TYPE_ORDER, order.getId(), "纠纷结算：押金赔偿入账"
+            );
+        }
+        BigDecimal remain = deposit.subtract(toOwner);
+        if (remain.compareTo(BigDecimal.ZERO) > 0) {
+            walletService.unfreeze(
+                order.getRenterId(), remain, REF_TYPE_ORDER, order.getId(), "纠纷结算：剩余押金退还"
+            );
+        }
+
+        order.setCommissionAmount(commission);
+        order.setOverdueDays(calculateOverdueDays(order));
+        order.setStatus(OrderStatus.COMPLETED.name());
+        order.setCompletedAt(LocalDateTime.now());
+        updateWithStatusGuard(order, current);
     }
 
     public PageResult<OrderResponse> list(Long userId, String role, String status, long page, long size) {
@@ -602,6 +702,77 @@ public class OrderService {
         return image == null ? null : image.getUrl();
     }
 
+    private int calculateOverdueDays(Order order) {
+        if (order.getEndDate() == null) {
+            return 0;
+        }
+        LocalDate actual = order.getReturnAt() == null
+            ? LocalDate.now()
+            : order.getReturnAt().toLocalDate();
+        long days = ChronoUnit.DAYS.between(order.getEndDate(), actual);
+        return (int) Math.max(0, days);
+    }
+
+    private void applyOverdueCreditPenalty(Order order, int overdueDays) {
+        if (
+            overdueDays <= 0 ||
+            (order.getOverduePenaltyApplied() != null && order.getOverduePenaltyApplied() == 1)
+        ) {
+            return;
+        }
+        User renter = userMapper.selectById(order.getRenterId());
+        if (renter != null) {
+            int score = renter.getCreditScore() == null ? 100 : renter.getCreditScore();
+            renter.setCreditScore(Math.max(0, score - 5));
+            userMapper.updateById(renter);
+        }
+        order.setOverduePenaltyApplied(1);
+    }
+
+    private void saveEvidence(
+        Long orderId,
+        String stage,
+        List<String> photoUrls,
+        Long uploadedBy
+    ) {
+        if (photoUrls == null || photoUrls.isEmpty()) {
+            throw new BusinessException(ErrorCode.PARAM_ERROR, "请至少上传 1 张交接凭证");
+        }
+        for (String url : photoUrls) {
+            if (!StringUtils.hasText(url)) {
+                continue;
+            }
+            OrderEvidence evidence = new OrderEvidence();
+            evidence.setOrderId(orderId);
+            evidence.setStage(stage);
+            evidence.setImageUrl(url.trim());
+            evidence.setUploadedBy(uploadedBy);
+            orderEvidenceMapper.insert(evidence);
+        }
+    }
+
+    public List<OrderEvidenceResponse> evidences(Long userId, Long orderId) {
+        Order order = requireOrder(orderId);
+        requireParticipant(order, userId);
+        return orderEvidenceMapper
+            .selectList(
+                Wrappers
+                    .<OrderEvidence>lambdaQuery()
+                    .eq(OrderEvidence::getOrderId, orderId)
+                    .orderByAsc(OrderEvidence::getId)
+            )
+            .stream()
+            .map(e -> new OrderEvidenceResponse(
+                e.getId(),
+                e.getOrderId(),
+                e.getStage(),
+                e.getImageUrl(),
+                e.getUploadedBy(),
+                e.getCreatedAt()
+            ))
+            .toList();
+    }
+
     private Map<Long, User> loadSenders(List<OrderMessage> messages) {
         List<Long> ids = messages.stream().map(OrderMessage::getSenderId).distinct().toList();
         if (ids.isEmpty()) {
@@ -635,6 +806,8 @@ public class OrderService {
             order.getRentAmount(),
             order.getDepositAmount(),
             order.getCommissionAmount(),
+            order.getOverdueDays(),
+            order.getOverdueFee(),
             order.getStatus(),
             pickupVisible ? order.getPickupCode() : null,
             order.getCancelReason(),

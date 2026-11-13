@@ -22,6 +22,8 @@ public record OrderResponse(
     BigDecimal rentAmount,
     BigDecimal depositAmount,
     BigDecimal commissionAmount,
+    Integer overdueDays,
+    BigDecimal overdueFee,
     String status,
     String pickupCode,
     String cancelReason,
