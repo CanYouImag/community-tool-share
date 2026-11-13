@@ -19,7 +19,7 @@ community-tool-share/
 ├─ README.md                       # 项目说明、启动方式、测试账号
 ├─ backend/                        # 后端源码（Java 17 · Spring Boot 3.3.5 · MyBatis-Plus）
 ├─ frontend/                       # 前端源码（Vue 3 · Vite 5 · Pinia · Axios）
-├─ db/                             # 数据库脚本（user-wallet.sql / community-dispute-platform.sql / order.sql / init.sql）
+├─ db/                             # 数据库脚本（init.sql / user-wallet.sql / item.sql / order.sql / community-dispute-platform.sql / migrations/）
 ├─ docker-compose.yml              # 一键启动 MySQL / 后端 / 前端
 ├─ .github/workflows/ci.yml        # CI：后端打包 + 前端构建
 ├─ scripts/start.sh                # 辅助启动脚本

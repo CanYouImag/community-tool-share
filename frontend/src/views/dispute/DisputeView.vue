@@ -11,6 +11,7 @@ import {
   submitReport,
 } from '@/api/modules/dispute';
 import { getMyOrders } from '@/api/modules/order';
+import { getMyMemberships } from '@/api/modules/community';
 import StatusBadge from '@/components/StatusBadge.vue';
 import ViewTabs from '@/components/ViewTabs.vue';
 import { formatAmount, formatDateTime } from '@/utils/format';
@@ -27,6 +28,7 @@ const activeTab = ref('new');
 
 // —— 提出扣留押金（仅物主） ——
 const orders = ref([]);
+const myCommunityId = ref('');
 const form = ref({
   orderId: '',
   communityId: '',
@@ -63,18 +65,31 @@ const reportDone = ref(false);
 
 async function load() {
   await loadMyDisputes();
+  await loadMyCommunity();
   await loadOrders();
   await loadAwards();
 }
 
+// 纠纷所属社区：订单/物品域未落 community_id（窦源泽的物品用 location 字符串），
+// 此处暂以物主（出租者）已加入的社区作为纠纷所属社区，供调解/仲裁按社区分派。
+async function loadMyCommunity() {
+  const memberships = (await getMyMemberships()) || [];
+  const joined = memberships.find((m) => m.status === 'JOINED');
+  myCommunityId.value = joined ? String(joined.id) : '';
+  if (!form.value.communityId) {
+    form.value.communityId = myCommunityId.value;
+  }
+}
+
 async function loadOrders() {
-  const all = (await getMyOrders()) || [];
+  const data = await getMyOrders();
+  const all = data?.records || [];
   const me = String(auth.user?.id);
   // 已发起过纠纷的订单（任意状态）不可再发起——直接在列表里标灰并禁用
   const disputedIds = new Set((myDisputes.value || []).map((d) => String(d.orderId)));
   // 只保留“我是物主（出租者）”的订单——扣留押金只能由物主提出
   orders.value = all
-    .filter((o) => String(o.ownerId) === me)
+    .filter((o) => String(o.lessorId) === me)
     .map((o) => ({ ...o, disputed: disputedIds.has(String(o.id)) }));
   if (!form.value.orderId) {
     const first = orders.value.find((o) => !o.disputed);
@@ -88,7 +103,7 @@ async function loadOrders() {
 function onOrderChange() {
   const o = orders.value.find((x) => String(x.id) === form.value.orderId);
   if (!o) return;
-  form.value.communityId = String(o.communityId);
+  form.value.communityId = myCommunityId.value;
   form.value.depositAmount = o.depositAmount ?? '';
   form.value.rentAmount = o.rentAmount ?? '';
 }
