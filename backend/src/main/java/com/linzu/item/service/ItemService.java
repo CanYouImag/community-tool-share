@@ -244,6 +244,7 @@ public class ItemService {
         validateSaveRequest(request);
         requireCategory(request.categoryId());
         requireRealName(ownerId);
+        requirePublishCredit(ownerId, request.deposit());
         requireCommunityExists(request.communityId());
 
         Item item = new Item();
@@ -265,6 +266,7 @@ public class ItemService {
         }
         validateSaveRequest(request);
         requireCategory(request.categoryId());
+        requirePublishCredit(ownerId, request.deposit());
         requireCommunityExists(request.communityId());
         applySaveRequest(item, request);
         // 编辑后需重新审核
@@ -441,15 +443,25 @@ public class ItemService {
         if (images.size() > MAX_IMAGES) {
             throw new BusinessException(ErrorCode.ITEM_IMAGE_TOO_MANY);
         }
-        if (request.deposit() != null && request.deposit().compareTo(new BigDecimal("500")) > 0) {
-            throw new BusinessException(ErrorCode.PARAM_ERROR, "押金不能超过 500 元");
-        }
     }
 
     private void requireRealName(Long ownerId) {
         var profile = userService.getProfile(ownerId);
         if (!"VERIFIED".equals(profile.realNameStatus())) {
             throw new BusinessException(ErrorCode.FORBIDDEN, "发布物品前请先完成实名认证");
+        }
+    }
+
+    private void requirePublishCredit(Long ownerId, BigDecimal deposit) {
+        if (deposit == null || deposit.compareTo(new BigDecimal("500")) <= 0) {
+            return;
+        }
+        User owner = userService.requireUser(ownerId);
+        if (owner.getCreditScore() == null || owner.getCreditScore() < 60) {
+            throw new BusinessException(
+                ErrorCode.PARAM_ERROR,
+                "信用分不足 60，无法发布押金超过 500 元的物品"
+            );
         }
     }
 
