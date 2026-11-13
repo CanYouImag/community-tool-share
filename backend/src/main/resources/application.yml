@@ -56,6 +56,17 @@ app:
     # 生产环境必须通过 JWT_SECRET 环境变量覆盖，长度至少 32 字节
     secret: ${JWT_SECRET:linzu-demo-secret-key-change-me-32bytes}
     expire-hours: 72
+  order:
+    # 平台佣金比例（0-1），结算时从租金中扣除
+    commission-rate: ${ORDER_COMMISSION_RATE:0}
+    # 待支付超时（分钟）→ 自动取消
+    timeout-pay-minutes: 15
+    # 待接单超时（小时）→ 自动取消并退款
+    timeout-accept-hours: 24
+    # 待取物超时（小时）→ 自动取消并退款
+    timeout-pickup-hours: 48
+    # 待归还/待验收超时（天）→ 自动验收通过并结算
+    timeout-return-days: 7
   demo:
     # 首次启动时插入演示账号；不需要时设为 false
     seed: true

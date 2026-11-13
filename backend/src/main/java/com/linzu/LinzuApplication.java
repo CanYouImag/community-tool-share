@@ -5,10 +5,17 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-@MapperScan({ "com.linzu.user.mapper", "com.linzu.wallet.mapper" })
+@MapperScan({
+    "com.linzu.user.mapper",
+    "com.linzu.wallet.mapper",
+    "com.linzu.item.mapper",
+    "com.linzu.order.mapper"
+})
 @EnableConfigurationProperties(JwtProperties.class)
+@EnableScheduling
 public class LinzuApplication {
 
     public static void main(String[] args) {
