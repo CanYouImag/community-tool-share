@@ -1,5 +1,6 @@
 package com.linzu.common.util;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -12,6 +13,12 @@ class IdCardUtilTest {
         assertTrue(IdCardUtil.isValid("11010519491231002X"));
         assertTrue(IdCardUtil.isValid("220101199001011232"));
         assertTrue(IdCardUtil.isValid("11010519491231002x"));
+    }
+
+    @Test
+    void masksMiddleDigits() {
+        assertEquals("220101********1232", IdCardUtil.mask("220101199001011232"));
+        assertEquals("220101********1232", IdCardUtil.mask(" 220101199001011232 "));
     }
 
     @Test

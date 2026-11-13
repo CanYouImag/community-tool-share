@@ -59,7 +59,8 @@ public class DemoDataInitializer implements CommandLineRunner {
             "13800000000",
             "演示用户",
             "220101199001011232",
-            new BigDecimal("500.00")
+            new BigDecimal("500.00"),
+            "VERIFIED"
         );
         seedUser(
             adminUsername,
@@ -69,7 +70,20 @@ public class DemoDataInitializer implements CommandLineRunner {
             "13900000000",
             "平台管理员",
             "220101199001011240",
-            BigDecimal.ZERO
+            BigDecimal.ZERO,
+            "VERIFIED"
+        );
+        // 给平台管理端留一条待审核实名认证，方便答辩演示审核通过/驳回。
+        seedUser(
+            "pending",
+            "123456",
+            "待审核用户",
+            "REGISTERED",
+            "13700000000",
+            "待审核用户",
+            "11010519491231002X",
+            new BigDecimal("100.00"),
+            "PENDING"
         );
     }
 
@@ -81,7 +95,8 @@ public class DemoDataInitializer implements CommandLineRunner {
         String phone,
         String realName,
         String idCardNo,
-        BigDecimal balance
+        BigDecimal balance,
+        String realNameStatus
     ) {
         Long exists = userMapper.selectCount(
             Wrappers
@@ -109,7 +124,7 @@ public class DemoDataInitializer implements CommandLineRunner {
         userRealName.setUserId(user.getId());
         userRealName.setRealName(realName);
         userRealName.setIdCardNo(idCardCipher.encrypt(idCardNo));
-        userRealName.setStatus("VERIFIED");
+        userRealName.setStatus(realNameStatus);
         userRealNameMapper.insert(userRealName);
 
         Wallet wallet = new Wallet();
@@ -121,10 +136,11 @@ public class DemoDataInitializer implements CommandLineRunner {
         walletMapper.insert(wallet);
 
         log.info(
-            "已创建演示账号：{} / {}（角色 {}，钱包余额 {}）",
+            "已创建演示账号：{} / {}（角色 {}，实名状态 {}，钱包余额 {}）",
             loginName,
             rawPassword,
             role,
+            realNameStatus,
             balance
         );
     }

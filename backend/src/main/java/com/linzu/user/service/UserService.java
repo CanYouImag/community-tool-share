@@ -155,7 +155,8 @@ public class UserService {
         String realNameValue = realName == null ? null : realName.getRealName();
         String idCardMasked = realName == null
             ? null
-            : maskIdCard(idCardCipher.decrypt(realName.getIdCardNo()));
+            : IdCardUtil.mask(idCardCipher.decrypt(realName.getIdCardNo()));
+        String realNameRejectReason = realName == null ? null : realName.getRejectReason();
         return new UserProfileResponse(
             user.getId(),
             user.getUsername(),
@@ -169,15 +170,9 @@ public class UserService {
             realNameStatus,
             realNameValue,
             idCardMasked,
+            realNameRejectReason,
             user.getCreatedAt()
         );
-    }
-
-    private String maskIdCard(String idCardNo) {
-        if (!StringUtils.hasText(idCardNo) || idCardNo.length() < 10) {
-            return idCardNo;
-        }
-        return idCardNo.substring(0, 6) + "********" + idCardNo.substring(idCardNo.length() - 4);
     }
 
     private boolean isAdmin(String role) {
