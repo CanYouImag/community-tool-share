@@ -538,6 +538,8 @@ public class OrderService {
                 && (viewerId == null
                     || viewerId.equals(order.getRenterId())
                     || viewerId.equals(order.getLessorId()));
+        User lessor = userMapper.selectById(order.getLessorId());
+        User renter = userMapper.selectById(order.getRenterId());
         return new OrderResponse(
             order.getId(),
             order.getOrderNo(),
@@ -562,7 +564,9 @@ public class OrderService {
             order.getReturnAt(),
             order.getCompletedAt(),
             order.getCancelledAt(),
-            order.getCreatedAt()
+            order.getCreatedAt(),
+            lessor == null ? null : lessor.getNickname(),
+            renter == null ? null : renter.getNickname()
         );
     }
 

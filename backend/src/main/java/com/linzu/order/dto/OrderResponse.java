@@ -31,5 +31,7 @@ public record OrderResponse(
     LocalDateTime returnAt,
     LocalDateTime completedAt,
     LocalDateTime cancelledAt,
-    LocalDateTime createdAt
+    LocalDateTime createdAt,
+    String lessorNickname,
+    String renterNickname
 ) {}
