@@ -77,6 +77,15 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
                 return true;
             }
         }
+        // 物品广场、分类和物品详情允许游客只读浏览（D017）。
+        for (String base : new String[]{"/api/items", "/api/v1/items"}) {
+            if (path.equals(base) || path.equals(base + "/categories")) {
+                return true;
+            }
+            if (path.matches(base + "/\\d+")) {
+                return true;
+            }
+        }
         return false;
     }
 

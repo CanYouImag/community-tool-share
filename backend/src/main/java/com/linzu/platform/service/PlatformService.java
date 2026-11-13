@@ -18,6 +18,8 @@ import com.linzu.platform.dto.CommunityUpdateRequest;
 import com.linzu.platform.dto.ConfigUpdateRequest;
 import com.linzu.platform.dto.UserAdminResponse;
 import com.linzu.platform.entity.PlatformConfig;
+import com.linzu.order.entity.Order;
+import com.linzu.order.mapper.OrderMapper;
 import com.linzu.platform.mapper.PlatformConfigMapper;
 import com.linzu.user.entity.User;
 import com.linzu.user.mapper.UserMapper;
@@ -51,6 +53,7 @@ public class PlatformService {
     private final CommunityMemberMapper memberMapper;
     private final UserMapper userMapper;
     private final DisputeMapper disputeMapper;
+    private final OrderMapper orderMapper;
     private final PlatformConfigMapper configMapper;
     private final CommunityService communityService;
     private final AuditLogService auditLogService;
@@ -262,9 +265,8 @@ public class PlatformService {
         result.put("userCount", userMapper.selectCount(null));
         result.put("communityCount", communityMapper.selectCount(null));
         result.put("disputeCount", disputeMapper.selectCount(null));
-        // TODO: 订单量 / GMV 待订单域（窦源泽）就绪后接入
-        result.put("orderCount", 0L);
-        result.put("gmv", BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP));
+        result.put("orderCount", orderMapper.selectCount(null));
+        result.put("gmv", completedRent(null));
         return result;
     }
 
@@ -283,13 +285,30 @@ public class PlatformService {
         result.put("disputeCount", disputeMapper.selectCount(
                 Wrappers.<Dispute>lambdaQuery().eq(Dispute::getCommunityId, communityId)
         ));
-        // TODO: 订单量 / GMV 待订单域就绪后按 community_id 过滤接入
-        result.put("orderCount", 0L);
-        result.put("gmv", BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP));
+        result.put("orderCount", orderMapper.selectCount(
+                Wrappers.<Order>lambdaQuery().eq(Order::getCommunityId, communityId)
+        ));
+        result.put("gmv", completedRent(communityId));
         return result;
     }
 
     // ===== 内部工具 =====
+
+    private BigDecimal completedRent(Long communityId) {
+        var wrapper = Wrappers
+            .<Order>query()
+            .select("COALESCE(SUM(rent_amount), 0) AS gmv")
+            .eq("status", "COMPLETED");
+        if (communityId != null) {
+            wrapper.eq("community_id", communityId);
+        }
+        List<Map<String, Object>> rows = orderMapper.selectMaps(wrapper);
+        if (rows.isEmpty() || rows.get(0).get("gmv") == null) {
+            return BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+        }
+        return new BigDecimal(rows.get(0).get("gmv").toString())
+            .setScale(2, RoundingMode.HALF_UP);
+    }
 
     private Community requireCommunity(Long communityId) {
         Community c = communityMapper.selectById(communityId);

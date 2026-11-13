@@ -1,14 +1,16 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 import { favoriteItem, getItem, unfavoriteItem } from '@/api/modules/item';
+import { createOrder } from '@/api/modules/order';
 import ItemAvailabilityCalendar from '@/components/ItemAvailabilityCalendar.vue';
 import { useUserStore } from '@/store/user';
 import { formatDate, formatMoney, formatRating } from '@/utils/format';
 import { pickItemListQuery } from '@/utils/itemListRoute';
 
 const route = useRoute();
+const router = useRouter();
 const returnToList = computed(() => ({ name: 'items', query: pickItemListQuery(route.query) }));
 const user = useUserStore();
 const item = ref(null);
@@ -18,6 +20,51 @@ const favoriteSaving = ref(false);
 const favoriteError = ref('');
 const selectedImageIndex = ref(0);
 const imageFailed = ref(false);
+
+const today = new Date().toISOString().slice(0, 10);
+const startDate = ref(today);
+const endDate = ref(addDays(today, 1));
+const ordering = ref(false);
+const orderError = ref('');
+
+function addDays(date, days) {
+  const value = new Date(`${date}T00:00:00`);
+  value.setDate(value.getDate() + days);
+  return value.toISOString().slice(0, 10);
+}
+
+const rentalDays = computed(() => {
+  if (!startDate.value || !endDate.value) return 0;
+  const start = new Date(`${startDate.value}T00:00:00`);
+  const end = new Date(`${endDate.value}T00:00:00`);
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || end < start) return 0;
+  return Math.floor((end - start) / 86400000) + 1;
+});
+const rentEstimate = computed(() => Number(item.value?.rentPerDay || 0) * rentalDays.value);
+const depositEstimate = computed(() => Number(item.value?.deposit || 0));
+const totalEstimate = computed(() => rentEstimate.value + depositEstimate.value);
+
+async function placeOrder() {
+  if (!item.value || ordering.value) return;
+  orderError.value = '';
+  if (!rentalDays.value) {
+    orderError.value = '请选择合法的租期';
+    return;
+  }
+  ordering.value = true;
+  try {
+    const created = await createOrder({
+      itemId: item.value.id,
+      startDate: startDate.value,
+      endDate: endDate.value,
+    });
+    await router.push({ name: 'order-detail', params: { id: created.id } });
+  } catch (err) {
+    orderError.value = err.message || '下单失败，请稍后重试';
+  } finally {
+    ordering.value = false;
+  }
+}
 
 const images = computed(() => {
   const pictures = Array.isArray(item.value?.images)
@@ -214,6 +261,58 @@ watch(
         <p v-if="favoriteError" role="alert">
           {{ favoriteError }}
         </p>
+
+        <template v-if="item.status === 'LISTED' && item.ownerId !== user.id">
+          <hr class="rule" />
+          <section aria-labelledby="order-item-heading">
+            <h3 id="order-item-heading">租用这件物品</h3>
+            <div class="two equal">
+              <label class="field">
+                <span>开始日期</span>
+                <input v-model="startDate" type="date" :min="today" />
+              </label>
+              <label class="field">
+                <span>结束日期</span>
+                <input v-model="endDate" type="date" :min="startDate || today" />
+              </label>
+            </div>
+            <dl class="line-list">
+              <div>
+                <dt>租期（含首尾）</dt>
+                <dd>{{ rentalDays }} 天</dd>
+              </div>
+              <div>
+                <dt>租金</dt>
+                <dd>{{ formatMoney(rentEstimate) }}</dd>
+              </div>
+              <div>
+                <dt>押金</dt>
+                <dd>{{ formatMoney(depositEstimate) }}</dd>
+              </div>
+              <div>
+                <dt>合计</dt>
+                <dd>{{ formatMoney(totalEstimate) }}</dd>
+              </div>
+            </dl>
+            <p v-if="!user.isLoggedIn" role="status">
+              <router-link :to="{ name: 'login', query: { redirect: route.fullPath } }">
+                登录后即可下单
+              </router-link>
+            </p>
+            <div v-else class="actions">
+              <button
+                class="btn primary"
+                type="button"
+                :disabled="ordering || rentalDays < 1"
+                @click="placeOrder"
+              >
+                {{ ordering ? '正在创建订单…' : '立即租用' }}
+              </button>
+            </div>
+            <p v-if="orderError" class="form-message error" role="alert">{{ orderError }}</p>
+          </section>
+        </template>
+        <p v-else-if="item.ownerId === user.id" class="muted">这是你发布的物品，不能租用。</p>
       </section>
     </div>
 

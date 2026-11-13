@@ -58,7 +58,7 @@ app:
     expire-hours: 72
   order:
     # 平台佣金比例（0-1），结算时从租金中扣除
-    commission-rate: ${ORDER_COMMISSION_RATE:0}
+    commission-rate: ${ORDER_COMMISSION_RATE:0.10}
     # 待支付超时（分钟）→ 自动取消
     timeout-pay-minutes: 15
     # 待接单超时（小时）→ 自动取消并退款

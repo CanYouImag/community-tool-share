@@ -29,6 +29,11 @@ public final class AuthContext {
         return require().id();
     }
 
+    public static Long userIdOrNull() {
+        AuthUser user = HOLDER.get();
+        return user == null ? null : user.id();
+    }
+
     public static void clear() {
         HOLDER.remove();
     }

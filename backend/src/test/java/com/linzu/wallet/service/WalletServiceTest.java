@@ -103,6 +103,38 @@ class WalletServiceTest {
         verify(walletMapper, never()).updateById(any(Wallet.class));
     }
 
+    @Test
+    void ledgerAmountTracksTotalAssetsAcrossFreezeConsumeAndUnfreeze() {
+        Wallet wallet = wallet(7L, "1000.00");
+        when(walletMapper.selectOne(any())).thenReturn(wallet);
+        when(walletMapper.updateById(any(Wallet.class))).thenReturn(1);
+        when(walletTransactionMapper.insert(any(WalletTransaction.class))).thenReturn(1);
+        when(walletTransactionMapper.selectList(any())).thenReturn(List.of());
+
+        walletService.freeze(7L, new BigDecimal("330.00"), "ORDER", 1L, "支付");
+        walletService.consumeFrozen(7L, new BigDecimal("30.00"), "ORDER", 1L, "结算租金");
+        walletService.unfreeze(7L, new BigDecimal("300.00"), "ORDER", 1L, "退还押金");
+
+        ArgumentCaptor<WalletTransaction> captor = ArgumentCaptor.forClass(
+            WalletTransaction.class
+        );
+        verify(walletTransactionMapper, org.mockito.Mockito.times(3)).insert(captor.capture());
+        List<WalletTransaction> transactions = captor.getAllValues();
+
+        assertEquals(0, transactions.get(0).getAmount().compareTo(BigDecimal.ZERO));
+        assertEquals(0, transactions.get(1).getAmount().compareTo(new BigDecimal("-30.00")));
+        assertEquals(0, transactions.get(2).getAmount().compareTo(BigDecimal.ZERO));
+
+        BigDecimal ledgerTotal = new BigDecimal("1000.00");
+        for (WalletTransaction transaction : transactions) {
+            ledgerTotal = ledgerTotal.add(transaction.getAmount());
+        }
+        assertEquals(
+            0,
+            ledgerTotal.compareTo(wallet.getBalance().add(wallet.getFrozenBalance()))
+        );
+    }
+
     private User activeUser(Long id) {
         User user = new User();
         user.setId(id);

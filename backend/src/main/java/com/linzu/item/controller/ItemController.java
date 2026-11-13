@@ -66,7 +66,7 @@ public class ItemController {
     ) {
         return Result.ok(
             itemService.search(
-                AuthContext.requireUserId(),
+                AuthContext.userIdOrNull(),
                 keyword,
                 categoryId,
                 communityId,
@@ -82,7 +82,7 @@ public class ItemController {
     @Operation(summary = "物品详情（C3）")
     @GetMapping("/{id}")
     public Result<ItemResponse> detail(@PathVariable Long id) {
-        return Result.ok(itemService.getDetail(AuthContext.requireUserId(), id));
+        return Result.ok(itemService.getDetail(AuthContext.userIdOrNull(), id));
     }
 
     @Operation(summary = "发布物品（C5），提交后进入平台审核")
