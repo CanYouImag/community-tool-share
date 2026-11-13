@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.linzu.common.api.PageResult;
 import com.linzu.common.exception.BusinessException;
 import com.linzu.common.exception.ErrorCode;
+import com.linzu.community.entity.CommunityMember;
+import com.linzu.community.mapper.CommunityMemberMapper;
 import com.linzu.item.entity.Item;
 import com.linzu.item.entity.ItemImage;
 import com.linzu.item.enums.ItemStatus;
@@ -18,6 +20,8 @@ import com.linzu.order.entity.OrderMessage;
 import com.linzu.order.enums.OrderStatus;
 import com.linzu.order.mapper.OrderMapper;
 import com.linzu.order.mapper.OrderMessageMapper;
+import com.linzu.platform.entity.PlatformConfig;
+import com.linzu.platform.mapper.PlatformConfigMapper;
 import com.linzu.user.entity.User;
 import com.linzu.user.mapper.UserMapper;
 import com.linzu.wallet.service.WalletService;
@@ -61,8 +65,10 @@ public class OrderService {
     private final ItemImageMapper itemImageMapper;
     private final UserMapper userMapper;
     private final WalletService walletService;
+    private final CommunityMemberMapper communityMemberMapper;
+    private final PlatformConfigMapper platformConfigMapper;
 
-    @Value("${app.order.commission-rate:0}")
+    @Value("${app.order.commission-rate:0.10}")
     private BigDecimal commissionRate;
 
     @Value("${app.order.timeout-pay-minutes:15}")
@@ -89,12 +95,52 @@ public class OrderService {
         if (renterId.equals(item.getOwnerId())) {
             throw new BusinessException(ErrorCode.PARAM_ERROR, "不能租用自己的物品");
         }
+        User renter = userMapper.selectById(renterId);
+        if (renter == null) {
+            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
+        }
+        if (renter.getCreditScore() != null && renter.getCreditScore() < 40) {
+            throw new BusinessException(ErrorCode.PARAM_ERROR, "信用分低于 40，暂不能租用物品");
+        }
+        if (item.getCommunityId() != null) {
+            Long membership = communityMemberMapper.selectCount(
+                Wrappers
+                    .<CommunityMember>lambdaQuery()
+                    .eq(CommunityMember::getCommunityId, item.getCommunityId())
+                    .eq(CommunityMember::getUserId, renterId)
+                    .eq(CommunityMember::getStatus, "ACTIVE")
+            );
+            if (membership == null || membership == 0) {
+                throw new BusinessException(ErrorCode.FORBIDDEN, "仅本社区居民可以租用该物品");
+            }
+        }
         LocalDate start = request.startDate();
         LocalDate end = request.endDate();
         if (end.isBefore(start) || start.isBefore(LocalDate.now())) {
             throw new BusinessException(ErrorCode.RENT_PERIOD_INVALID);
         }
-        long days = Math.max(1, ChronoUnit.DAYS.between(start, end));
+        Long overlapping = orderMapper.selectCount(
+            Wrappers
+                .<Order>lambdaQuery()
+                .eq(Order::getItemId, item.getId())
+                .in(
+                    Order::getStatus,
+                    OrderStatus.PENDING_PAYMENT.name(),
+                    OrderStatus.PENDING_ACCEPT.name(),
+                    OrderStatus.PENDING_PICKUP.name(),
+                    OrderStatus.IN_USE.name(),
+                    OrderStatus.PENDING_RETURN.name(),
+                    OrderStatus.PENDING_INSPECT.name(),
+                    OrderStatus.DISPUTED.name()
+                )
+                .le(Order::getStartDate, end)
+                .ge(Order::getEndDate, start)
+        );
+        if (overlapping != null && overlapping > 0) {
+            throw new BusinessException(ErrorCode.PARAM_ERROR, "所选租期与该物品已有订单重叠");
+        }
+        // 含首尾两天：11-10 至 11-12 为 3 天。
+        long days = Math.max(1, ChronoUnit.DAYS.between(start, end) + 1);
         BigDecimal rent = item.getRentPerDay()
             .multiply(BigDecimal.valueOf(days))
             .setScale(2, RoundingMode.HALF_UP);
@@ -230,7 +276,9 @@ public class OrderService {
         walletService.consumeFrozen(
             order.getRenterId(), rent, REF_TYPE_ORDER, order.getId(), "订单结算：租金划扣"
         );
-        BigDecimal commission = rent.multiply(commissionRate).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal commission = rent
+            .multiply(currentCommissionRate())
+            .setScale(2, RoundingMode.HALF_UP);
         BigDecimal income = rent.subtract(commission);
         if (income.compareTo(BigDecimal.ZERO) > 0) {
             walletService.income(
@@ -254,7 +302,15 @@ public class OrderService {
         Order order = requireOrder(orderId);
         requireParticipant(order, userId);
         OrderStatus current = OrderStatus.valueOf(order.getStatus());
-        OrderStateMachine.check(current, OrderStatus.CANCELLED);
+        if (
+            current != OrderStatus.PENDING_PAYMENT &&
+            current != OrderStatus.PENDING_ACCEPT
+        ) {
+            throw new BusinessException(
+                ErrorCode.ORDER_STATE_NOT_ALLOWED,
+                "接单后不可单方取消，请通过纠纷流程处理"
+            );
+        }
         cancelAndRefund(order, current, nullSafe(reason));
         return toResponse(order, userId);
     }
@@ -312,9 +368,10 @@ public class OrderService {
                 .lt(Order::getUpdatedAt, deadline)
         );
         for (Order order : orders) {
+            OrderStatus previous = OrderStatus.valueOf(order.getStatus());
             settle(order);
             order.setCancelReason("出租人超时未验收，系统自动完成结算");
-            updateWithStatusGuard(order, OrderStatus.valueOf(order.getStatus()));
+            updateWithStatusGuard(order, previous);
         }
     }
 
@@ -459,6 +516,9 @@ public class OrderService {
         if (!StringUtils.hasText(content) || content.isBlank()) {
             throw new BusinessException(ErrorCode.ORDER_MESSAGE_EMPTY);
         }
+        if (content.trim().length() > 500) {
+            throw new BusinessException(ErrorCode.PARAM_ERROR, "留言内容不能超过 500 字");
+        }
         OrderMessage message = new OrderMessage();
         message.setOrderId(orderId);
         message.setSenderId(userId);
@@ -500,6 +560,26 @@ public class OrderService {
         if (!ok) {
             throw new BusinessException(ErrorCode.STATE_CONFLICT);
         }
+    }
+
+    private BigDecimal currentCommissionRate() {
+        PlatformConfig config = platformConfigMapper.selectOne(
+            Wrappers
+                .<PlatformConfig>lambdaQuery()
+                .eq(PlatformConfig::getConfigKey, "commission_rate")
+        );
+        BigDecimal rate = commissionRate;
+        if (config != null && StringUtils.hasText(config.getConfigValue())) {
+            try {
+                rate = new BigDecimal(config.getConfigValue().trim());
+            } catch (NumberFormatException ignored) {
+                // 配置损坏时回退到 application.yml，避免结算直接失败。
+            }
+        }
+        if (rate == null || rate.compareTo(BigDecimal.ZERO) < 0) {
+            return BigDecimal.ZERO;
+        }
+        return rate.min(new BigDecimal("0.50"));
     }
 
     private String generateOrderNo() {

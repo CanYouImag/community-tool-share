@@ -52,7 +52,7 @@ public class AuthService {
         );
         user.setRole("REGISTERED");
         user.setStatus("ACTIVE");
-        user.setCreditScore(100);
+        user.setCreditScore(80);
         userMapper.insert(user);
 
         Wallet wallet = new Wallet();

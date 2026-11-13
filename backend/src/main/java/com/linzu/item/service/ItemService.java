@@ -243,6 +243,8 @@ public class ItemService {
     public ItemResponse create(Long ownerId, ItemSaveRequest request) {
         validateSaveRequest(request);
         requireCategory(request.categoryId());
+        requireRealName(ownerId);
+        requireCommunityExists(request.communityId());
 
         Item item = new Item();
         item.setOwnerId(ownerId);
@@ -263,6 +265,7 @@ public class ItemService {
         }
         validateSaveRequest(request);
         requireCategory(request.categoryId());
+        requireCommunityExists(request.communityId());
         applySaveRequest(item, request);
         // 编辑后需重新审核
         item.setStatus(ItemStatus.PENDING_REVIEW.name());
@@ -365,6 +368,17 @@ public class ItemService {
     @Transactional
     public void pin(Long itemId, boolean pinned) {
         Item item = requireItem(itemId);
+        if (pinned && (item.getIsPinned() == null || item.getIsPinned() == 0)) {
+            Long pinnedCount = itemMapper.selectCount(
+                Wrappers
+                    .<Item>lambdaQuery()
+                    .eq(Item::getCommunityId, item.getCommunityId())
+                    .eq(Item::getIsPinned, 1)
+            );
+            if (pinnedCount != null && pinnedCount >= 3) {
+                throw new BusinessException(ErrorCode.PARAM_ERROR, "每个社区最多置顶 3 件物品");
+            }
+        }
         item.setIsPinned(Boolean.TRUE.equals(pinned) ? 1 : 0);
         itemMapper.updateById(item);
     }
@@ -421,8 +435,27 @@ public class ItemService {
 
     private void validateSaveRequest(ItemSaveRequest request) {
         List<String> images = request.images();
-        if (images != null && images.size() > MAX_IMAGES) {
+        if (images == null || images.isEmpty()) {
+            throw new BusinessException(ErrorCode.PARAM_ERROR, "发布物品至少需要上传 1 张图片");
+        }
+        if (images.size() > MAX_IMAGES) {
             throw new BusinessException(ErrorCode.ITEM_IMAGE_TOO_MANY);
+        }
+        if (request.deposit() != null && request.deposit().compareTo(new BigDecimal("500")) > 0) {
+            throw new BusinessException(ErrorCode.PARAM_ERROR, "押金不能超过 500 元");
+        }
+    }
+
+    private void requireRealName(Long ownerId) {
+        var profile = userService.getProfile(ownerId);
+        if (!"VERIFIED".equals(profile.realNameStatus())) {
+            throw new BusinessException(ErrorCode.FORBIDDEN, "发布物品前请先完成实名认证");
+        }
+    }
+
+    private void requireCommunityExists(Long communityId) {
+        if (communityId != null && communityMapper.selectById(communityId) == null) {
+            throw new BusinessException(ErrorCode.COMMUNITY_NOT_FOUND);
         }
     }
 

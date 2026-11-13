@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -63,6 +64,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(ErrorCode.FILE_TOO_LARGE.getHttpStatus()).body(
             Result.fail(ErrorCode.FILE_TOO_LARGE)
         );
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<Result<Void>> handleMethodNotAllowed(
+        HttpRequestMethodNotSupportedException e
+    ) {
+        return ResponseEntity
+            .status(HttpStatus.METHOD_NOT_ALLOWED)
+            .body(Result.fail(4050, "Method Not Allowed"));
     }
 
     @ExceptionHandler(NoResourceFoundException.class)

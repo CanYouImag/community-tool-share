@@ -86,14 +86,16 @@ public class WalletService {
         wallet.setBalance(wallet.getBalance().subtract(value));
         wallet.setFrozenBalance(wallet.getFrozenBalance().add(value));
         updateWallet(wallet);
+        // 冻结只是可用余额与冻结余额之间的内部划转，不改变总资产。
+        // t_wallet_transaction.amount 记录总资产变化，因此 FREEZE/UNFREEZE 记 0。
         record(
             userId,
             WalletTransactionType.FREEZE,
-            value.negate(),
+            BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP),
             wallet.getBalance(),
             refType,
             refId,
-            remark
+            remark + "（冻结 " + value + "）"
         );
         return getWallet(userId);
     }
@@ -121,11 +123,11 @@ public class WalletService {
         record(
             userId,
             WalletTransactionType.UNFREEZE,
-            value,
+            BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP),
             wallet.getBalance(),
             refType,
             refId,
-            remark
+            remark + "（解冻 " + value + "）"
         );
         return getWallet(userId);
     }
