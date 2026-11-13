@@ -4,6 +4,7 @@ import com.linzu.common.api.PageResult;
 import com.linzu.common.api.Result;
 import com.linzu.common.security.AuthContext;
 import com.linzu.common.security.RequirePermission;
+import com.linzu.order.service.OrderService;
 import com.linzu.wallet.dto.AdjustBalanceRequest;
 import com.linzu.wallet.dto.FreezeRequest;
 import com.linzu.wallet.dto.WalletResponse;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class WalletController {
 
     private final WalletService walletService;
+    private final OrderService orderService;
 
     @Operation(summary = "获取钱包")
     @GetMapping
@@ -73,12 +75,12 @@ public class WalletController {
 
     /**
      * 兼容宋嘉幸现有钱包页的 /wallet/deposits 接口。
-     * 押金明细需要订单域数据，订单接口完成前先返回空列表。
+     * 押金明细来自订单域：最近 20 笔押金大于 0 的租入订单。
      */
     @Operation(summary = "押金明细（兼容旧前端）")
     @GetMapping("/deposits")
     public Result<List<Map<String, Object>>> deposits() {
-        return Result.ok(List.of());
+        return Result.ok(orderService.recentDeposits(AuthContext.requireUserId()));
     }
 
     @Operation(summary = "冻结余额")

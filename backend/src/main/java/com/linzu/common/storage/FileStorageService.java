@@ -62,8 +62,15 @@ public class FileStorageService {
     }
 
     public String storeAvatar(MultipartFile file) {
+        return storeImage(file, "avatars");
+    }
+
+    /**
+     * 通用图片存储，folder 决定子目录，例如 avatars / items。
+     */
+    public String storeImage(MultipartFile file, String folder) {
         if (file == null || file.isEmpty()) {
-            throw new BusinessException(ErrorCode.PARAM_ERROR, "请选择头像文件");
+            throw new BusinessException(ErrorCode.PARAM_ERROR, "请选择图片文件");
         }
         if (file.getSize() > maxAvatarBytes) {
             throw new BusinessException(ErrorCode.FILE_TOO_LARGE);
@@ -81,8 +88,11 @@ public class FileStorageService {
             throw new BusinessException(ErrorCode.FILE_TYPE_NOT_SUPPORTED);
         }
 
+        String safeFolder = folder == null || folder.isBlank()
+            ? "misc"
+            : folder.replaceAll("[^a-zA-Z0-9_-]", "");
         String relativePath =
-            "avatars/" + LocalDate.now().format(DATE_PATH) + "/" + UUID.randomUUID() + "." + extension;
+            safeFolder + "/" + LocalDate.now().format(DATE_PATH) + "/" + UUID.randomUUID() + "." + extension;
         Path target = root.resolve(relativePath).normalize();
         if (!target.startsWith(root)) {
             throw new BusinessException(ErrorCode.PARAM_ERROR, "文件路径不合法");
