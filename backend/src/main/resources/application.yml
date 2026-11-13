@@ -20,6 +20,10 @@ spring:
   mvc:
     problemdetails:
       enabled: false
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 3MB
 
 mybatis-plus:
   configuration:
@@ -37,15 +41,40 @@ springdoc:
     operations-sorter: method
 
 app:
+  captcha:
+    # 演示环境开启；本地调试如需绕过可设 CAPTCHA_ENABLED=false
+    enabled: ${CAPTCHA_ENABLED:true}
+    expire-seconds: 120
+  upload:
+    dir: ${UPLOAD_DIR:./uploads}
+    public-prefix: /uploads
+    max-avatar-bytes: 2097152
+  security:
+    # 生产环境必须通过 ID_CARD_KEY 覆盖，长度至少 32 字符
+    id-card-key: ${ID_CARD_KEY:linzu-demo-id-card-key-change-me-32chars}
   jwt:
     # 生产环境必须通过 JWT_SECRET 环境变量覆盖，长度至少 32 字节
     secret: ${JWT_SECRET:linzu-demo-secret-key-change-me-32bytes}
     expire-hours: 72
+  order:
+    # 平台佣金比例（0-1），结算时从租金中扣除
+    commission-rate: ${ORDER_COMMISSION_RATE:0}
+    # 待支付超时（分钟）→ 自动取消
+    timeout-pay-minutes: 15
+    # 待接单超时（小时）→ 自动取消并退款
+    timeout-accept-hours: 24
+    # 待取物超时（小时）→ 自动取消并退款
+    timeout-pickup-hours: 48
+    # 待归还/待验收超时（天）→ 自动验收通过并结算
+    timeout-return-days: 7
   demo:
     # 首次启动时插入演示账号；不需要时设为 false
     seed: true
     username: Starling
     password: '123456'
     nickname: Starling
+    admin-username: admin
+    admin-password: 'admin123'
+    admin-nickname: 平台管理员
     # 演示阶段实名认证直接通过；接入管理端审核后改为 false
     auto-verify-real-name: true

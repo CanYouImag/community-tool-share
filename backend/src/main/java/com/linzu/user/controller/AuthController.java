@@ -2,11 +2,13 @@ package com.linzu.user.controller;
 
 import com.linzu.common.api.Result;
 import com.linzu.common.security.AuthContext;
+import com.linzu.user.dto.CaptchaResponse;
 import com.linzu.user.dto.LoginRequest;
 import com.linzu.user.dto.LoginResponse;
 import com.linzu.user.dto.RegisterRequest;
 import com.linzu.user.dto.UserProfileResponse;
 import com.linzu.user.service.AuthService;
+import com.linzu.user.service.CaptchaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -24,6 +26,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+    private final CaptchaService captchaService;
+
+    @Operation(summary = "获取图形验证码")
+    @GetMapping("/captcha")
+    public Result<CaptchaResponse> captcha() {
+        return Result.ok(captchaService.create());
+    }
 
     @Operation(summary = "注册")
     @PostMapping("/register")

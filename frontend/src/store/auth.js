@@ -82,6 +82,13 @@ export const useAuthStore = defineStore('auth', {
       return user;
     },
 
+    async uploadAvatar(file) {
+      const user = await authApi.uploadAvatar(file);
+      this.user = user;
+      persistUser(user);
+      return user;
+    },
+
     async changePassword(form) {
       await authApi.changePassword(form);
     },

@@ -6,16 +6,11 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.Data;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
-/**
- * 订单（最小载体）：仅为「发起纠纷」提供订单号与金额快照，
- * 完整订单状态机由设计员（窦源泽）补充。
- */
 @Data
 @TableName("t_order")
 public class Order {
@@ -23,21 +18,53 @@ public class Order {
     @TableId(type = IdType.AUTO)
     private Long id;
 
+    /** 业务单号 */
+    private String orderNo;
+
     private Long itemId;
 
+    /** 下单时物品标题快照 */
     private String itemTitle;
 
-    private Long communityId;
+    /** 下单时物品封面图快照 */
+    private String itemImage;
+
+    private Long lessorId;
 
     private Long renterId;
 
-    private Long ownerId;
+    private LocalDate startDate;
 
-    private BigDecimal depositAmount;
+    private LocalDate endDate;
+
+    private Integer days;
 
     private BigDecimal rentAmount;
 
+    private BigDecimal depositAmount;
+
+    /** 平台佣金，结算时从租金中扣除 */
+    private BigDecimal commissionAmount;
+
+    /** PENDING_PAYMENT、PENDING_ACCEPT、PENDING_PICKUP、IN_USE、PENDING_RETURN、PENDING_INSPECT、COMPLETED、CANCELLED、DISPUTED */
     private String status;
+
+    /** 取物码，验码取物后置空 */
+    private String pickupCode;
+
+    private String cancelReason;
+
+    private LocalDateTime paidAt;
+
+    private LocalDateTime acceptedAt;
+
+    private LocalDateTime pickupAt;
+
+    private LocalDateTime returnAt;
+
+    private LocalDateTime completedAt;
+
+    private LocalDateTime cancelledAt;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
@@ -46,6 +73,5 @@ public class Order {
     private LocalDateTime updatedAt;
 
     @TableLogic
-    @JsonIgnore
     private Integer deleted;
 }

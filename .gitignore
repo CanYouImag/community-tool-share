@@ -24,6 +24,10 @@ venv/
 .env.*
 !.env.example
 
+# ===== 本地上传文件 =====
+backend/uploads/
+uploads/
+
 # ===== IDE / 编辑器 =====
 .idea/
 *.iml

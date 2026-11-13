@@ -8,4 +8,5 @@ public enum WalletTransactionType {
     COMMISSION,
     WITHDRAW,
     REFUND,
+    ADMIN_ADJUST,
 }
