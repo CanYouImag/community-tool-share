@@ -59,7 +59,8 @@ public class DemoDataInitializer implements CommandLineRunner {
             "13800000000",
             "演示用户",
             "220101199001011232",
-            new BigDecimal("500.00")
+            new BigDecimal("500.00"),
+            BigDecimal.ZERO
         );
         seedUser(
             adminUsername,
@@ -69,7 +70,20 @@ public class DemoDataInitializer implements CommandLineRunner {
             "13900000000",
             "平台管理员",
             "220101199001011240",
+            BigDecimal.ZERO,
             BigDecimal.ZERO
+        );
+        // 租客演示账号：与 Starling（物主）配对，用于演示订单与纠纷（押金 50 已在演示种子订单中冻结）
+        seedUser(
+            "shuling",
+            "123456",
+            "钟姝伶",
+            "CERTIFIED",
+            "13700000000",
+            "钟姝伶",
+            "220101199001011250",
+            new BigDecimal("200.00"),
+            new BigDecimal("50.00")
         );
     }
 
@@ -81,7 +95,8 @@ public class DemoDataInitializer implements CommandLineRunner {
         String phone,
         String realName,
         String idCardNo,
-        BigDecimal balance
+        BigDecimal balance,
+        BigDecimal frozenBalance
     ) {
         Long exists = userMapper.selectCount(
             Wrappers
@@ -115,7 +130,7 @@ public class DemoDataInitializer implements CommandLineRunner {
         Wallet wallet = new Wallet();
         wallet.setUserId(user.getId());
         wallet.setBalance(balance);
-        wallet.setFrozenBalance(BigDecimal.ZERO);
+        wallet.setFrozenBalance(frozenBalance == null ? BigDecimal.ZERO : frozenBalance);
         wallet.setTotalIncome(BigDecimal.ZERO);
         wallet.setVersion(0);
         walletMapper.insert(wallet);

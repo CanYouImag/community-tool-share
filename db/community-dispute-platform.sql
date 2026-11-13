@@ -77,24 +77,30 @@ CREATE TABLE IF NOT EXISTS t_community_join_apply (
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '社区加入申请';
 
 -- ===== 演示种子数据（幂等，可重复执行）=====
+-- 用户 ID 约定（由后端 DemoDataInitializer 运行时创建，插入顺序固定）：
+--   id=1 Starling（认证居民，物主）  id=2 admin（平台管理员）  id=3 shuling（认证居民，租客）
 INSERT IGNORE INTO t_community (id, name, intro, cover_url, auto_approve, member_count, item_count, status) VALUES
-    (1, '青禾社区', '取物和归还时请核对配件并拍照。', NULL, 0, 1, 0, 'ACTIVE'),
-    (2, '梧桐里社区', '欢迎新邻居加入，共享闲置工具。', NULL, 0, 1, 0, 'ACTIVE'),
-    (3, '松柏社区', '本周六社区置换活动，欢迎参加。', NULL, 1, 0, 0, 'ACTIVE');
+    (1, '青禾社区', '取物和归还时请核对配件并拍照。', NULL, 0, 3, 1, 'ACTIVE'),
+    (2, '梧桐里社区', '欢迎新邻居加入，共享闲置工具。', NULL, 1, 0, 0, 'ACTIVE');
 
--- 社区成员：admin(id=1) 为青禾社区管理员，Starling(id=2) 为梧桐里成员
+-- 社区成员：admin(2) 为青禾社区管理员，Starling(1) 物主、shuling(3) 租客为成员
 INSERT IGNORE INTO t_community_member (id, community_id, user_id, role, status) VALUES
-    (1, 1, 1, 'ADMIN', 'ACTIVE'),
-    (2, 2, 2, 'MEMBER', 'ACTIVE');
+    (1, 1, 2, 'ADMIN', 'ACTIVE'),
+    (2, 1, 1, 'MEMBER', 'ACTIVE'),
+    (3, 1, 3, 'MEMBER', 'ACTIVE');
 
 -- 社区公告（青禾社区）
 INSERT IGNORE INTO t_community_announcement (id, community_id, title, content, created_by) VALUES
-    (1, 1, '青禾社区公约', '借用工具请提前一天预约，归还时当面清点配件。', 1),
-    (2, 1, '周末工具共享日', '本周六下午 2 点在社区活动室举办工具共享与维修小课堂。', 1);
+    (1, 1, '青禾社区公约', '借用工具请提前一天预约，归还时当面清点配件。', 2),
+    (2, 1, '周末工具共享日', '本周六下午 2 点在社区活动室举办工具共享与维修小课堂。', 2);
 
--- 入社申请：Starling 申请加入青禾社区（待审核）
-INSERT IGNORE INTO t_community_join_apply (id, community_id, user_id, apply_reason, status) VALUES
-    (1, 1, 2, '新搬来青禾小区，想借用家用工具。', 'PENDING');
+-- 物品（物主 Starling=1，社区 1，已上架，供下单/纠纷演示）
+INSERT IGNORE INTO t_item (id, category_id, owner_id, community_id, title, description, condition_level, rent_per_day, deposit, location, status) VALUES
+    (1, 1, 1, 1, '18V 充电式电钻', '八成新，含两块电池与充电器。', 'GOOD', 30.00, 50.00, '青禾社区 3 号楼 2 单元', 'LISTED');
+
+-- 订单（已完成；押金 50 已冻结在租客 shuling=3 钱包，供「提出扣留押金」从零发起纠纷）
+INSERT IGNORE INTO t_order (id, order_no, item_id, item_title, item_image, community_id, lessor_id, renter_id, start_date, end_date, days, rent_amount, deposit_amount, commission_amount, status) VALUES
+    (1, 'SO202611130001', 1, '18V 充电式电钻', NULL, 1, 1, 3, '2026-11-10', '2026-11-12', 3, 90.00, 50.00, 0.00, 'COMPLETED');
 
 -- ===== 纠纷与举报 =====
 
@@ -187,10 +193,9 @@ CREATE TABLE IF NOT EXISTS t_report (
 -- 说明：初始不预置纠纷——三个种子订单（101/102/201）押金均已冻结、尚未发起纠纷，
 --       物主可从「提出扣留押金」从零发起，便于完整演示「提出 → 租客回应 → 调解 → 仲裁」闭环。
 
--- 举报（待处理）
+-- 举报（待处理；shuling=3 举报种子物品 id=1）
 INSERT IGNORE INTO t_report (id, reporter_id, community_id, target_type, target_id, reason_type, description) VALUES
-    (1, 2, 1, 'ITEM', 101, 'FALSE_INFO', '该电钻详情页标注功率 800W，实际铭牌仅 500W，涉嫌虚假描述。'),
-    (2, 2, 1, 'ITEM', 102, 'ILLEGAL_CONTENT', '该物品详情图片包含违规内容，请平台核实下架。');
+    (1, 3, 1, 'ITEM', 1, 'FALSE_INFO', '该电钻详情页标注功率 800W，实际铭牌仅 500W，涉嫌虚假描述。');
 
 -- ===== 平台治理 =====
 

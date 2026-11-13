@@ -13,6 +13,7 @@ public record OrderResponse(
     Long itemId,
     String itemTitle,
     String itemImage,
+    Long communityId,
     Long lessorId,
     Long renterId,
     LocalDate startDate,

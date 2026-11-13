@@ -11,7 +11,6 @@ import {
   submitReport,
 } from '@/api/modules/dispute';
 import { getMyOrders } from '@/api/modules/order';
-import { getMyMemberships } from '@/api/modules/community';
 import StatusBadge from '@/components/StatusBadge.vue';
 import ViewTabs from '@/components/ViewTabs.vue';
 import { formatAmount, formatDateTime } from '@/utils/format';
@@ -28,7 +27,6 @@ const activeTab = ref('new');
 
 // —— 提出扣留押金（仅物主） ——
 const orders = ref([]);
-const myCommunityId = ref('');
 const form = ref({
   orderId: '',
   communityId: '',
@@ -65,20 +63,8 @@ const reportDone = ref(false);
 
 async function load() {
   await loadMyDisputes();
-  await loadMyCommunity();
   await loadOrders();
   await loadAwards();
-}
-
-// 纠纷所属社区：订单/物品域未落 community_id（窦源泽的物品用 location 字符串），
-// 此处暂以物主（出租者）已加入的社区作为纠纷所属社区，供调解/仲裁按社区分派。
-async function loadMyCommunity() {
-  const memberships = (await getMyMemberships()) || [];
-  const joined = memberships.find((m) => m.status === 'JOINED');
-  myCommunityId.value = joined ? String(joined.id) : '';
-  if (!form.value.communityId) {
-    form.value.communityId = myCommunityId.value;
-  }
 }
 
 async function loadOrders() {
@@ -103,7 +89,7 @@ async function loadOrders() {
 function onOrderChange() {
   const o = orders.value.find((x) => String(x.id) === form.value.orderId);
   if (!o) return;
-  form.value.communityId = myCommunityId.value;
+  form.value.communityId = o.communityId == null ? '' : String(o.communityId);
   form.value.depositAmount = o.depositAmount ?? '';
   form.value.rentAmount = o.rentAmount ?? '';
 }

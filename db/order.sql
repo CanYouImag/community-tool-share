@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS t_order (
   item_id BIGINT NOT NULL COMMENT '物品 ID',
   item_title VARCHAR(64) NOT NULL COMMENT '下单时物品标题快照',
   item_image VARCHAR(255) DEFAULT NULL COMMENT '下单时物品封面图快照',
+  community_id BIGINT DEFAULT NULL COMMENT '所属社区 ID（下单时从物品快照）',
   lessor_id BIGINT NOT NULL COMMENT '出租人用户 ID',
   renter_id BIGINT NOT NULL COMMENT '租客用户 ID',
   start_date DATE NOT NULL COMMENT '租期开始日期',

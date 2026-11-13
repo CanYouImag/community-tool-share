@@ -440,6 +440,7 @@ public class ItemService {
         item.setConditionLevel(request.conditionLevel());
         item.setRentPerDay(request.rentPerDay().setScale(2, RoundingMode.HALF_UP));
         item.setDeposit(request.deposit().setScale(2, RoundingMode.HALF_UP));
+        item.setCommunityId(request.communityId());
         item.setLocation(request.location().trim());
     }
 
@@ -501,6 +502,7 @@ public class ItemService {
             owner == null ? null : owner.getNickname(),
             owner == null ? null : owner.getAvatarUrl(),
             owner == null ? null : owner.getCreditScore(),
+            item.getCommunityId(),
             item.getTitle(),
             item.getDescription(),
             item.getConditionLevel(),

@@ -11,10 +11,9 @@ services:
     ports:
       - "3307:3306"
     volumes:
-      # 顺序即执行顺序：先用户/钱包，再订单（纠纷引用 t_order），最后治理
-      - ./db/user-wallet.sql:/docker-entrypoint-initdb.d/01-user-wallet.sql:ro
-      - ./db/order.sql:/docker-entrypoint-initdb.d/02-order.sql:ro
-      - ./db/community-dispute-platform.sql:/docker-entrypoint-initdb.d/03-governance.sql:ro
+      # 顺序即执行顺序：先核心域（用户/钱包/物品/订单），再社区与纠纷治理（引用 t_user/t_order 并落种子）
+      - ./db/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./db/community-dispute-platform.sql:/docker-entrypoint-initdb.d/02-governance.sql:ro
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-proot"]
       interval: 10s

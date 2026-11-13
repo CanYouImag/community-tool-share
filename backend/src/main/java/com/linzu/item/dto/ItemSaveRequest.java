@@ -32,6 +32,8 @@ public record ItemSaveRequest(
     @DecimalMin(value = "0", message = "押金不能为负")
     BigDecimal deposit,
 
+    Long communityId,
+
     @NotBlank(message = "取还地点不能为空")
     @Size(max = 128, message = "地点最长 128 字")
     String location,

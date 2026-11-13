@@ -29,6 +29,9 @@ public class Order {
     /** 下单时物品封面图快照 */
     private String itemImage;
 
+    /** 所属社区 ID（下单时从物品快照） */
+    private Long communityId;
+
     private Long lessorId;
 
     private Long renterId;

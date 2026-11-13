@@ -51,11 +51,11 @@ docker compose up -d --build
 
 | 账号 | 密码 | 角色 |
 |---|---|---|
-| admin | admin123 | 平台管理员（PLATFORM_ADMIN），兼任社区 1 管理员 |
-| Starling | 123456 | 认证居民（钱包余额 500、冻结押金 190），社区 2 成员 |
-| shuling | 123456 | 注册居民（未认证，用于演示加入社区） |
+| admin | admin123 | 平台管理员（PLATFORM_ADMIN），兼任青禾社区（id=1）管理员 |
+| Starling | 123456 | 认证居民，物主（钱包余额 500）；青禾社区成员，名下有种子物品「电钻」与一笔已完成订单 |
+| shuling | 123456 | 认证居民，租客（钱包余额 200、冻结押金 50）；青禾社区成员，对应上述订单的租客 |
 
-> 社区管理员在运行时由 admin 在「平台管理 → 社区管理」任命产生（被任命者重新登录后生效）；被任命前无预置社区管理员账号。
+> 演示数据由 `backend` 的 DemoDataInitializer（用户/钱包）与 `db/community-dispute-platform.sql`（社区/物品/订单/举报种子）在首次启动时写入，用户 ID 固定为 Starling=1、admin=2、shuling=3。
 
 ## 端口说明
 

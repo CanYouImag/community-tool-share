@@ -16,6 +16,7 @@ public record ItemResponse(
     String ownerNickname,
     String ownerAvatar,
     Integer ownerCreditScore,
+    Long communityId,
     String title,
     String description,
     String conditionLevel,

@@ -104,6 +104,7 @@ public class OrderService {
         order.setItemId(item.getId());
         order.setItemTitle(item.getTitle());
         order.setItemImage(firstImage(item.getId()));
+        order.setCommunityId(item.getCommunityId());
         order.setLessorId(item.getOwnerId());
         order.setRenterId(renterId);
         order.setStartDate(start);
@@ -543,6 +544,7 @@ public class OrderService {
             order.getItemId(),
             order.getItemTitle(),
             order.getItemImage(),
+            order.getCommunityId(),
             order.getLessorId(),
             order.getRenterId(),
             order.getStartDate(),

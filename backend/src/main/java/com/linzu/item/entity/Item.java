@@ -21,6 +21,9 @@ public class Item {
 
     private Long ownerId;
 
+    /** 所属社区 ID */
+    private Long communityId;
+
     private String title;
 
     private String description;
