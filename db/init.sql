@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS t_item (
   community_id BIGINT DEFAULT NULL COMMENT '所属社区 ID（社区域）',
   title VARCHAR(64) NOT NULL COMMENT '标题',
   description VARCHAR(2000) DEFAULT NULL COMMENT '描述',
-  condition VARCHAR(64) NOT NULL COMMENT '成色说明（自由文本，需求基线 UC-C5）',
+  condition_desc VARCHAR(64) NOT NULL COMMENT '成色说明（自由文本，需求基线 UC-C5）',
   rent_per_day DECIMAL(10, 2) NOT NULL COMMENT '日租金',
   deposit DECIMAL(10, 2) NOT NULL DEFAULT 0.00 COMMENT '押金',
   location VARCHAR(128) DEFAULT NULL COMMENT '取还地点（可选）',
