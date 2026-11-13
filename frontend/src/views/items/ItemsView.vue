@@ -3,13 +3,12 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 import { getCommunities } from '@/api/modules/community';
-import { getItems } from '@/api/modules/item';
+import { getCategories, getFavorites, getItems } from '@/api/modules/item';
 import EmptyState from '@/components/EmptyState.vue';
 import ItemCard from '@/components/ItemCard.vue';
 import Pagination from '@/components/Pagination.vue';
 import ViewTabs from '@/components/ViewTabs.vue';
 import { useUserStore } from '@/store/user';
-import { ITEM_CATEGORY } from '@/utils/constants';
 import { ITEM_SORT_OPTIONS, parsePriceRange } from '@/utils/itemFilters';
 import { itemListQuery, readItemListQuery } from '@/utils/itemListRoute';
 
@@ -26,16 +25,17 @@ const total = ref(0);
 const loading = ref(true);
 const error = ref('');
 const keyword = ref('');
-const category = ref('');
+const categoryId = ref('');
 const minPrice = ref('');
 const maxPrice = ref('');
 const filterError = ref('');
-const sort = ref('latest');
+const sort = ref('newest');
 const activeTab = ref('browse');
 const communities = ref([]);
+const categories = ref([]);
 const communityLoading = ref(false);
 const communityError = ref('');
-const communitySelection = ref(user.isLoggedIn ? 'joined' : 'all');
+const communitySelection = ref('all');
 const page = ref(1);
 const pageSize = ref(6);
 const appliedQuery = ref(null);
@@ -48,12 +48,12 @@ let successfulQueryKey = '';
 
 function restoreFields(query) {
   keyword.value = query.keyword;
-  category.value = query.category;
+  categoryId.value = query.categoryId;
   minPrice.value = query.minPrice ?? '';
   maxPrice.value = query.maxPrice ?? '';
   sort.value = query.sort;
   activeTab.value = query.favoritesOnly ? 'favorites' : 'browse';
-  communitySelection.value = query.communityId || query.communityScope;
+  communitySelection.value = query.communityId || 'all';
   pageSize.value = query.size;
   filterError.value = '';
 }
@@ -92,16 +92,21 @@ async function loadCommunities() {
   }
 }
 
+async function loadCategories() {
+  try {
+    categories.value = await getCategories();
+  } catch {
+    categories.value = [];
+  }
+}
+
 function buildQuery() {
   return {
     keyword: keyword.value.trim(),
-    category: category.value,
+    categoryId: categoryId.value || undefined,
     favoritesOnly: activeTab.value === 'favorites',
     sort: sort.value,
-    communityScope: communitySelection.value === 'joined' ? 'joined' : 'all',
-    communityId: ['joined', 'all'].includes(communitySelection.value)
-      ? undefined
-      : communitySelection.value,
+    communityId: communitySelection.value === 'all' ? undefined : communitySelection.value,
     size: pageSize.value,
     ...parsePriceRange(minPrice.value, maxPrice.value),
   };
@@ -109,12 +114,12 @@ function buildQuery() {
 
 function clearFilters() {
   keyword.value = '';
-  category.value = '';
+  categoryId.value = '';
   minPrice.value = '';
   maxPrice.value = '';
-  sort.value = 'latest';
+  sort.value = 'newest';
   filterError.value = '';
-  communitySelection.value = user.isLoggedIn && activeTab.value === 'browse' ? 'joined' : 'all';
+  communitySelection.value = 'all';
 }
 
 function switchTab(tab) {
@@ -172,7 +177,9 @@ async function loadItems(query, targetPage = 1) {
   lastRequest.value = { query, page: targetPage };
 
   try {
-    const data = await getItems({ ...query, page: targetPage });
+    const data = query.favoritesOnly
+      ? await getFavorites({ page: targetPage, size: query.size })
+      : await getItems({ ...query, page: targetPage });
     if (version !== requestVersion || route.name !== 'items') return;
     items.value = data.records;
     total.value = data.total;
@@ -209,7 +216,10 @@ watch(
   { immediate: true },
 );
 
-onMounted(loadCommunities);
+onMounted(() => {
+  loadCommunities();
+  loadCategories();
+});
 onBeforeUnmount(() => {
   requestVersion++;
 });
@@ -246,9 +256,8 @@ onBeforeUnmount(() => {
             :disabled="loading || communityLoading"
             @change="searchItems"
           >
-            <option v-if="user.isLoggedIn" value="joined">已加入社区</option>
             <option value="all">全部社区</option>
-            <option v-for="community in communities" :key="community.id" :value="community.id">
+            <option v-for="community in communities" :key="community.id" :value="String(community.id)">
               {{ community.name }}
             </option>
           </select>
@@ -266,10 +275,10 @@ onBeforeUnmount(() => {
 
         <label class="field">
           <span>分类</span>
-          <select v-model="category" :disabled="loading">
+          <select v-model="categoryId" :disabled="loading">
             <option value="">全部分类</option>
-            <option v-for="name in ITEM_CATEGORY" :key="name" :value="name">
-              {{ name }}
+            <option v-for="c in categories" :key="c.id" :value="String(c.id)">
+              {{ c.name }}
             </option>
           </select>
         </label>

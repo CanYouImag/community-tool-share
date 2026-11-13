@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 
-import { deleteItem, getMyItems, updateItemStatus } from '@/api/modules/item';
+import { deleteItem, getMyItems, shelfItem } from '@/api/modules/item';
 import EmptyState from '@/components/EmptyState.vue';
 import StatusBadge from '@/components/StatusBadge.vue';
 import { useUserStore } from '@/store/user';
@@ -34,13 +34,13 @@ async function changeStatus(item) {
   if (savingId.value || loading.value) return;
   if (!checkManagePermission()) return;
 
-  const nextStatus = item.status === 'AVAILABLE' ? 'PAUSED' : 'AVAILABLE';
+  const isListed = item.status === 'LISTED';
 
   savingId.value = item.id;
   actionError.value = '';
 
   try {
-    await updateItemStatus(item.id, nextStatus);
+    await shelfItem(item.id, !isListed);
     await loadMyItems();
   } catch (err) {
     actionError.value = err.message || '操作失败，请重试';
@@ -164,7 +164,7 @@ onMounted(loadMyItems);
             <tr v-for="item in items" :key="item.id">
               <td>{{ item.title }}</td>
               <td>{{ item.communityName }}</td>
-              <td>{{ formatMoney(item.dailyPrice) }}</td>
+              <td>{{ formatMoney(item.rentPerDay) }}</td>
               <td>{{ formatMoney(item.deposit) }}</td>
               <td>
                 <StatusBadge
@@ -177,7 +177,7 @@ onMounted(loadMyItems);
                   v-if="
                     user.isCertified &&
                     !savingId &&
-                    ['PENDING_REVIEW', 'AVAILABLE', 'REJECTED', 'PAUSED'].includes(item.status)
+                    ['PENDING_REVIEW', 'REJECTED', 'LISTED', 'DELISTED'].includes(item.status)
                   "
                   class="btn small"
                   :to="{ name: 'edit-item', params: { id: item.id } }"
@@ -185,7 +185,7 @@ onMounted(loadMyItems);
                   编辑
                 </router-link>
                 <button
-                  v-if="user.isCertified && ['AVAILABLE', 'PAUSED'].includes(item.status)"
+                  v-if="user.isCertified && ['LISTED', 'DELISTED'].includes(item.status)"
                   class="btn small"
                   type="button"
                   :disabled="Boolean(savingId)"
@@ -194,9 +194,9 @@ onMounted(loadMyItems);
                   {{
                     savingId === item.id
                       ? '处理中…'
-                      : item.status === 'AVAILABLE'
-                        ? '暂停出租'
-                        : '恢复出租'
+                      : item.status === 'LISTED'
+                        ? '下架'
+                        : '重新上架'
                   }}
                 </button>
                 <button

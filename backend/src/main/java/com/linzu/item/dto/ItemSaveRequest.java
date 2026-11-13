@@ -21,8 +21,8 @@ public record ItemSaveRequest(
     @Size(max = 2000, message = "描述最长 2000 字")
     String description,
 
-    @NotBlank(message = "成色不能为空")
-    String conditionLevel,
+    @NotBlank(message = "成色说明不能为空")
+    String condition,
 
     @NotNull(message = "日租金不能为空")
     @DecimalMin(value = "0.01", message = "日租金必须大于 0")
@@ -34,7 +34,6 @@ public record ItemSaveRequest(
 
     Long communityId,
 
-    @NotBlank(message = "取还地点不能为空")
     @Size(max = 128, message = "地点最长 128 字")
     String location,
 

@@ -46,12 +46,14 @@ async function toggleFavorite() {
   favoriteError.value = '';
 
   try {
-    const result = target.favorited
-      ? await unfavoriteItem(target.id)
-      : await favoriteItem(target.id);
+    if (target.favorited) {
+      await unfavoriteItem(target.id);
+    } else {
+      await favoriteItem(target.id);
+    }
 
     if (item.value === target) {
-      target.favorited = result.favorited;
+      target.favorited = !target.favorited;
     }
   } catch (err) {
     if (item.value === target) {
@@ -149,12 +151,12 @@ watch(
 
       <section class="panel">
         <h2>{{ item.title }}</h2>
-        <p class="muted">{{ item.category }} / {{ item.communityName }}</p>
+        <p class="muted">{{ item.categoryName }} / {{ item.communityName }}</p>
 
         <hr class="rule" />
 
         <p class="price">
-          {{ formatMoney(item.dailyPrice) }}
+          {{ formatMoney(item.rentPerDay) }}
           <small>/ 天</small>
         </p>
 
@@ -175,11 +177,11 @@ watch(
           </div>
           <div>
             <dt>出借人</dt>
-            <dd>{{ item.owner }}</dd>
+            <dd>{{ item.ownerNickname }}</dd>
           </div>
           <div>
             <dt>信用分</dt>
-            <dd>{{ item.ownerCredit }}</dd>
+            <dd>{{ item.ownerCreditScore }}</dd>
           </div>
           <div>
             <dt>所属社区</dt>

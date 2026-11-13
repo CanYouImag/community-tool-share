@@ -1,8 +1,9 @@
+// 排序值对齐后端 search 接口：newest/price_asc/price_desc/hot
 export const ITEM_SORT_OPTIONS = [
-  { value: 'latest', label: '最新发布' },
+  { value: 'newest', label: '最新发布' },
   { value: 'price_asc', label: '价格从低到高' },
   { value: 'price_desc', label: '价格从高到低' },
-  { value: 'rating_desc', label: '评分优先' },
+  { value: 'hot', label: '最热' },
 ];
 
 export function paginateItems(items, page = 1, size = 10) {

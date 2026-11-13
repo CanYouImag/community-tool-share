@@ -28,10 +28,8 @@ public class Item {
 
     private String description;
 
-    /**
-     * 成色：NEW 全新 / LIKE_NEW 九成新 / GOOD 八成新 / FAIR 明显使用痕迹
-     */
-    private String conditionLevel;
+    /** 成色说明（自由文本，需求基线 UC-C5） */
+    private String condition;
 
     /**
      * 日租金

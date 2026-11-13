@@ -95,8 +95,8 @@ INSERT IGNORE INTO t_community_announcement (id, community_id, title, content, c
     (2, 1, '周末工具共享日', '本周六下午 2 点在社区活动室举办工具共享与维修小课堂。', 2);
 
 -- 物品（物主 Starling=1，社区 1，已上架，供下单/纠纷演示）
-INSERT IGNORE INTO t_item (id, category_id, owner_id, community_id, title, description, condition_level, rent_per_day, deposit, location, status) VALUES
-    (1, 1, 1, 1, '18V 充电式电钻', '八成新，含两块电池与充电器。', 'GOOD', 30.00, 50.00, '青禾社区 3 号楼 2 单元', 'LISTED');
+INSERT IGNORE INTO t_item (id, category_id, owner_id, community_id, title, description, condition, rent_per_day, deposit, location, status) VALUES
+    (1, 1, 1, 1, '18V 充电式电钻', '八成新，含两块电池与充电器。', '九成新，功能正常', 30.00, 50.00, '青禾社区 3 号楼 2 单元', 'LISTED');
 
 -- 订单（已完成；押金 50 已冻结在租客 shuling=3 钱包，供「提出扣留押金」从零发起纠纷）
 INSERT IGNORE INTO t_order (id, order_no, item_id, item_title, item_image, community_id, lessor_id, renter_id, start_date, end_date, days, rent_amount, deposit_amount, commission_amount, status) VALUES
