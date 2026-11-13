@@ -12,7 +12,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
     "com.linzu.user.mapper",
     "com.linzu.wallet.mapper",
     "com.linzu.item.mapper",
-    "com.linzu.order.mapper"
+    "com.linzu.order.mapper",
+    "com.linzu.community.mapper",
+    "com.linzu.dispute.mapper",
+    "com.linzu.platform.mapper"
 })
 @EnableConfigurationProperties(JwtProperties.class)
 @EnableScheduling

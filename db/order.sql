@@ -2,6 +2,8 @@
 -- 说明：与 db/init.sql 基线保持同步；增量执行方式：mysql -uroot -p < db/order.sql
 -- 状态机：PENDING_PAYMENT → PENDING_ACCEPT → PENDING_PICKUP → IN_USE →
 --         PENDING_RETURN → PENDING_INSPECT → COMPLETED / CANCELLED / DISPUTED
+SET NAMES utf8mb4;
+
 USE linzu;
 
 CREATE TABLE IF NOT EXISTS t_order (
@@ -10,6 +12,7 @@ CREATE TABLE IF NOT EXISTS t_order (
   item_id BIGINT NOT NULL COMMENT '物品 ID',
   item_title VARCHAR(64) NOT NULL COMMENT '下单时物品标题快照',
   item_image VARCHAR(255) DEFAULT NULL COMMENT '下单时物品封面图快照',
+  community_id BIGINT DEFAULT NULL COMMENT '所属社区 ID（下单时从物品快照）',
   lessor_id BIGINT NOT NULL COMMENT '出租人用户 ID',
   renter_id BIGINT NOT NULL COMMENT '租客用户 ID',
   start_date DATE NOT NULL COMMENT '租期开始日期',

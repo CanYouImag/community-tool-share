@@ -7,6 +7,7 @@ import Pagination from '@/components/Pagination.vue';
 import StatusBadge from '@/components/StatusBadge.vue';
 import ViewTabs from '@/components/ViewTabs.vue';
 import { ORDER_STATUS_FILTER } from '@/utils/constants';
+import { formatMoney } from '@/utils/format';
 
 const tabs = [
   { id: 'borrow', label: '我租入的' },
@@ -14,24 +15,18 @@ const tabs = [
 ];
 
 const activeTab = ref('borrow'); // borrow | lend
-const keyword = ref('');
 const status = ref('');
 const list = ref([]);
 const total = ref(0);
 
 async function load() {
-  const role = activeTab.value;
-  const res = await getOrders({
-    role,
-    keyword: keyword.value,
-    status: status.value,
-  });
-  list.value = res.list;
-  total.value = res.total;
+  const role = activeTab.value === 'lend' ? 'lessor' : 'renter';
+  const res = await getOrders({ role, status: status.value });
+  list.value = res.records || [];
+  total.value = res.total || 0;
 }
 
 function resetFilters() {
-  keyword.value = '';
   status.value = '';
   load();
 }
@@ -84,6 +79,7 @@ onMounted(load);
   <main class="public-main">
     <header class="page-head">
       <h1>我的订单</h1>
+      <router-link class="btn primary" :to="{ name: 'dispute' }">提出扣留押金 / 举报</router-link>
     </header>
 
     <ViewTabs
@@ -96,10 +92,6 @@ onMounted(load);
     <section class="view-panel">
       <section class="panel">
         <div class="filters">
-          <label class="field">
-            <span>订单号 / 物品</span>
-            <input v-model="keyword" type="text" aria-label="订单号 / 物品" @keyup.enter="load" />
-          </label>
           <label class="field">
             <span>订单状态</span>
             <select v-model="status" aria-label="订单状态" @change="load">
@@ -133,9 +125,12 @@ onMounted(load);
                   {{ o.id }}
                   <small>{{ o.itemTitle }}</small>
                 </td>
-                <td>{{ activeTab === 'borrow' ? o.lender : o.borrower }}</td>
-                <td>{{ o.startDate.slice(5) }} 至 {{ o.endDate.slice(5) }}</td>
-                <td>¥{{ o.rent }} / ¥{{ o.deposit }}</td>
+                <td>{{ activeTab === 'borrow' ? o.lessorNickname : o.renterNickname }}</td>
+                <td>
+                  {{ o.startDate ? o.startDate.slice(5) : '—' }} 至
+                  {{ o.endDate ? o.endDate.slice(5) : '—' }}
+                </td>
+                <td>{{ formatMoney(o.rentAmount) }} / {{ formatMoney(o.depositAmount) }}</td>
                 <td><StatusBadge :status="o.status" /></td>
                 <td>
                   <router-link :to="orderLocation(o)">{{ actionText(o) }}</router-link>

@@ -1,22 +1,36 @@
 # 一键启动 MySQL / 后端 / 前端
-# 各服务代码就绪后按需完善环境变量与构建方式
+# 数据库名统一为 linzu（与 backend/application.yml 及各域建表脚本一致）
 services:
   db:
     image: mysql:8.0
     container_name: cts-db
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: community_tool_share
+      MYSQL_DATABASE: linzu
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     ports:
-      - '3306:3306'
+      - "3307:3306"
     volumes:
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      # 顺序即执行顺序：先核心域（用户/钱包/物品/订单），再社区与纠纷治理（引用 t_user/t_order 并落种子）
+      - ./db/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./db/community-dispute-platform.sql:/docker-entrypoint-initdb.d/02-governance.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   backend:
     build: ./backend
     container_name: cts-backend
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:mysql://db:3306/linzu?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      JWT_SECRET: linzu-demo-secret-key-change-me-32bytes
     ports:
       - '8080:8080'
 
@@ -26,4 +40,4 @@ services:
     depends_on:
       - backend
     ports:
-      - '5173:5173'
+      - "80:80"

@@ -57,7 +57,7 @@ public class ItemController {
     public Result<PageResult<ItemResponse>> search(
         @RequestParam(required = false) String keyword,
         @RequestParam(required = false) Long categoryId,
-        @RequestParam(required = false) String condition,
+        @RequestParam(required = false) Long communityId,
         @RequestParam(required = false) BigDecimal minPrice,
         @RequestParam(required = false) BigDecimal maxPrice,
         @RequestParam(defaultValue = "newest") String sort,
@@ -69,7 +69,7 @@ public class ItemController {
                 AuthContext.requireUserId(),
                 keyword,
                 categoryId,
-                condition,
+                communityId,
                 minPrice,
                 maxPrice,
                 sort,

@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "app.demo.seed", havingValue = "true")
+@Order(1)
 public class DemoDataInitializer implements CommandLineRunner {
 
     private final UserMapper userMapper;
@@ -60,6 +62,7 @@ public class DemoDataInitializer implements CommandLineRunner {
             "演示用户",
             "220101199001011232",
             new BigDecimal("500.00"),
+            BigDecimal.ZERO,
             "VERIFIED"
         );
         seedUser(
@@ -71,6 +74,21 @@ public class DemoDataInitializer implements CommandLineRunner {
             "平台管理员",
             "220101199001011240",
             BigDecimal.ZERO,
+            BigDecimal.ZERO,
+            "VERIFIED"
+        );
+        // 租客演示账号：与 Starling（物主）配对，用于演示订单与纠纷（两笔演示订单押金各 50，共 100 已冻结）
+        // 保持 shuling 为 3 号用户，与 db/community-dispute-platform.sql 的种子数据一致。
+        seedUser(
+            "shuling",
+            "123456",
+            "钟姝伶",
+            "CERTIFIED",
+            "13700000000",
+            "钟姝伶",
+            "220101199001011250",
+            new BigDecimal("200.00"),
+            new BigDecimal("100.00"),
             "VERIFIED"
         );
         // 给平台管理端留一条待审核实名认证，方便答辩演示审核通过/驳回。
@@ -79,10 +97,11 @@ public class DemoDataInitializer implements CommandLineRunner {
             "123456",
             "待审核用户",
             "REGISTERED",
-            "13700000000",
+            "13600000000",
             "待审核用户",
             "11010519491231002X",
             new BigDecimal("100.00"),
+            BigDecimal.ZERO,
             "PENDING"
         );
     }
@@ -96,6 +115,7 @@ public class DemoDataInitializer implements CommandLineRunner {
         String realName,
         String idCardNo,
         BigDecimal balance,
+        BigDecimal frozenBalance,
         String realNameStatus
     ) {
         Long exists = userMapper.selectCount(
@@ -130,7 +150,7 @@ public class DemoDataInitializer implements CommandLineRunner {
         Wallet wallet = new Wallet();
         wallet.setUserId(user.getId());
         wallet.setBalance(balance);
-        wallet.setFrozenBalance(BigDecimal.ZERO);
+        wallet.setFrozenBalance(frozenBalance == null ? BigDecimal.ZERO : frozenBalance);
         wallet.setTotalIncome(BigDecimal.ZERO);
         wallet.setVersion(0);
         walletMapper.insert(wallet);

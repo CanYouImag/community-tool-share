@@ -13,6 +13,7 @@ public record OrderResponse(
     Long itemId,
     String itemTitle,
     String itemImage,
+    Long communityId,
     Long lessorId,
     Long renterId,
     LocalDate startDate,
@@ -30,5 +31,7 @@ public record OrderResponse(
     LocalDateTime returnAt,
     LocalDateTime completedAt,
     LocalDateTime cancelledAt,
-    LocalDateTime createdAt
+    LocalDateTime createdAt,
+    String lessorNickname,
+    String renterNickname
 ) {}

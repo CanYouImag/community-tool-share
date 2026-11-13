@@ -3,9 +3,8 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 import { onBeforeRouteLeave, onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 
 import { getMyMemberships } from '@/api/modules/community';
-import { createItem, getMyItem, updateItem } from '@/api/modules/item';
+import { createItem, getCategories, getItem, updateItem, uploadItemImage } from '@/api/modules/item';
 import { useUserStore } from '@/store/user';
-import { ITEM_CATEGORY } from '@/utils/constants';
 
 const router = useRouter();
 const route = useRoute();
@@ -18,9 +17,9 @@ const submissionComplete = ref(false);
 
 const form = reactive({
   title: '',
-  category: '',
+  categoryId: '',
   communityId: '',
-  dailyPrice: '',
+  rentPerDay: '',
   deposit: '',
   condition: '',
   description: '',
@@ -29,6 +28,7 @@ const form = reactive({
 const error = ref('');
 const message = ref('');
 const joinedCommunities = ref([]);
+const categories = ref([]);
 const communityLoading = ref(true);
 const communityError = ref('');
 
@@ -72,14 +72,25 @@ async function loadJoinedCommunities() {
   }
 }
 
-onMounted(loadJoinedCommunities);
+async function loadCategories() {
+  try {
+    categories.value = await getCategories();
+  } catch {
+    categories.value = [];
+  }
+}
+
+onMounted(() => {
+  loadJoinedCommunities();
+  loadCategories();
+});
 
 const images = ref([]);
 const baseline = ref(null);
 
 function formSnapshot() {
   return {
-    fields: { ...form, dailyPrice: String(form.dailyPrice), deposit: String(form.deposit) },
+    fields: { ...form, rentPerDay: String(form.rentPerDay), deposit: String(form.deposit) },
     images: images.value.map((image) => image.url),
   };
 }
@@ -218,7 +229,7 @@ function checkForm() {
     return;
   }
 
-  if (!ITEM_CATEGORY.includes(form.category)) {
+  if (!form.categoryId) {
     error.value = '请选择物品分类';
     return;
   }
@@ -234,18 +245,6 @@ function checkForm() {
   }
 
   return true;
-}
-
-function readImage(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = () => reject(new Error(`图片读取失败：${file.name}`));
-    reader.onabort = () => reject(new Error('图片读取已取消'));
-
-    reader.readAsDataURL(file);
-  });
 }
 
 async function submitItem() {
@@ -265,9 +264,9 @@ async function submitItem() {
 
   const payload = {
     title: form.title.trim(),
-    category: form.category,
-    communityId: form.communityId,
-    dailyPrice: Number(form.dailyPrice),
+    categoryId: Number(form.categoryId),
+    communityId: Number(form.communityId),
+    rentPerDay: Number(form.rentPerDay),
     deposit: Number(form.deposit),
     condition: form.condition.trim(),
     description: form.description.trim(),
@@ -279,9 +278,14 @@ async function submitItem() {
   }));
 
   try {
-    payload.images = await Promise.all(
-      pictureSnapshot.map((image) => (image.file ? readImage(image.file) : image.url)),
-    );
+    // 新选择的文件上传到后端换取 URL，已保存的图片沿用原 URL
+    payload.images = (
+      await Promise.all(
+        pictureSnapshot.map((image) =>
+          image.file ? uploadItemImage(image.file).then((r) => r.url) : image.url,
+        ),
+      )
+    ).filter((url) => typeof url === 'string' && url.trim());
 
     if (editingId) {
       await updateItem(editingId, payload);
@@ -320,9 +324,9 @@ watch(
 
     Object.assign(form, {
       title: '',
-      category: '',
+      categoryId: '',
       communityId: joinedCommunities.value[0]?.id || '',
-      dailyPrice: '',
+      rentPerDay: '',
       deposit: '',
       condition: '',
       description: '',
@@ -335,20 +339,20 @@ watch(
     }
 
     try {
-      const item = await getMyItem(id);
+      const item = await getItem(id);
       if (cancelled) return;
 
       Object.assign(form, {
         title: item.title,
-        category: item.category,
+        categoryId: String(item.categoryId ?? ''),
         communityId: item.communityId,
-        dailyPrice: item.dailyPrice,
-        deposit: item.deposit,
+        rentPerDay: item.rentPerDay ?? '',
+        deposit: item.deposit ?? '',
         condition: item.condition || '',
         description: item.description || '',
       });
 
-      images.value = item.images.map((url, index) => ({
+      images.value = (item.images || []).map((url, index) => ({
         key: `saved-${index}`,
         file: null,
         url,
@@ -450,10 +454,10 @@ watch(
 
               <label class="field">
                 <span>分类 <em>*</em></span>
-                <select v-model="form.category" required>
+                <select v-model="form.categoryId" required>
                   <option value="" disabled>请选择分类</option>
-                  <option v-for="name in ITEM_CATEGORY" :key="name" :value="name">
-                    {{ name }}
+                  <option v-for="c in categories" :key="c.id" :value="String(c.id)">
+                    {{ c.name }}
                   </option>
                 </select>
               </label>
@@ -461,7 +465,7 @@ watch(
               <label class="field">
                 <span>日租金（元）<em>*</em></span>
                 <input
-                  v-model="form.dailyPrice"
+                  v-model="form.rentPerDay"
                   type="number"
                   min="0.01"
                   step="0.01"

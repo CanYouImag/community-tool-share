@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.linzu.common.api.PageResult;
 import com.linzu.common.exception.BusinessException;
 import com.linzu.common.exception.ErrorCode;
+import com.linzu.community.entity.Community;
+import com.linzu.community.mapper.CommunityMapper;
 import com.linzu.item.dto.CategoryRequest;
 import com.linzu.item.dto.CategoryResponse;
 import com.linzu.item.dto.ItemResponse;
@@ -25,7 +27,6 @@ import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +42,6 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 public class ItemService {
 
-    public static final Set<String> CONDITION_LEVELS = Set.of("NEW", "LIKE_NEW", "GOOD", "FAIR");
     private static final int MAX_IMAGES = 6;
 
     private final ItemMapper itemMapper;
@@ -49,6 +49,7 @@ public class ItemService {
     private final ItemImageMapper imageMapper;
     private final ItemFavoriteMapper favoriteMapper;
     private final UserService userService;
+    private final CommunityMapper communityMapper;
 
     // ==================== 分类（UC-C1） ====================
 
@@ -106,16 +107,13 @@ public class ItemService {
         Long viewerId,
         String keyword,
         Long categoryId,
-        String condition,
+        Long communityId,
         BigDecimal minPrice,
         BigDecimal maxPrice,
         String sort,
         long page,
         long size
     ) {
-        if (StringUtils.hasText(condition) && !CONDITION_LEVELS.contains(condition)) {
-            throw new BusinessException(ErrorCode.PARAM_ERROR, "成色筛选不合法");
-        }
         if (categoryId != null) {
             requireCategory(categoryId);
         }
@@ -127,7 +125,7 @@ public class ItemService {
         var wrapper = Wrappers.<Item>lambdaQuery()
             .eq(Item::getStatus, ItemStatus.LISTED.name())
             .eq(categoryId != null, Item::getCategoryId, categoryId)
-            .eq(StringUtils.hasText(condition), Item::getConditionLevel, condition)
+            .eq(communityId != null, Item::getCommunityId, communityId)
             .ge(minPrice != null, Item::getRentPerDay, minPrice)
             .le(maxPrice != null, Item::getRentPerDay, maxPrice)
             .orderByDesc(Item::getIsPinned);
@@ -422,9 +420,6 @@ public class ItemService {
     }
 
     private void validateSaveRequest(ItemSaveRequest request) {
-        if (!CONDITION_LEVELS.contains(request.conditionLevel())) {
-            throw new BusinessException(ErrorCode.PARAM_ERROR, "成色取值不合法");
-        }
         List<String> images = request.images();
         if (images != null && images.size() > MAX_IMAGES) {
             throw new BusinessException(ErrorCode.ITEM_IMAGE_TOO_MANY);
@@ -437,10 +432,11 @@ public class ItemService {
         item.setDescription(
             StringUtils.hasText(request.description()) ? request.description().trim() : null
         );
-        item.setConditionLevel(request.conditionLevel());
+        item.setConditionDesc(request.condition().trim());
         item.setRentPerDay(request.rentPerDay().setScale(2, RoundingMode.HALF_UP));
         item.setDeposit(request.deposit().setScale(2, RoundingMode.HALF_UP));
-        item.setLocation(request.location().trim());
+        item.setCommunityId(request.communityId());
+        item.setLocation(request.location() == null ? null : request.location().trim());
     }
 
     private void saveImages(Long itemId, List<String> images) {
@@ -454,6 +450,14 @@ public class ItemService {
             image.setSort(i);
             imageMapper.insert(image);
         }
+    }
+
+    private String resolveCommunityName(Long communityId) {
+        if (communityId == null) {
+            return null;
+        }
+        Community community = communityMapper.selectById(communityId);
+        return community == null ? null : community.getName();
     }
 
     private boolean isFavorite(Long userId, Long itemId) {
@@ -501,9 +505,11 @@ public class ItemService {
             owner == null ? null : owner.getNickname(),
             owner == null ? null : owner.getAvatarUrl(),
             owner == null ? null : owner.getCreditScore(),
+            item.getCommunityId(),
+            resolveCommunityName(item.getCommunityId()),
             item.getTitle(),
             item.getDescription(),
-            item.getConditionLevel(),
+            item.getConditionDesc(),
             item.getRentPerDay(),
             item.getDeposit(),
             item.getLocation(),

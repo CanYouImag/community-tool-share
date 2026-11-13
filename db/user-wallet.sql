@@ -1,6 +1,9 @@
 -- 邻租：用户与资金域建表脚本
 -- 说明：本文件由陈麒元维护，最终由窦源泽合并进 db/init.sql。
 -- 执行方式：mysql -uroot -p < db/user-wallet.sql
+-- 强制客户端按 utf8mb4 读取本脚本，避免中文被 latin1 双重编码成乱码
+SET NAMES utf8mb4;
+
 CREATE DATABASE IF NOT EXISTS linzu DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 USE linzu;

@@ -1,5 +1,7 @@
 -- 邻租：物品域建表脚本（C1-C7）
 -- 说明：与 db/init.sql 基线保持同步；增量执行方式：mysql -uroot -p < db/item.sql
+SET NAMES utf8mb4;
+
 USE linzu;
 
 CREATE TABLE IF NOT EXISTS t_item_category (
@@ -19,12 +21,13 @@ CREATE TABLE IF NOT EXISTS t_item (
   id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键',
   category_id BIGINT NOT NULL COMMENT '分类 ID',
   owner_id BIGINT NOT NULL COMMENT '物主用户 ID',
+  community_id BIGINT DEFAULT NULL COMMENT '所属社区 ID（社区域）',
   title VARCHAR(64) NOT NULL COMMENT '标题',
   description VARCHAR(2000) DEFAULT NULL COMMENT '描述',
-  condition_level VARCHAR(16) NOT NULL COMMENT '成色：NEW/LIKE_NEW/GOOD/FAIR',
+  condition_desc VARCHAR(64) NOT NULL COMMENT '成色说明（自由文本，需求基线 UC-C5）',
   rent_per_day DECIMAL(10, 2) NOT NULL COMMENT '日租金',
   deposit DECIMAL(10, 2) NOT NULL DEFAULT 0.00 COMMENT '押金',
-  location VARCHAR(128) NOT NULL COMMENT '所在社区/取还地点',
+  location VARCHAR(128) DEFAULT NULL COMMENT '取还地点（可选）',
   status VARCHAR(16) NOT NULL DEFAULT 'PENDING_REVIEW' COMMENT 'PENDING_REVIEW/REJECTED/LISTED/DELISTED/VIOLATION_OFF',
   is_pinned TINYINT NOT NULL DEFAULT 0 COMMENT '平台置顶：1 是 0 否',
   reject_reason VARCHAR(255) DEFAULT NULL COMMENT '审核驳回原因',
@@ -61,11 +64,8 @@ CREATE TABLE IF NOT EXISTS t_item_favorite (
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '物品收藏';
 
 INSERT INTO t_item_category (name, sort, status) VALUES
-  ('电动工具', 1, 'ENABLED'),
-  ('手动工具', 2, 'ENABLED'),
-  ('户外装备', 3, 'ENABLED'),
-  ('厨房电器', 4, 'ENABLED'),
-  ('清洁设备', 5, 'ENABLED'),
-  ('母婴用品', 6, 'ENABLED'),
-  ('数码配件', 7, 'ENABLED'),
+  ('工具', 1, 'ENABLED'),
+  ('家电', 2, 'ENABLED'),
+  ('户外', 3, 'ENABLED'),
+  ('数码', 4, 'ENABLED'),
   ('其他', 99, 'ENABLED');

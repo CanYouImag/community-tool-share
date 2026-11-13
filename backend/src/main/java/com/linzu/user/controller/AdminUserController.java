@@ -3,7 +3,9 @@ package com.linzu.user.controller;
 import com.linzu.common.api.PageResult;
 import com.linzu.common.api.Result;
 import com.linzu.common.security.AuthContext;
+import com.linzu.common.security.PermissionCodes;
 import com.linzu.common.security.RequirePermission;
+import com.linzu.platform.service.AuditLogService;
 import com.linzu.user.dto.AdminRealNameResponse;
 import com.linzu.user.dto.AdminUserResponse;
 import com.linzu.user.dto.RealNameReviewRequest;
@@ -11,6 +13,7 @@ import com.linzu.user.service.AdminUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,8 +26,8 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * 平台管理端用户与实名认证审核接口。
  *
- * <p>权限码暂定：platform:user-manage、platform:real-name-review，
- * 待与钟姝伶的权限码清单对齐。</p>
+ * <p>权限码与钟姝伶维护的 {@link PermissionCodes} 对齐：
+ * 用户管理使用 platform:ban，实名审核使用 platform:cert。</p>
  */
 @Tag(name = "平台用户管理")
 @RestController
@@ -33,9 +36,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminUserController {
 
     private final AdminUserService adminUserService;
+    private final AuditLogService auditLogService;
 
     @Operation(summary = "分页查询用户（支持用户名/昵称/手机号搜索、角色和状态筛选）")
-    @RequirePermission("platform:user-manage")
+    @RequirePermission(PermissionCodes.PLATFORM_BAN)
     @GetMapping("/users")
     public Result<PageResult<AdminUserResponse>> users(
         @RequestParam(required = false) String keyword,
@@ -48,21 +52,33 @@ public class AdminUserController {
     }
 
     @Operation(summary = "封禁用户")
-    @RequirePermission("platform:user-manage")
+    @RequirePermission(PermissionCodes.PLATFORM_BAN)
     @PostMapping("/users/{id}/ban")
-    public Result<AdminUserResponse> ban(@PathVariable Long id) {
-        return Result.ok(adminUserService.banUser(AuthContext.requireUserId(), id));
+    public Result<AdminUserResponse> ban(
+        @PathVariable Long id,
+        @RequestBody(required = false) Map<String, String> body
+    ) {
+        Long operatorId = AuthContext.requireUserId();
+        AdminUserResponse response = adminUserService.banUser(operatorId, id);
+        auditLogService.record(operatorId, "BAN_USER", "USER", id, reason(body));
+        return Result.ok(response);
     }
 
     @Operation(summary = "解封用户")
-    @RequirePermission("platform:user-manage")
+    @RequirePermission(PermissionCodes.PLATFORM_BAN)
     @PostMapping("/users/{id}/unban")
-    public Result<AdminUserResponse> unban(@PathVariable Long id) {
-        return Result.ok(adminUserService.unbanUser(id));
+    public Result<AdminUserResponse> unban(
+        @PathVariable Long id,
+        @RequestBody(required = false) Map<String, String> body
+    ) {
+        Long operatorId = AuthContext.requireUserId();
+        AdminUserResponse response = adminUserService.unbanUser(id);
+        auditLogService.record(operatorId, "UNBAN_USER", "USER", id, reason(body));
+        return Result.ok(response);
     }
 
     @Operation(summary = "分页查询实名认证申请（审核队列可传 status=PENDING）")
-    @RequirePermission("platform:real-name-review")
+    @RequirePermission(PermissionCodes.PLATFORM_CERT)
     @GetMapping("/real-names")
     public Result<PageResult<AdminRealNameResponse>> realNames(
         @RequestParam(required = false) String status,
@@ -74,19 +90,23 @@ public class AdminUserController {
     }
 
     @Operation(summary = "通过实名认证")
-    @RequirePermission("platform:real-name-review")
+    @RequirePermission(PermissionCodes.PLATFORM_CERT)
     @PostMapping("/real-names/{id}/approve")
     public Result<AdminRealNameResponse> approveRealName(@PathVariable Long id) {
         return Result.ok(adminUserService.approveRealName(id));
     }
 
     @Operation(summary = "驳回实名认证")
-    @RequirePermission("platform:real-name-review")
+    @RequirePermission(PermissionCodes.PLATFORM_CERT)
     @PostMapping("/real-names/{id}/reject")
     public Result<AdminRealNameResponse> rejectRealName(
         @PathVariable Long id,
         @Valid @RequestBody RealNameReviewRequest request
     ) {
         return Result.ok(adminUserService.rejectRealName(id, request.reason()));
+    }
+
+    private String reason(Map<String, String> body) {
+        return body == null ? null : body.get("reason");
     }
 }

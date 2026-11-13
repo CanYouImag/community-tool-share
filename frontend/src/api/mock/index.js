@@ -430,6 +430,15 @@ const handlers = [
   },
   {
     method: 'GET',
+    pattern: /^\/orders\/mine$/,
+    handler: () => [
+      { id: 201, itemId: 1003, itemTitle: '冲击钻', communityId: 1, renterId: 2, ownerId: 1, depositAmount: 60, rentAmount: 35, status: 'COMPLETED' },
+      { id: 101, itemId: 1001, itemTitle: '18V 充电式电钻', communityId: 1, renterId: 2, ownerId: 1, depositAmount: 50, rentAmount: 30, status: 'COMPLETED' },
+      { id: 102, itemId: 1002, itemTitle: '铝合金折叠梯', communityId: 2, renterId: 2, ownerId: 1, depositAmount: 80, rentAmount: 40, status: 'COMPLETED' },
+    ],
+  },
+  {
+    method: 'GET',
     pattern: /^\/orders\/(.+)$/,
     handler: (_params, matches) => {
       const order = db.orders.find((o) => o.id === matches[1]) || db.orders[0];

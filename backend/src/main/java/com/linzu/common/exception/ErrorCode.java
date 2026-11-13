@@ -24,10 +24,25 @@ public enum ErrorCode {
     ITEM_IMAGE_TOO_MANY(1015, "物品图片最多 6 张", HttpStatus.BAD_REQUEST),
     ORDER_MESSAGE_EMPTY(1016, "留言内容不能为空", HttpStatus.BAD_REQUEST),
 
+    // ===== 社区与治理域（钟姝伶）=====
+    COMMUNITY_NAME_EXISTS(1101, "社区名称已存在", HttpStatus.BAD_REQUEST),
+    ALREADY_IN_COMMUNITY(1102, "已是该社区成员", HttpStatus.BAD_REQUEST),
+    JOIN_APPLY_EXISTS(1103, "已有待处理的加入申请", HttpStatus.BAD_REQUEST),
+    COMMUNITY_HAS_ACTIVE_ORDER(1104, "该社区下存在进行中订单，暂不能操作", HttpStatus.BAD_REQUEST),
+    ALREADY_DISPUTED(1105, "该订单已发起过纠纷，不能重复发起", HttpStatus.BAD_REQUEST),
+    DISPUTE_STATE_INVALID(1106, "纠纷状态不允许该操作", HttpStatus.BAD_REQUEST),
+    ARBITRATION_EXISTS(1107, "该纠纷已裁决", HttpStatus.BAD_REQUEST),
+    DEDUCT_EXCEEDS_DEPOSIT(1108, "扣除金额不能超过押金", HttpStatus.BAD_REQUEST),
+    REPORT_DUPLICATE(1109, "该目标已有待处理的举报", HttpStatus.BAD_REQUEST),
+    COMMUNITY_ADMIN_EXISTS(1110, "该社区已有管理员", HttpStatus.BAD_REQUEST),
+    USER_NOT_CERTIFIED(1111, "用户未通过实名认证", HttpStatus.BAD_REQUEST),
+    USER_ALREADY_ADMIN(1112, "该用户已是其他社区的管理员", HttpStatus.BAD_REQUEST),
+
     UNAUTHORIZED(2001, "未登录或登录已过期", HttpStatus.UNAUTHORIZED),
     FORBIDDEN(2002, "无权限执行该操作", HttpStatus.FORBIDDEN),
     ACCOUNT_OR_PASSWORD_ERROR(2003, "账号或密码错误", HttpStatus.UNAUTHORIZED),
     ACCOUNT_BANNED(2004, "账号已被封禁", HttpStatus.FORBIDDEN),
+    NOT_COMMUNITY_ADMIN(2005, "不是社区管理员", HttpStatus.FORBIDDEN),
 
     USER_NOT_FOUND(3001, "用户不存在", HttpStatus.NOT_FOUND),
     WALLET_NOT_FOUND(3002, "钱包不存在", HttpStatus.NOT_FOUND),
@@ -40,7 +55,13 @@ public enum ErrorCode {
     PICKUP_CODE_ERROR(3009, "取物码不正确", HttpStatus.BAD_REQUEST),
     DISPUTE_STATE_NOT_ALLOWED(3010, "订单当前不在纠纷中", HttpStatus.CONFLICT),
     CATEGORY_NAME_EXISTS(3011, "分类名称已存在", HttpStatus.BAD_REQUEST),
-    REAL_NAME_NOT_FOUND(3012, "实名认证申请不存在", HttpStatus.NOT_FOUND),
+    COMMUNITY_NOT_FOUND(3012, "社区不存在", HttpStatus.NOT_FOUND),
+    JOIN_APPLY_NOT_FOUND(3013, "加入申请不存在", HttpStatus.NOT_FOUND),
+    COMMUNITY_MEMBER_NOT_FOUND(3014, "社区成员不存在", HttpStatus.NOT_FOUND),
+    COMMUNITY_ANNOUNCEMENT_NOT_FOUND(3015, "公告不存在", HttpStatus.NOT_FOUND),
+    DISPUTE_NOT_FOUND(3016, "纠纷不存在", HttpStatus.NOT_FOUND),
+    REPORT_NOT_FOUND(3017, "举报不存在", HttpStatus.NOT_FOUND),
+    REAL_NAME_NOT_FOUND(3018, "实名认证申请不存在", HttpStatus.NOT_FOUND),
 
     SYSTEM_ERROR(5000, "系统错误", HttpStatus.INTERNAL_SERVER_ERROR);
 

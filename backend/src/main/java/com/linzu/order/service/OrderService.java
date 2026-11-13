@@ -104,6 +104,7 @@ public class OrderService {
         order.setItemId(item.getId());
         order.setItemTitle(item.getTitle());
         order.setItemImage(firstImage(item.getId()));
+        order.setCommunityId(item.getCommunityId());
         order.setLessorId(item.getOwnerId());
         order.setRenterId(renterId);
         order.setStartDate(start);
@@ -537,12 +538,15 @@ public class OrderService {
                 && (viewerId == null
                     || viewerId.equals(order.getRenterId())
                     || viewerId.equals(order.getLessorId()));
+        User lessor = userMapper.selectById(order.getLessorId());
+        User renter = userMapper.selectById(order.getRenterId());
         return new OrderResponse(
             order.getId(),
             order.getOrderNo(),
             order.getItemId(),
             order.getItemTitle(),
             order.getItemImage(),
+            order.getCommunityId(),
             order.getLessorId(),
             order.getRenterId(),
             order.getStartDate(),
@@ -560,7 +564,9 @@ public class OrderService {
             order.getReturnAt(),
             order.getCompletedAt(),
             order.getCancelledAt(),
-            order.getCreatedAt()
+            order.getCreatedAt(),
+            lessor == null ? null : lessor.getNickname(),
+            renter == null ? null : renter.getNickname()
         );
     }
 

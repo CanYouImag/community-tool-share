@@ -69,6 +69,34 @@ const routes = [
     component: () => import('@/views/dispute/DisputeView.vue'),
     meta: { title: '纠纷与举报', nav: '/orders', requiresAuth: true },
   },
+  {
+    path: '/admin',
+    redirect: '/admin/platform',
+  },
+  {
+    path: '/admin/community',
+    name: 'admin-community',
+    component: () => import('@/views/admin/CommunityAdminView.vue'),
+    meta: { title: '社区管理' },
+  },
+  {
+    path: '/admin/mediation',
+    name: 'admin-mediation',
+    component: () => import('@/views/admin/MediationView.vue'),
+    meta: { title: '调解工作台' },
+  },
+  {
+    path: '/admin/platform',
+    name: 'admin-platform',
+    component: () => import('@/views/admin/PlatformAdminView.vue'),
+    meta: { title: '平台管理' },
+  },
+  {
+    path: '/admin/arbitration',
+    name: 'admin-arbitration',
+    component: () => import('@/views/admin/ArbitrationView.vue'),
+    meta: { title: '仲裁中心' },
+  },
 ];
 
 const router = createRouter({

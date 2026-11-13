@@ -22,6 +22,21 @@ async function logout() {
   }
 }
 
+// 平台管理员可同时进「平台管理」与「社区管理」（平台管理员兼任社区 1 管理员时需审核加入申请）；
+// 社区管理员仅进「社区管理」。
+const adminNavItems = computed(() => {
+  if (auth.user?.role === 'PLATFORM_ADMIN') {
+    return [
+      { to: '/admin/platform', label: '平台管理', admin: true },
+      { to: '/admin/community', label: '社区管理', admin: true },
+    ];
+  }
+  if (auth.user?.role === 'COMMUNITY_ADMIN') {
+    return [{ to: '/admin/community', label: '社区管理', admin: true }];
+  }
+  return [];
+});
+
 // 详情、编辑等页面的导航归属统一在路由 meta.nav 中声明。
 const navItems = computed(() => [
   { to: '/items', label: '物品广场' },
@@ -30,6 +45,7 @@ const navItems = computed(() => [
   { to: '/orders', label: '我的订单' },
   { to: '/wallet', label: '钱包' },
   auth.isLoggedIn ? { to: '/account', label: '个人中心' } : { to: '/login', label: '登录 / 注册' },
+  ...adminNavItems.value,
 ]);
 </script>
 
@@ -45,7 +61,7 @@ const navItems = computed(() => [
           v-for="item in navItems"
           :key="item.to"
           :to="item.to"
-          :class="{ active: route.meta.nav === item.to }"
+          :class="{ active: item.admin ? route.path === item.to : route.meta.nav === item.to }"
           :aria-current="route.meta.nav === item.to ? 'location' : undefined"
         >
           {{ item.label }}

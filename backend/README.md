@@ -1,4 +1,4 @@
-# 邻租后端（用户、钱包、物品、订单）
+# 邻租后端（用户、钱包、物品、订单、社区、纠纷、平台）
 
 ## 技术栈
 
@@ -17,7 +17,9 @@
 | 钱包、资金流水 | `backend/.../wallet` | 已完成主体；管理员调余额可用 |
 | 物品、分类、收藏、审核 | `backend/.../item` | 后端已合并；前端待接真实接口 |
 | 订单、状态机、取物码、结算 | `backend/.../order` | 后端已合并；前端待接真实接口 |
-| 社区、纠纷、举报、平台统计 | - | 后端和表尚未实现，相关页面继续 Mock |
+| 社区、成员、公告 | `backend/.../community` | 后端已完成；前端已接真实接口 |
+| 纠纷、仲裁、举报 | `backend/.../dispute` | 后端已完成；前端已接真实接口 |
+| 平台社区、用户、配置、统计、日志 | `backend/.../platform` | 后端已完成 |
 
 ## 启动步骤
 
@@ -25,13 +27,15 @@
 
 ```powershell
 mysql --default-character-set=utf8mb4 -uroot -p -e "source db/init.sql"
+mysql --default-character-set=utf8mb4 -uroot -p -e "source db/community-dispute-platform.sql"
 ```
 
-`db/init.sql` 已合并 user、wallet、item、order 四个域的建表脚本。注意：
+`db/init.sql` 已合并 user、wallet、item、order 四个域的建表脚本，`db/community-dispute-platform.sql` 负责社区、纠纷、举报、平台表及治理域种子。注意：
 
 - 必须带 `--default-character-set=utf8mb4`，否则中文分类名会乱码。
-- 分类初始化数据不是幂等的；重复执行可能因分类唯一键冲突失败。需要重置时先删库再导入。
+- 分类和治理域初始化数据不是幂等的；重复执行可能因唯一键冲突失败。需要重置时先删库再导入。
 - 只做用户/钱包域调试时，也可以使用增量脚本 `db/user-wallet.sql`。
+- 使用 Docker Compose 时会按顺序自动执行这两个脚本，无需手工导入。
 
 2. 配置数据库连接。默认读取：
 
@@ -52,7 +56,7 @@ $env:DB_PASSWORD="你的密码"
 
 ```powershell
 cd backend
-mvn spring-boot:run "-Dspring-boot.run.profiles=local"
+mvn spring-boot:run
 ```
 
 4. 打开 Swagger：
@@ -83,8 +87,9 @@ http://localhost:8080/swagger-ui.html
 
 | 角色 | 账号 | 说明 |
 | --- | --- | --- |
-| 居民 | `Starling / 123456` | 已实名，钱包余额 500.00 |
-| 平台管理员 | `admin / admin123` | `PLATFORM_ADMIN`，可审核物品、调余额、审核实名、裁决纠纷 |
+| 居民（物主） | `Starling / 123456` | 已实名，钱包余额 500.00，青禾社区成员 |
+| 居民（租客） | `shuling / 123456` | 已实名，钱包余额 200.00、冻结押金 100.00，青禾社区成员 |
+| 平台管理员 | `admin / admin123` | `PLATFORM_ADMIN`，可审核物品、调余额、审核实名、管理社区与用户、裁决纠纷 |
 | 待审核用户 | `pending / 123456` | 已提交实名但状态为 `PENDING`，用于演示管理端审核通过/驳回 |
 
 配置项在 `application.yml` 的 `app.demo` 下，可关闭。实名认证测试可用身份证号 `220101200101100115`（仅用于校验格式和校验位，不对应真实身份）。
@@ -131,13 +136,13 @@ http://localhost:8080/swagger-ui.html
 
 ### 平台用户管理（本轮新增）
 
-权限码暂定 `platform:user-manage`、`platform:real-name-review`，待与钟姝伶的权限码清单对齐。`PLATFORM_ADMIN` 会自动放行。
+权限码已与 `PermissionCodes` 对齐：用户管理使用 `platform:ban`，实名审核使用 `platform:cert`。`PLATFORM_ADMIN` 会自动放行。
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
 | GET | `/api/v1/admin/users` | 分页查询用户；参数 `keyword/role/status/page/size` |
-| POST | `/api/v1/admin/users/{id}/ban` | 封禁用户；不能封禁自己或平台管理员 |
-| POST | `/api/v1/admin/users/{id}/unban` | 解封用户 |
+| POST | `/api/v1/admin/users/{id}/ban` | 封禁用户；不能封禁自己或平台管理员，请求体可选 `{ "reason": "原因" }` 并写入操作日志 |
+| POST | `/api/v1/admin/users/{id}/unban` | 解封用户，请求体可选 `{ "reason": "原因" }` 并写入操作日志 |
 | GET | `/api/v1/admin/real-names` | 分页查询实名申请；审核队列传 `status=PENDING`，支持 `keyword` |
 | POST | `/api/v1/admin/real-names/{id}/approve` | 通过实名认证，普通用户角色升级为 `CERTIFIED` |
 | POST | `/api/v1/admin/real-names/{id}/reject` | 驳回实名认证，请求体 `{ "reason": "驳回原因" }` |
@@ -154,6 +159,16 @@ http://localhost:8080/swagger-ui.html
 2. 管理员调用 `GET /api/v1/admin/real-names?status=PENDING` 获取审核队列。
 3. 调用 `approve` 或 `reject`。通过后用户 `realNameStatus=VERIFIED`、角色变为 `CERTIFIED`；驳回后保留原因，用户可重新提交。
 4. 演示账号 `pending / 123456` 已预置一条待审核记录。
+
+### 社区、纠纷、举报与平台治理
+
+| 域 | 主要路径 | 说明 |
+| --- | --- | --- |
+| 社区 | `/api/v1/communities` | 社区列表/详情、加入/退出、成员、加入申请审核、公告、我的社区管理员身份 |
+| 成员关系 | `/api/v1/memberships/mine` | 当前用户加入的社区 |
+| 纠纷 | `/api/v1/disputes` | 发起纠纷、列表/详情、响应、留言、调解、上报仲裁、仲裁裁决、裁决书 |
+| 举报 | `/api/v1/reports` | 提交举报、我的举报、举报列表、社区/平台处理 |
+| 平台治理 | `/api/v1/admin` | 社区 CRUD、任命/罢免社区管理员、平台配置、平台/社区统计、操作日志 |
 
 ### 物品与订单
 
@@ -221,7 +236,8 @@ mvn clean test
 
 ## 数据库脚本
 
-- `db/init.sql`：当前完整建库脚本，已合并 user、wallet、item、order 四个域。
+- `db/init.sql`：核心建库脚本，已合并 user、wallet、item、order 四个域。
+- `db/community-dispute-platform.sql`：社区、纠纷、举报、平台建表与治理域种子。
 - `db/user-wallet.sql`：用户/钱包域增量脚本，由陈麒元维护。
 - `db/migrations/`：旧库增量迁移脚本。
 
@@ -229,8 +245,7 @@ mvn clean test
 
 ## 当前限制
 
-- 社区、纠纷、举报、平台统计后端和表仍未实现，相关页面只能继续 Mock。
-- `t_item` 没有 `community_id`，暂不能实现“本社区物品/发布到社区”。
 - 物品列表和详情当前仍需登录，游客浏览会返回 401，演示前需修复。
 - 订单自动验收和纠纷扣款逻辑仍有缺陷，佣金默认 0，演示前需修复/配置。
-- 物品、订单域还没有单元测试，前端契约也未完全对齐。
+- 物品、订单、社区、纠纷域还没有完整单元测试，前端契约仍需联调确认。
+- 旧库升级需先补 `t_item.community_id`、`t_order.community_id` 等字段，再执行治理域脚本；新库直接按两个脚本初始化即可。
