@@ -98,9 +98,10 @@ INSERT IGNORE INTO t_community_announcement (id, community_id, title, content, c
 INSERT IGNORE INTO t_item (id, category_id, owner_id, community_id, title, description, condition_desc, rent_per_day, deposit, location, status) VALUES
     (1, 1, 1, 1, '18V 充电式电钻', '八成新，含两块电池与充电器。', '九成新，功能正常', 30.00, 50.00, '青禾社区 3 号楼 2 单元', 'LISTED');
 
--- 订单（已完成；押金 50 已冻结在租客 shuling=3 钱包，供「提出扣留押金」从零发起纠纷）
+-- 订单（已完成；两笔押金各 50 已冻结在租客 shuling=3 钱包，供「提出扣留押金」各走一条纠纷路径：调解成功 / 仲裁）
 INSERT IGNORE INTO t_order (id, order_no, item_id, item_title, item_image, community_id, lessor_id, renter_id, start_date, end_date, days, rent_amount, deposit_amount, commission_amount, status) VALUES
-    (1, 'SO202611130001', 1, '18V 充电式电钻', NULL, 1, 1, 3, '2026-11-10', '2026-11-12', 3, 90.00, 50.00, 0.00, 'COMPLETED');
+    (1, 'SO202611130001', 1, '18V 充电式电钻', NULL, 1, 1, 3, '2026-11-10', '2026-11-12', 3, 90.00, 50.00, 0.00, 'COMPLETED'),
+    (2, 'SO202611130002', 1, '18V 充电式电钻', NULL, 1, 1, 3, '2026-11-06', '2026-11-08', 3, 90.00, 50.00, 0.00, 'COMPLETED');
 
 -- ===== 纠纷与举报 =====
 

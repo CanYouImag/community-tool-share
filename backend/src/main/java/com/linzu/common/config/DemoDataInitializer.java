@@ -75,7 +75,7 @@ public class DemoDataInitializer implements CommandLineRunner {
             BigDecimal.ZERO,
             BigDecimal.ZERO
         );
-        // 租客演示账号：与 Starling（物主）配对，用于演示订单与纠纷（押金 50 已在演示种子订单中冻结）
+        // 租客演示账号：与 Starling（物主）配对，用于演示订单与纠纷（两笔演示订单押金各 50，共 100 已冻结）
         seedUser(
             "shuling",
             "123456",
@@ -85,7 +85,7 @@ public class DemoDataInitializer implements CommandLineRunner {
             "钟姝伶",
             "220101199001011250",
             new BigDecimal("200.00"),
-            new BigDecimal("50.00")
+            new BigDecimal("100.00")
         );
     }
 
