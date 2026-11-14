@@ -44,6 +44,7 @@ const activeTab = ref('communities')
 
 // —— 社区 ——
 const communities = ref([])
+const communityError = ref('')
 const editing = reactive({ id: null, name: '', intro: '', coverUrl: '', autoApprove: false, status: 'ACTIVE' })
 const appoint = reactive({ communityId: null, userId: '' })
 const appointableUsers = computed(() =>
@@ -90,20 +91,34 @@ async function saveCommunity() {
   loadCommunities()
 }
 function beginAppoint(c) {
+  communityError.value = ''
   appoint.communityId = c.id
   appoint.userId = ''
 }
 async function doAppoint() {
-  if (!appoint.userId) return
-  await appointAdmin(appoint.communityId, { userId: Number(appoint.userId) })
-  appoint.communityId = null
-  appoint.userId = ''
-  loadCommunities()
-  alert('已任命社区管理员，被任命者重新登录后生效')
+  if (!appoint.userId) {
+    communityError.value = '请先选择要任命的认证用户'
+    return
+  }
+  communityError.value = ''
+  try {
+    await appointAdmin(appoint.communityId, { userId: Number(appoint.userId) })
+    appoint.communityId = null
+    appoint.userId = ''
+    await loadCommunities()
+    alert('已任命社区管理员，被任命者重新登录后生效')
+  } catch (err) {
+    communityError.value = err.message || '任命失败'
+  }
 }
 async function doDismiss(c) {
-  await dismissAdmin(c.id, c.adminId)
-  loadCommunities()
+  communityError.value = ''
+  try {
+    await dismissAdmin(c.id, c.adminId)
+    await loadCommunities()
+  } catch (err) {
+    communityError.value = err.message || '罢免失败'
+  }
 }
 
 // —— 物品审核 ——
@@ -273,6 +288,7 @@ onMounted(async () => {
     <!-- 社区管理 -->
     <section v-show="activeTab === 'communities'" class="view-panel">
       <h2 class="view-heading">社区管理</h2>
+      <p v-if="communityError" class="form-message error">{{ communityError }}</p>
       <section class="panel">
         <div class="panel-title">
           <h2>{{ editing.id ? '编辑社区' : '新增社区' }}</h2>
@@ -342,8 +358,12 @@ onMounted(async () => {
                 <td>
                   <div class="actions">
                     <a @click="beginEdit(c)">编辑</a>
-                    <a v-if="appoint.communityId !== c.id" @click="beginAppoint(c)">任命管理员</a>
+                    <a
+                      v-if="!c.adminId && appoint.communityId !== c.id"
+                      @click="beginAppoint(c)"
+                    >任命管理员</a>
                     <a v-if="c.adminId" class="danger-text" @click="doDismiss(c)">罢免</a>
+                    <span v-if="c.adminId" class="muted">（先罢免才能更换）</span>
                   </div>
                   <div v-if="appoint.communityId === c.id" class="actions">
                     <select v-model="appoint.userId" aria-label="选择管理员">
