@@ -81,9 +81,9 @@ CREATE TABLE IF NOT EXISTS t_community_join_apply (
 --   id=1 Starling（认证居民，物主）  id=2 admin（平台管理员）  id=3 shuling（认证居民，租客）
 INSERT IGNORE INTO t_community (id, name, intro, cover_url, auto_approve, member_count, item_count, status) VALUES
     (1, '青禾社区', '取物和归还时请核对配件并拍照。', NULL, 0, 3, 1, 'ACTIVE'),
-    (2, '梧桐里社区', '欢迎新邻居加入，共享闲置工具。', NULL, 1, 0, 0, 'ACTIVE');
+    (2, '梧桐里社区', '欢迎新邻居加入，共享闲置工具。', NULL, 0, 0, 0, 'ACTIVE');
 
--- 社区成员：admin(2) 为青禾社区管理员，Starling(1) 物主、shuling(3) 租客为成员
+-- 社区成员：admin(2) 为平台管理员，Starling(1) 物主、shuling(3) 租客为成员
 INSERT IGNORE INTO t_community_member (id, community_id, user_id, role, status) VALUES
     (1, 1, 2, 'MEMBER', 'ACTIVE'),
     (2, 1, 1, 'MEMBER', 'ACTIVE'),

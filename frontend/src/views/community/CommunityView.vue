@@ -38,6 +38,12 @@ const joinState = ref(''); // '' | 'APPLIED' | 'JOINED'
 // 我的社区
 const memberships = ref([]);
 
+function membershipState(c) {
+  const m = memberships.value.find((x) => x.id === c.id);
+  if (!m) return '';
+  return m.status === 'JOINED' ? 'JOINED' : 'APPLIED';
+}
+
 async function loadCommunities() {
   allCommunities.value = await getCommunities();
 }
@@ -87,7 +93,11 @@ async function applyJoin(c) {
     const joined = res?.status === 'JOINED';
     joinState.value = joined ? 'JOINED' : 'APPLIED';
     await loadMemberships();
-    if (joined) alert('已加入社区');
+    if (joined) {
+      alert(c.autoApprove ? '该社区自动通过申请，已加入社区' : '已加入社区');
+    } else {
+      alert('加入申请已提交，等待社区管理员审核');
+    }
   } catch (e) {
     alert(e?.message || '加入失败');
   }
@@ -139,6 +149,8 @@ onMounted(() => {
           v-for="c in filteredCommunities"
           :key="c.id"
           :community="c"
+          :joinable="!membershipState(c)"
+          :join-state="membershipState(c)"
           @enter="enterCommunity"
           @join="applyJoin"
         />
@@ -156,6 +168,9 @@ onMounted(() => {
                 社区管理员：{{ currentCommunity.admin }} / 成员 {{ currentCommunity.members }} 人 /
                 在租物品 {{ currentCommunity.onRent }} 件
               </p>
+              <p v-if="currentCommunity.autoApprove" class="muted">
+                该社区配置为自动通过入社申请，点击“加入社区”后直接成为成员。
+              </p>
             </div>
             <button
               type="button"
@@ -163,7 +178,7 @@ onMounted(() => {
               class="btn primary"
               @click="applyJoin(currentCommunity)"
             >
-              申请加入
+              {{ currentCommunity.autoApprove ? '加入社区' : '申请加入' }}
             </button>
             <span v-else-if="joinState === 'APPLIED'" class="badge warn">待审核</span>
             <span v-else class="badge">已加入</span>
