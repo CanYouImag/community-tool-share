@@ -13,6 +13,9 @@ import {
   getUsers,
   banUser,
   unbanUser,
+  getRealNames,
+  approveRealName,
+  rejectRealName,
   getItemsForReview,
   reviewItem,
   getConfig,
@@ -34,6 +37,7 @@ const tabs = [
   { id: 'items', label: '物品审核' },
   { id: 'reports', label: '举报处理' },
   { id: 'users', label: '用户管理' },
+  { id: 'realNames', label: '实名审核' },
   { id: 'mediation', label: '调解工作台', to: '/admin/mediation' },
   { id: 'arbitration', label: '仲裁中心', to: '/admin/arbitration' },
   { id: 'config', label: '参数配置' },
@@ -210,6 +214,75 @@ async function doUnban(u) {
   }
 }
 
+// —— 实名审核 ——
+const REAL_NAME_STATUS_LABEL = {
+  PENDING: '待审核',
+  VERIFIED: '已通过',
+  REJECTED: '已驳回',
+  UNVERIFIED: '未提交'
+}
+const realNameStatus = ref('PENDING')
+const realNameKeyword = ref('')
+const realNames = ref([])
+const realNameTotal = ref(0)
+const realNamePage = ref(1)
+const realNameError = ref('')
+const rejectingRealName = reactive({ id: null, reason: '' })
+
+async function loadRealNames() {
+  realNameError.value = ''
+  try {
+    const data = await getRealNames({
+      status: realNameStatus.value || undefined,
+      keyword: realNameKeyword.value || undefined,
+      page: realNamePage.value,
+      size: 10
+    })
+    realNames.value = data.records || []
+    realNameTotal.value = data.total || 0
+  } catch (err) {
+    realNameError.value = err.message || '实名审核列表加载失败'
+  }
+}
+
+function changeRealNamePage(p) {
+  realNamePage.value = p
+  loadRealNames()
+}
+
+async function doApproveRealName(r) {
+  realNameError.value = ''
+  try {
+    await approveRealName(r.id)
+    await Promise.all([loadRealNames(), loadUsers()])
+    alert('实名认证已通过，用户需要重新登录后才能获得认证用户权限')
+  } catch (err) {
+    realNameError.value = err.message || '实名认证通过失败'
+  }
+}
+
+function beginRejectRealName(r) {
+  realNameError.value = ''
+  rejectingRealName.id = r.id
+  rejectingRealName.reason = ''
+}
+
+async function doRejectRealName() {
+  realNameError.value = ''
+  if (!rejectingRealName.reason.trim()) {
+    realNameError.value = '请填写驳回原因'
+    return
+  }
+  try {
+    await rejectRealName(rejectingRealName.id, { reason: rejectingRealName.reason.trim() })
+    rejectingRealName.id = null
+    rejectingRealName.reason = ''
+    await loadRealNames()
+  } catch (err) {
+    realNameError.value = err.message || '实名认证驳回失败'
+  }
+}
+
 // —— 参数 ——
 const configForm = reactive({ commissionRate: '', communityAutoApprove: false, itemAuditEnabled: true })
 async function loadConfig() {
@@ -254,6 +327,7 @@ onMounted(async () => {
     loadCommunities(),
     loadReviewItems(),
     loadUsers(),
+    loadRealNames(),
     loadConfig(),
     loadStats(),
     loadLogs()
@@ -545,6 +619,98 @@ onMounted(async () => {
           </table>
         </div>
         <Pagination :total="userTotal" :page="userPage" :page-size="10" @change="changeUserPage" />
+      </section>
+    </section>
+
+    <!-- 实名审核 -->
+    <section v-show="activeTab === 'realNames'" class="view-panel">
+      <h2 class="view-heading">实名审核</h2>
+      <section class="panel">
+        <div class="filters">
+          <label class="field">
+            <span>审核状态</span>
+            <select
+              v-model="realNameStatus"
+              aria-label="实名审核状态"
+              @change="realNamePage = 1; loadRealNames()"
+            >
+              <option value="PENDING">待审核</option>
+              <option value="VERIFIED">已通过</option>
+              <option value="REJECTED">已驳回</option>
+              <option value="">全部</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>账号 / 昵称 / 姓名</span>
+            <input
+              v-model="realNameKeyword"
+              type="text"
+              aria-label="搜索实名申请"
+              placeholder="输入账号、昵称或姓名"
+              @keyup.enter="realNamePage = 1; loadRealNames()"
+            />
+          </label>
+          <div class="actions">
+            <a class="btn primary" @click="realNamePage = 1; loadRealNames()">搜索</a>
+          </div>
+        </div>
+
+        <p v-if="realNameError" class="form-message error">{{ realNameError }}</p>
+        <EmptyState v-if="!realNames.length" text="暂无实名审核申请" />
+        <div v-else class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">申请人</th>
+                <th scope="col">真实姓名</th>
+                <th scope="col">证件号</th>
+                <th scope="col">状态</th>
+                <th scope="col">提交时间</th>
+                <th scope="col">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="r in realNames" :key="r.id">
+                <td>
+                  {{ r.nickname || r.username }}
+                  <small>{{ r.username }} #{{ r.userId }}</small>
+                </td>
+                <td>{{ r.realName || '—' }}</td>
+                <td>{{ r.idCardMasked || '—' }}</td>
+                <td>
+                  <StatusBadge
+                    :label="REAL_NAME_STATUS_LABEL[r.status] || r.status"
+                    :cls="r.status === 'PENDING' ? 'warn' : r.status === 'REJECTED' ? 'error' : ''"
+                  />
+                  <small v-if="r.rejectReason">驳回原因：{{ r.rejectReason }}</small>
+                </td>
+                <td>{{ formatDateTime(r.createdAt) }}</td>
+                <td>
+                  <div v-if="rejectingRealName.id === r.id" class="actions">
+                    <input
+                      v-model="rejectingRealName.reason"
+                      type="text"
+                      placeholder="驳回原因"
+                    />
+                    <a class="btn small primary" @click="doRejectRealName">确认驳回</a>
+                    <a class="btn small" @click="rejectingRealName.id = null">取消</a>
+                  </div>
+                  <div v-else-if="r.status === 'PENDING'" class="actions">
+                    <a class="btn small primary" @click="doApproveRealName(r)">通过</a>
+                    <a class="danger-text" @click="beginRejectRealName(r)">驳回</a>
+                  </div>
+                  <span v-else class="muted">已处理</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <Pagination
+          :total="realNameTotal"
+          :page="realNamePage"
+          :page-size="10"
+          @change="changeRealNamePage"
+        />
       </section>
     </section>
 
