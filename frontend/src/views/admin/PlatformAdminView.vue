@@ -3,6 +3,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import Pagination from '@/components/Pagination.vue'
 import EmptyState from '@/components/EmptyState.vue'
+import ReportQueue from '@/components/ReportQueue.vue'
 import {
   getPlatformCommunities,
   createCommunity,
@@ -12,6 +13,8 @@ import {
   getUsers,
   banUser,
   unbanUser,
+  getItemsForReview,
+  reviewItem,
   getConfig,
   updateConfig,
   getPlatformStats,
@@ -28,6 +31,8 @@ const ROLE_LABEL = {
 
 const tabs = [
   { id: 'communities', label: '社区管理' },
+  { id: 'items', label: '物品审核' },
+  { id: 'reports', label: '举报处理' },
   { id: 'users', label: '用户管理' },
   { id: 'mediation', label: '调解工作台', to: '/admin/mediation' },
   { id: 'arbitration', label: '仲裁中心', to: '/admin/arbitration' },
@@ -101,12 +106,55 @@ async function doDismiss(c) {
   loadCommunities()
 }
 
+// —— 物品审核 ——
+const itemStatus = ref('PENDING_REVIEW')
+const reviewItems = ref([])
+const reviewItemTotal = ref(0)
+const reviewItemPage = ref(1)
+const reviewError = ref('')
+
+async function loadReviewItems() {
+  reviewError.value = ''
+  try {
+    const data = await getItemsForReview({
+      status: itemStatus.value || undefined,
+      page: reviewItemPage.value,
+      size: 10
+    })
+    reviewItems.value = data.records || []
+    reviewItemTotal.value = data.total || 0
+  } catch (err) {
+    reviewError.value = err.message || '物品审核列表加载失败'
+  }
+}
+
+function changeReviewItemPage(p) {
+  reviewItemPage.value = p
+  loadReviewItems()
+}
+
+async function doReview(item, approved) {
+  reviewError.value = ''
+  let reason = ''
+  if (!approved) {
+    reason = window.prompt('请输入驳回原因')
+    if (reason === null) return
+  }
+  try {
+    await reviewItem(item.id, { approved, reason })
+    await loadReviewItems()
+  } catch (err) {
+    reviewError.value = err.message || '审核操作失败'
+  }
+}
+
 // —— 用户 ——
 const userKeyword = ref('')
 const userStatus = ref('')
 const users = ref([])
 const userTotal = ref(0)
 const userPage = ref(1)
+const userError = ref('')
 const ban = reactive({ userId: null, reason: '' })
 
 async function loadUsers() {
@@ -128,13 +176,23 @@ function beginBan(u) {
   ban.reason = ''
 }
 async function doBan() {
-  await banUser(ban.userId, { reason: ban.reason })
-  ban.userId = null
-  loadUsers()
+  userError.value = ''
+  try {
+    await banUser(ban.userId, { reason: ban.reason })
+    ban.userId = null
+    await loadUsers()
+  } catch (err) {
+    userError.value = err.message || '封禁失败'
+  }
 }
 async function doUnban(u) {
-  await unbanUser(u.id, { reason: '' })
-  loadUsers()
+  userError.value = ''
+  try {
+    await unbanUser(u.id, { reason: '' })
+    await loadUsers()
+  } catch (err) {
+    userError.value = err.message || '解封失败'
+  }
 }
 
 // —— 参数 ——
@@ -177,7 +235,14 @@ function changeLogPage(p) {
 }
 
 onMounted(async () => {
-  await Promise.all([loadCommunities(), loadUsers(), loadConfig(), loadStats(), loadLogs()])
+  await Promise.all([
+    loadCommunities(),
+    loadReviewItems(),
+    loadUsers(),
+    loadConfig(),
+    loadStats(),
+    loadLogs()
+  ])
 })
 </script>
 
@@ -298,6 +363,88 @@ onMounted(async () => {
       </section>
     </section>
 
+    <!-- 物品审核 -->
+    <section v-show="activeTab === 'items'" class="view-panel">
+      <h2 class="view-heading">物品审核</h2>
+      <section class="panel">
+        <div class="filters">
+          <label class="field">
+            <span>审核状态</span>
+            <select v-model="itemStatus" aria-label="物品审核状态" @change="reviewItemPage = 1; loadReviewItems()">
+              <option value="PENDING_REVIEW">待审核</option>
+              <option value="REJECTED">已驳回</option>
+              <option value="LISTED">已上架</option>
+              <option value="">全部</option>
+            </select>
+          </label>
+          <div class="actions">
+            <a class="btn primary" @click="reviewItemPage = 1; loadReviewItems()">刷新</a>
+          </div>
+        </div>
+
+        <p v-if="reviewError" class="form-message error">{{ reviewError }}</p>
+        <EmptyState v-if="!reviewItems.length" text="暂无待审核物品" />
+        <div v-else class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">物品</th>
+                <th scope="col">所属社区</th>
+                <th scope="col">出租者</th>
+                <th scope="col">日租金 / 押金</th>
+                <th scope="col">状态</th>
+                <th scope="col">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="item in reviewItems" :key="item.id">
+                <td>
+                  {{ item.title }}
+                  <small>#{{ item.id }} / {{ item.categoryName || '未分类' }}</small>
+                </td>
+                <td>{{ item.communityName || '—' }}</td>
+                <td>{{ item.ownerNickname || `#${item.ownerId}` }}</td>
+                <td>¥{{ formatAmount(item.rentPerDay) }} / ¥{{ formatAmount(item.deposit) }}</td>
+                <td>
+                  <StatusBadge
+                    :label="item.status === 'PENDING_REVIEW' ? '待审核' : item.status"
+                    :cls="item.status === 'PENDING_REVIEW' ? 'warn' : ''"
+                  />
+                </td>
+                <td>
+                  <div class="actions">
+                    <a
+                      v-if="item.status === 'PENDING_REVIEW'"
+                      class="btn small primary"
+                      @click="doReview(item, true)"
+                    >通过</a>
+                    <a
+                      v-if="item.status === 'PENDING_REVIEW'"
+                      class="btn small danger-text"
+                      @click="doReview(item, false)"
+                    >驳回</a>
+                    <span v-else>—</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <Pagination
+          :total="reviewItemTotal"
+          :page="reviewItemPage"
+          :page-size="10"
+          @change="changeReviewItemPage"
+        />
+      </section>
+    </section>
+
+    <!-- 举报处理 -->
+    <section v-show="activeTab === 'reports'" class="view-panel">
+      <h2 class="view-heading">举报处理</h2>
+      <ReportQueue />
+    </section>
+
     <!-- 用户管理 -->
     <section v-show="activeTab === 'users'" class="view-panel">
       <h2 class="view-heading">用户管理</h2>
@@ -320,6 +467,7 @@ onMounted(async () => {
           </div>
         </div>
 
+        <p v-if="userError" class="form-message error">{{ userError }}</p>
         <EmptyState v-if="!users.length" text="暂无用户" />
         <div v-else class="table-wrap">
           <table>
