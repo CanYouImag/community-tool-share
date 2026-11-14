@@ -156,7 +156,7 @@ public class ItemService {
         List<ItemResponse> records = result
             .getRecords()
             .stream()
-            .map(item -> toResponse(item, categoryNames.get(item.getCategoryId()), null, null, false))
+            .map(item -> toResponse(item, categoryNames.get(item.getCategoryId()), null, null, true))
             .toList();
         return new PageResult<>(records, result.getTotal(), result.getCurrent(), result.getSize());
     }
@@ -248,7 +248,7 @@ public class ItemService {
             .filter(f -> items.containsKey(f.getItemId()))
             .map(f -> {
                 Item item = items.get(f.getItemId());
-                return toResponse(item, categoryNames.get(item.getCategoryId()), null, true, false);
+                return toResponse(item, categoryNames.get(item.getCategoryId()), null, true, true);
             })
             .toList();
         return new PageResult<>(records, result.getTotal(), result.getCurrent(), result.getSize());
@@ -317,7 +317,7 @@ public class ItemService {
         List<ItemResponse> records = result
             .getRecords()
             .stream()
-            .map(item -> toResponse(item, categoryNames.get(item.getCategoryId()), null, null, false))
+            .map(item -> toResponse(item, categoryNames.get(item.getCategoryId()), null, null, true))
             .toList();
         return new PageResult<>(records, result.getTotal(), result.getCurrent(), result.getSize());
     }
@@ -359,7 +359,7 @@ public class ItemService {
         List<ItemResponse> records = result
             .getRecords()
             .stream()
-            .map(item -> toResponse(item, categoryNames.get(item.getCategoryId()), null, null, false))
+            .map(item -> toResponse(item, categoryNames.get(item.getCategoryId()), null, null, true))
             .toList();
         return new PageResult<>(records, result.getTotal(), result.getCurrent(), result.getSize());
     }

@@ -33,6 +33,8 @@ export const dismissAdmin = (id, userId) => http.delete(`/admin/communities/${id
 export const getUsers = (params) => http.get('/admin/users', { params })
 export const banUser = (userId, data) => http.post(`/admin/users/${userId}/ban`, data)
 export const unbanUser = (userId, data) => http.post(`/admin/users/${userId}/unban`, data)
+export const getItemsForReview = (params) => http.get('/admin/items', { params })
+export const reviewItem = (id, data) => http.post(`/admin/items/${id}/review`, data)
 export const getConfig = () => http.get('/admin/config')
 export const updateConfig = (data) => http.put('/admin/config', data)
 export const getPlatformStats = () => http.get('/admin/stats')

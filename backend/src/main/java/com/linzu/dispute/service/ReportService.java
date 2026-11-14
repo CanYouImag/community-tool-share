@@ -13,9 +13,13 @@ import com.linzu.dispute.dto.ReportHandleRequest;
 import com.linzu.dispute.dto.ReportResponse;
 import com.linzu.dispute.entity.Report;
 import com.linzu.dispute.mapper.ReportMapper;
+import com.linzu.item.entity.Item;
+import com.linzu.item.enums.ItemStatus;
+import com.linzu.item.mapper.ItemMapper;
 import com.linzu.platform.service.AuditLogService;
 import com.linzu.user.entity.User;
 import com.linzu.user.mapper.UserMapper;
+import com.linzu.user.service.AdminUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +42,8 @@ public class ReportService {
 
     private final ReportMapper reportMapper;
     private final UserMapper userMapper;
+    private final ItemMapper itemMapper;
+    private final AdminUserService adminUserService;
     private final CommunityService communityService;
     private final AuditLogService auditLogService;
 
@@ -47,6 +53,7 @@ public class ReportService {
     public ReportResponse create(Long reporterId, ReportCreateRequest req) {
         String targetType = normalizeTarget(req.target());
         String reasonType = normalizeReason(req.type());
+        validateTarget(targetType, req.targetId());
 
         if (req.targetId() != null) {
             Long dup = reportMapper.selectCount(
@@ -125,9 +132,12 @@ public class ReportService {
         }
 
         String action = req.action().trim();
+        // 处理动作需要真正联动到物品/用户，而不是只更新举报单。
         if (!HANDLE_ACTIONS.contains(action)) {
             throw new BusinessException(ErrorCode.PARAM_ERROR, "未知处理措施");
         }
+
+        applyAction(operatorId, auth, r, action, req.note());
 
         r.setHandleAction(action);
         r.setHandleNote(req.note());
@@ -142,6 +152,67 @@ public class ReportService {
     }
 
     // ===== 内部工具 =====
+
+    private void applyAction(
+            Long operatorId,
+            AuthUser auth,
+            Report report,
+            String action,
+            String note
+    ) {
+        String reason = StringUtils.hasText(note) ? note.trim() : "举报处理";
+        switch (action) {
+            case "ITEM_DOWN" -> {
+                if (!"ITEM".equals(report.getTargetType())) {
+                    throw new BusinessException(ErrorCode.PARAM_ERROR, "只有物品举报可以下架物品");
+                }
+                takeDownItem(report.getTargetId(), reason);
+            }
+            case "BAN" -> {
+                if (!PLATFORM_ADMIN.equals(auth.role())) {
+                    throw new BusinessException(ErrorCode.FORBIDDEN, "只有平台管理员可以封禁账号");
+                }
+                if ("USER".equals(report.getTargetType())) {
+                    adminUserService.banUser(operatorId, report.getTargetId());
+                } else if ("ITEM".equals(report.getTargetType())) {
+                    Item item = takeDownItem(report.getTargetId(), reason);
+                    adminUserService.banUser(operatorId, item.getOwnerId());
+                } else {
+                    throw new BusinessException(ErrorCode.PARAM_ERROR, "该举报目标不支持封禁");
+                }
+            }
+            case "WARN", "REJECT" -> {
+                // 仅记录处理结果，不改业务状态。
+            }
+            default -> throw new BusinessException(ErrorCode.PARAM_ERROR, "未知处理措施");
+        }
+    }
+
+    private Item takeDownItem(Long itemId, String reason) {
+        Item item = itemMapper.selectById(itemId);
+        if (item == null) {
+            throw new BusinessException(ErrorCode.ITEM_NOT_FOUND);
+        }
+        if (!ItemStatus.VIOLATION_OFF.name().equals(item.getStatus())) {
+            item.setStatus(ItemStatus.VIOLATION_OFF.name());
+            item.setViolationReason("举报处理：" + reason);
+            item.setIsPinned(0);
+            itemMapper.updateById(item);
+        }
+        return item;
+    }
+
+    private void validateTarget(String targetType, Long targetId) {
+        if (targetId == null) {
+            throw new BusinessException(ErrorCode.PARAM_ERROR, "举报目标不能为空");
+        }
+        if ("ITEM".equals(targetType) && itemMapper.selectById(targetId) == null) {
+            throw new BusinessException(ErrorCode.ITEM_NOT_FOUND);
+        }
+        if ("USER".equals(targetType) && userMapper.selectById(targetId) == null) {
+            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
+        }
+    }
 
     private Report requireReport(Long reportId) {
         Report r = reportMapper.selectById(reportId);
