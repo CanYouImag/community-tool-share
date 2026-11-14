@@ -40,6 +40,7 @@ public class PlatformService {
 
     private static final String CERTIFIED = "CERTIFIED";
     private static final String COMMUNITY_ADMIN = "COMMUNITY_ADMIN";
+    private static final String PLATFORM_ADMIN = "PLATFORM_ADMIN";
     private static final String BANNED = "BANNED";
     private static final String ACTIVE = "ACTIVE";
     private static final String ADMIN = "ADMIN";
@@ -177,10 +178,13 @@ public class PlatformService {
         if (m == null) {
             throw new BusinessException(ErrorCode.NOT_COMMUNITY_ADMIN);
         }
+        User user = userMapper.selectById(userId);
+        if (user != null && PLATFORM_ADMIN.equals(user.getRole())) {
+            throw new BusinessException(ErrorCode.FORBIDDEN, "系统管理员不可罢免");
+        }
         m.setRole(MEMBER);
         memberMapper.updateById(m);
 
-        User user = userMapper.selectById(userId);
         if (user != null && COMMUNITY_ADMIN.equals(user.getRole())) {
             user.setRole(CERTIFIED);
             userMapper.updateById(user);
@@ -341,6 +345,7 @@ public class PlatformService {
         CommunityMember admin = findAdmin(c.getId());
         Long adminId = admin == null ? null : admin.getUserId();
         String adminName = admin == null ? null : userName(admin.getUserId());
+        String adminRole = admin == null ? null : userRole(admin.getUserId());
         return new CommunityAdminResponse(
                 c.getId(),
                 c.getName(),
@@ -352,6 +357,7 @@ public class PlatformService {
                 c.getStatus(),
                 adminId,
                 adminName,
+                adminRole,
                 c.getCreatedAt()
         );
     }
@@ -372,6 +378,14 @@ public class PlatformService {
         }
         User u = userMapper.selectById(userId);
         return u == null ? null : u.getNickname();
+    }
+
+    private String userRole(Long userId) {
+        if (userId == null) {
+            return null;
+        }
+        User u = userMapper.selectById(userId);
+        return u == null ? null : u.getRole();
     }
 
     private String getValue(String key, String defaultValue) {
