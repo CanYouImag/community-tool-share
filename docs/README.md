@@ -38,11 +38,11 @@ community-tool-share/
    │  └─ project-management/       # 先启阶段：初始/详细软件开发计划、开发职责说明
    ├─ 02-elaboration/
    │  ├─ requirements/             # 精化阶段：软件需求规范（需求分析）、用例图
-   │  ├─ design/                   # 精化阶段：设计文档（待设计员补充）
+   │  ├─ design/                   # 精化阶段：软件设计文档
    │  └─ ui/                       # 精化阶段：界面原型、截图
    ├─ 03-construction/
    │  ├─ configuration-management/ # 构建阶段：配置管理计划、基线记录与变更记录
-   │  └─ test/                     # 构建阶段：测试计划/测试设计（待测试经理补充）
+   │  └─ test/                     # 构建阶段：软件测试设计文档
    └─ 04-transition/               # 产品化阶段：用户手册、软件测试报告
 ```
 
@@ -63,7 +63,7 @@ community-tool-share/
 | 基线记录与变更记录 | `docs/03-construction/configuration-management/` | V1.3 | —（随各基线更新） | 钟姝伶 |
 | 软件测试设计文档 | `docs/03-construction/test/03-软件测试设计文档.pdf` | V1.0 | 测试基线-v1.0 | 常子衡 |
 | 软件测试报告 | `docs/04-transition/04-软件测试报告.pdf` | V1.0 | 发布基线-v1.0 | 常子衡 |
-| 用户手册 | [Markdown](04-transition/04-用户手册.md) / [PDF](04-transition/04-用户手册.pdf) | V0.1（初版，待评审） | 发布基线-v1.0（待建立） | 林星 |
+| 用户手册 | [Markdown](04-transition/04-用户手册.md) / [PDF](04-transition/04-用户手册.pdf) | V0.1（初版，待评审） | 发布基线-v1.0 | 林星 |
 
 ## 三、基线状态
 
