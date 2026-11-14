@@ -114,8 +114,12 @@ public class PlatformController {
     @Operation(summary = "本社区数据统计（UC-G7）")
     @GetMapping("/community-stats")
     @RequirePermission(PermissionCodes.COMMUNITY_STATS)
-    public Result<Map<String, Object>> communityStats() {
-        return Result.ok(platformService.communityStats(AuthContext.requireUserId()));
+    public Result<Map<String, Object>> communityStats(
+            @RequestParam(required = false) Long communityId
+    ) {
+        return Result.ok(
+                platformService.communityStats(AuthContext.requireUserId(), communityId)
+        );
     }
 
     // ===== UC-G6 操作日志 =====

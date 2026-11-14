@@ -48,11 +48,15 @@ public class CommunityController {
         return Result.ok(communityService.home(id));
     }
 
-    @Operation(summary = "我的管理社区（社区管理员）")
+    @Operation(summary = "我的管理社区（社区管理员；系统管理员需传 communityId）")
     @GetMapping("/my-admin")
     @RequirePermission(PermissionCodes.COMMUNITY_MEMBER_MANAGE)
-    public Result<CommunityResponse> myAdminCommunity() {
-        return Result.ok(communityService.myAdminCommunity(AuthContext.requireUserId()));
+    public Result<CommunityResponse> myAdminCommunity(
+            @RequestParam(required = false) Long communityId
+    ) {
+        return Result.ok(
+                communityService.myAdminCommunity(AuthContext.requireUserId(), communityId)
+        );
     }
 
     @Operation(summary = "申请加入社区")

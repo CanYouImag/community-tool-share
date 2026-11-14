@@ -2,7 +2,8 @@
 import http from '../request'
 
 // —— 社区管理员 ——
-export const getMyAdminCommunity = () => http.get('/communities/my-admin')
+export const getMyAdminCommunity = (communityId) =>
+  http.get('/communities/my-admin', { params: communityId ? { communityId } : {} })
 export const getJoinApplies = (id, params) => http.get(`/communities/${id}/join-applies`, { params })
 export const auditJoinApply = (id, applyId, data) => http.post(`/communities/${id}/join-applies/${applyId}/audit`, data)
 export const getMembers = (id, params) => http.get(`/communities/${id}/members`, { params })
@@ -10,7 +11,8 @@ export const kickMember = (id, userId) => http.delete(`/communities/${id}/member
 export const getAnnouncements = (id) => http.get(`/communities/${id}/announcements`)
 export const publishAnnouncement = (id, data) => http.post(`/communities/${id}/announcements`, data)
 export const deleteAnnouncement = (id, announcementId) => http.delete(`/communities/${id}/announcements/${announcementId}`)
-export const getCommunityStats = () => http.get('/admin/community-stats')
+export const getCommunityStats = (communityId) =>
+  http.get('/admin/community-stats', { params: communityId ? { communityId } : {} })
 
 // —— 纠纷（调解 / 仲裁）——
 export const getDisputes = (params) => http.get('/disputes', { params })

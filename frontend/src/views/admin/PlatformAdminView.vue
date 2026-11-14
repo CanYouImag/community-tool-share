@@ -361,6 +361,9 @@ onMounted(async () => {
                 <td>
                   <div class="actions">
                     <a @click="beginEdit(c)">编辑</a>
+                    <router-link :to="{ name: 'admin-community', query: { communityId: c.id } }">
+                      进入管理
+                    </router-link>
                     <a
                       v-if="!c.adminId && appoint.communityId !== c.id"
                       @click="beginAppoint(c)"

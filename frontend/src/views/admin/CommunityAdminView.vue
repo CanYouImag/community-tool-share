@@ -1,5 +1,6 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import StatusBadge from '@/components/StatusBadge.vue'
 import Pagination from '@/components/Pagination.vue'
 import EmptyState from '@/components/EmptyState.vue'
@@ -15,7 +16,16 @@ import {
   publishAnnouncement,
   deleteAnnouncement
 } from '@/api/modules/admin'
+import { getCommunities } from '@/api/modules/community'
+import { useAuthStore } from '@/store/auth'
 import { formatAmount, formatDateTime } from '@/utils/format'
+
+const route = useRoute()
+const auth = useAuthStore()
+const isPlatformAdmin = auth.user?.role === 'PLATFORM_ADMIN'
+const communities = ref([])
+const selectedCommunityId = ref(null)
+const communityError = ref('')
 
 const community = ref(null)
 const stats = ref(null)
@@ -44,10 +54,39 @@ const memberPage = ref(1)
 const announcements = ref([])
 const form = reactive({ title: '', content: '', imageUrl: '' })
 
+async function loadCommunityOptions() {
+  if (!isPlatformAdmin) return
+  communities.value = await getCommunities()
+  const routeId = Number(route.query.communityId || 0)
+  if (routeId) selectedCommunityId.value = routeId
+}
+
 async function load() {
-  community.value = await getMyAdminCommunity()
-  stats.value = await getCommunityStats()
-  await Promise.all([loadApplies(), loadMembers(), loadAnnouncements()])
+  communityError.value = ''
+  if (isPlatformAdmin && !selectedCommunityId.value) {
+    community.value = null
+    stats.value = null
+    applies.value = []
+    members.value = []
+    announcements.value = []
+    return
+  }
+  try {
+    const selectedId = selectedCommunityId.value || undefined
+    community.value = await getMyAdminCommunity(selectedId)
+    stats.value = await getCommunityStats(selectedId)
+    await Promise.all([loadApplies(), loadMembers(), loadAnnouncements()])
+  } catch (e) {
+    communityError.value = e?.message || '社区管理数据加载失败'
+    community.value = null
+  }
+}
+
+async function chooseCommunity(id) {
+  selectedCommunityId.value = Number(id)
+  applyPage.value = 1
+  memberPage.value = 1
+  await load()
 }
 
 async function loadApplies() {
@@ -127,7 +166,10 @@ function roleLabel(role) {
   return role === 'ADMIN' ? '管理员' : '成员'
 }
 
-onMounted(load)
+onMounted(async () => {
+  await loadCommunityOptions()
+  await load()
+})
 </script>
 
 <template>
@@ -135,10 +177,30 @@ onMounted(load)
     <header class="page-head">
       <div>
         <h1>社区管理</h1>
-        <p class="muted">{{ community?.name }}</p>
+        <p class="muted">{{ community?.name || (isPlatformAdmin ? '请选择要管理的社区' : '') }}</p>
       </div>
+      <label v-if="isPlatformAdmin" class="field">
+        <span>选择社区</span>
+        <select
+          :value="selectedCommunityId || ''"
+          aria-label="选择社区"
+          @change="chooseCommunity($event.target.value)"
+        >
+          <option value="" disabled>请选择社区</option>
+          <option v-for="c in communities" :key="c.id" :value="c.id">
+            {{ c.name }}（#{{ c.id }}）
+          </option>
+        </select>
+      </label>
     </header>
 
+    <p v-if="communityError" class="form-message error">{{ communityError }}</p>
+    <EmptyState
+      v-if="isPlatformAdmin && !selectedCommunityId"
+      text="请先选择社区，再进入成员、公告和加入申请管理"
+    />
+
+    <div v-if="community">
     <div class="stats">
       <div class="stat">
         <small>成员数</small>
@@ -311,5 +373,6 @@ onMounted(load)
       <h2 class="view-heading">举报处理</h2>
       <ReportQueue />
     </section>
+    </div>
   </main>
 </template>

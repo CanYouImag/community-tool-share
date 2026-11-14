@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.linzu.common.api.PageResult;
 import com.linzu.common.exception.BusinessException;
 import com.linzu.common.exception.ErrorCode;
+import com.linzu.common.security.AuthContext;
 import com.linzu.community.entity.Community;
 import com.linzu.community.entity.CommunityMember;
 import com.linzu.community.mapper.CommunityMapper;
@@ -274,8 +275,19 @@ public class PlatformService {
         return result;
     }
 
-    public Map<String, Object> communityStats(Long operatorId) {
-        long communityId = communityService.requireAdminCommunityId(operatorId);
+    public Map<String, Object> communityStats(Long operatorId, Long requestedCommunityId) {
+        long communityId;
+        if (PLATFORM_ADMIN.equals(AuthContext.require().role())) {
+            if (requestedCommunityId == null) {
+                throw new BusinessException(ErrorCode.PARAM_ERROR, "请先选择社区");
+            }
+            communityId = requestedCommunityId;
+        } else {
+            communityId = communityService.requireAdminCommunityId(operatorId);
+            if (requestedCommunityId != null && !requestedCommunityId.equals(communityId)) {
+                throw new BusinessException(ErrorCode.FORBIDDEN);
+            }
+        }
         Community c = requireCommunity(communityId);
 
         Map<String, Object> result = new LinkedHashMap<>();

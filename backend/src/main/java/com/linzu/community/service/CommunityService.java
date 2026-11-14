@@ -322,8 +322,18 @@ public class CommunityService {
     /**
      * 社区管理员所辖社区（供管理后台首页取社区 ID）。
      */
-    public CommunityResponse myAdminCommunity(Long operatorId) {
+    public CommunityResponse myAdminCommunity(Long operatorId, Long requestedCommunityId) {
+        AuthUser auth = AuthContext.require();
+        if ("PLATFORM_ADMIN".equals(auth.role())) {
+            if (requestedCommunityId == null) {
+                throw new BusinessException(ErrorCode.PARAM_ERROR, "请先选择社区");
+            }
+            return toResponse(requireCommunity(requestedCommunityId));
+        }
         long communityId = requireAdminCommunityId(operatorId);
+        if (requestedCommunityId != null && !requestedCommunityId.equals(communityId)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN);
+        }
         return toResponse(requireCommunity(communityId));
     }
 
