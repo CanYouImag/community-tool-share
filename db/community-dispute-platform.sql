@@ -85,7 +85,7 @@ INSERT IGNORE INTO t_community (id, name, intro, cover_url, auto_approve, member
 
 -- 社区成员：admin(2) 为青禾社区管理员，Starling(1) 物主、shuling(3) 租客为成员
 INSERT IGNORE INTO t_community_member (id, community_id, user_id, role, status) VALUES
-    (1, 1, 2, 'ADMIN', 'ACTIVE'),
+    (1, 1, 2, 'MEMBER', 'ACTIVE'),
     (2, 1, 1, 'MEMBER', 'ACTIVE'),
     (3, 1, 3, 'MEMBER', 'ACTIVE');
 

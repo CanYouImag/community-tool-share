@@ -354,7 +354,10 @@ onMounted(async () => {
                     :cls="c.status === 'ACTIVE' ? '' : 'neutral'"
                   />
                 </td>
-                <td>{{ c.adminName || '未任命' }}</td>
+                <td>
+                  {{ c.adminName || '未任命' }}
+                  <small v-if="c.adminRole === 'PLATFORM_ADMIN'">系统管理员</small>
+                </td>
                 <td>
                   <div class="actions">
                     <a @click="beginEdit(c)">编辑</a>
@@ -362,8 +365,18 @@ onMounted(async () => {
                       v-if="!c.adminId && appoint.communityId !== c.id"
                       @click="beginAppoint(c)"
                     >任命管理员</a>
-                    <a v-if="c.adminId" class="danger-text" @click="doDismiss(c)">罢免</a>
-                    <span v-if="c.adminId" class="muted">（先罢免才能更换）</span>
+                    <a
+                      v-if="c.adminId && c.adminRole !== 'PLATFORM_ADMIN'"
+                      class="danger-text"
+                      @click="doDismiss(c)"
+                    >罢免</a>
+                    <span v-if="c.adminId && c.adminRole === 'PLATFORM_ADMIN'" class="muted">
+                      系统管理员不可罢免
+                    </span>
+                    <span
+                      v-else-if="c.adminId"
+                      class="muted"
+                    >（先罢免才能更换）</span>
                   </div>
                   <div v-if="appoint.communityId === c.id" class="actions">
                     <select v-model="appoint.userId" aria-label="选择管理员">

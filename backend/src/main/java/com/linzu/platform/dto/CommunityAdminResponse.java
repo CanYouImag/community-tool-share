@@ -13,6 +13,7 @@ public record CommunityAdminResponse(
         String status,
         Long adminId,
         String adminName,
+        String adminRole,
         LocalDateTime createdAt
 ) {
 }
