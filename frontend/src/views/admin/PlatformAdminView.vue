@@ -109,7 +109,7 @@ async function doAppoint() {
     await appointAdmin(appoint.communityId, { userId: Number(appoint.userId) })
     appoint.communityId = null
     appoint.userId = ''
-    await loadCommunities()
+    await Promise.all([loadCommunities(), loadUsers()])
     alert('已任命社区管理员，被任命者重新登录后生效')
   } catch (err) {
     communityError.value = err.message || '任命失败'
@@ -431,6 +431,7 @@ onMounted(async () => {
                 <td>
                   {{ c.adminName || '未任命' }}
                   <small v-if="c.adminRole === 'PLATFORM_ADMIN'">系统管理员</small>
+                  <small v-else-if="c.adminId">社区管理员</small>
                 </td>
                 <td>
                   <div class="actions">
@@ -443,6 +444,10 @@ onMounted(async () => {
                       @click="beginAppoint(c)"
                     >任命管理员</a>
                     <a
+                      v-if="c.adminId && c.adminRole !== 'PLATFORM_ADMIN' && appoint.communityId !== c.id"
+                      @click="beginAppoint(c)"
+                    >更换管理员</a>
+                    <a
                       v-if="c.adminId && c.adminRole !== 'PLATFORM_ADMIN'"
                       class="danger-text"
                       @click="doDismiss(c)"
@@ -450,10 +455,6 @@ onMounted(async () => {
                     <span v-if="c.adminId && c.adminRole === 'PLATFORM_ADMIN'" class="muted">
                       系统管理员不可罢免
                     </span>
-                    <span
-                      v-else-if="c.adminId"
-                      class="muted"
-                    >（先罢免才能更换）</span>
                   </div>
                   <div v-if="appoint.communityId === c.id" class="actions">
                     <select v-model="appoint.userId" aria-label="选择管理员">

@@ -163,7 +163,7 @@ async function removeNotice(id) {
 }
 
 function roleLabel(role) {
-  return role === 'ADMIN' ? '管理员' : '成员'
+  return role === 'ADMIN' ? '社区管理员' : '社区成员'
 }
 
 onMounted(async () => {
