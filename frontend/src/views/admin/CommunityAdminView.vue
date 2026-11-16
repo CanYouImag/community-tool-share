@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { computed, ref, reactive, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import StatusBadge from '@/components/StatusBadge.vue'
 import Pagination from '@/components/Pagination.vue'
@@ -14,7 +14,11 @@ import {
   kickMember,
   getAnnouncements,
   publishAnnouncement,
-  deleteAnnouncement
+  deleteAnnouncement,
+  getPlatformCommunities,
+  getUsers,
+  appointAdmin,
+  dismissAdmin
 } from '@/api/modules/admin'
 import { getCommunities } from '@/api/modules/community'
 import { useAuthStore } from '@/store/auth'
@@ -24,18 +28,23 @@ const route = useRoute()
 const auth = useAuthStore()
 const isPlatformAdmin = auth.user?.role === 'PLATFORM_ADMIN'
 const communities = ref([])
+const platformCommunities = ref([])
 const selectedCommunityId = ref(null)
 const communityError = ref('')
 
 const community = ref(null)
 const stats = ref(null)
 
-const tabs = [
-  { id: 'apply', label: '加入申请' },
-  { id: 'members', label: '成员管理' },
-  { id: 'notice', label: '公告管理' },
-  { id: 'reports', label: '举报处理' }
-]
+const tabs = computed(() => {
+  const list = [
+    { id: 'apply', label: '加入申请' },
+    { id: 'members', label: '成员管理' },
+    { id: 'notice', label: '公告管理' },
+    { id: 'reports', label: '举报处理' }
+  ]
+  if (isPlatformAdmin) list.push({ id: 'admin', label: '管理员设置' })
+  return list
+})
 const activeTab = ref('apply')
 
 // 加入申请
@@ -54,11 +63,72 @@ const memberPage = ref(1)
 const announcements = ref([])
 const form = reactive({ title: '', content: '', imageUrl: '' })
 
+// 管理员设置（仅系统管理员）
+const adminUsers = ref([])
+const adminUserId = ref('')
+const adminError = ref('')
+const adminSaving = ref(false)
+const selectedPlatformCommunity = computed(() =>
+  platformCommunities.value.find((c) => c.id === Number(selectedCommunityId.value))
+)
+const currentAdminId = computed(() => selectedPlatformCommunity.value?.adminId || null)
+const currentAdminName = computed(() => selectedPlatformCommunity.value?.adminName || '')
+const currentAdminRole = computed(() => selectedPlatformCommunity.value?.adminRole || '')
+const appointableUsers = computed(() =>
+  adminUsers.value.filter(
+    (u) => u.role === 'CERTIFIED' && u.status === 'ACTIVE' && u.id !== currentAdminId.value
+  )
+)
+
 async function loadCommunityOptions() {
   if (!isPlatformAdmin) return
   communities.value = await getCommunities()
+  await loadAdminData()
   const routeId = Number(route.query.communityId || 0)
   if (routeId) selectedCommunityId.value = routeId
+}
+
+async function loadAdminData() {
+  if (!isPlatformAdmin) return
+  platformCommunities.value = await getPlatformCommunities()
+  const data = await getUsers({ page: 1, size: 100 })
+  adminUsers.value = data.records || []
+}
+
+async function doAppointAdmin() {
+  if (adminSaving.value) return
+  adminError.value = ''
+  if (!adminUserId.value) {
+    adminError.value = '请先选择要任命的认证用户'
+    return
+  }
+  adminSaving.value = true
+  try {
+    await appointAdmin(community.value.id, { userId: Number(adminUserId.value) })
+    adminUserId.value = ''
+    await Promise.all([loadAdminData(), loadMembers()])
+    alert('社区管理员已设置，新管理员重新登录后生效')
+  } catch (e) {
+    adminError.value = e?.message || '任命社区管理员失败'
+  } finally {
+    adminSaving.value = false
+  }
+}
+
+async function removeCurrentAdmin() {
+  if (adminSaving.value || !currentAdminId.value) return
+  if (!window.confirm(`确定罢免 ${currentAdminName.value || '当前管理员'} 吗？`)) return
+  adminError.value = ''
+  adminSaving.value = true
+  try {
+    await dismissAdmin(community.value.id, currentAdminId.value)
+    adminUserId.value = ''
+    await Promise.all([loadAdminData(), loadMembers()])
+  } catch (e) {
+    adminError.value = e?.message || '罢免社区管理员失败'
+  } finally {
+    adminSaving.value = false
+  }
 }
 
 async function load() {
@@ -86,6 +156,8 @@ async function chooseCommunity(id) {
   selectedCommunityId.value = Number(id)
   applyPage.value = 1
   memberPage.value = 1
+  adminUserId.value = ''
+  adminError.value = ''
   await load()
 }
 
@@ -323,6 +395,53 @@ onMounted(async () => {
           </table>
         </div>
         <Pagination :total="memberTotal" :page="memberPage" :page-size="10" @change="changeMemberPage" />
+      </section>
+    </section>
+
+    <!-- 管理员设置 -->
+    <section v-show="activeTab === 'admin'" class="view-panel">
+      <h2 class="view-heading">管理员设置</h2>
+      <section class="panel">
+        <div class="panel-title">
+          <h2>{{ community.name }}社区管理员</h2>
+        </div>
+        <p v-if="adminError" class="form-message error">{{ adminError }}</p>
+        <p>
+          当前管理员：
+          <strong>{{ currentAdminName || '未任命' }}</strong>
+          <StatusBadge
+            v-if="currentAdminName"
+            :label="currentAdminRole === 'PLATFORM_ADMIN' ? '系统管理员' : '社区管理员'"
+            :cls="currentAdminRole === 'PLATFORM_ADMIN' ? 'neutral' : ''"
+          />
+        </p>
+        <p class="muted">
+          一个社区只设一名社区管理员。任命新管理员会直接替换当前管理员，旧管理员恢复为认证用户。
+        </p>
+        <label class="field">
+          <span>{{ currentAdminId ? '更换为' : '任命为' }}</span>
+          <select v-model="adminUserId" aria-label="选择社区管理员">
+            <option value="" disabled>选择认证用户</option>
+            <option v-for="u in appointableUsers" :key="u.id" :value="u.id">
+              {{ u.nickname || u.username }}（#{{ u.id }}）
+            </option>
+          </select>
+        </label>
+        <p v-if="!appointableUsers.length" class="muted">
+          暂无可任命的认证用户；目标用户需已通过实名认证，且不能是其他社区的现任管理员。
+        </p>
+        <div class="actions">
+          <a class="btn primary" :class="{ disabled: adminSaving }" @click="doAppointAdmin">
+            {{ currentAdminId ? '更换管理员' : '任命管理员' }}
+          </a>
+          <a
+            v-if="currentAdminId && currentAdminRole !== 'PLATFORM_ADMIN'"
+            class="btn danger-text"
+            @click="removeCurrentAdmin"
+          >
+            罢免当前管理员
+          </a>
+        </div>
       </section>
     </section>
 
