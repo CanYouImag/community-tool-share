@@ -126,9 +126,6 @@ public class PlatformService {
         if (otherAdmin != null && otherAdmin > 0) {
             throw new BusinessException(ErrorCode.USER_ALREADY_ADMIN);
         }
-        if (!CERTIFIED.equals(user.getRole())) {
-            throw new BusinessException(ErrorCode.USER_NOT_CERTIFIED);
-        }
 
         List<CommunityMember> currentAdmins = memberMapper.selectList(
                 Wrappers.<CommunityMember>lambdaQuery()
@@ -138,6 +135,19 @@ public class PlatformService {
         );
         if (currentAdmins.stream().anyMatch(admin -> admin.getUserId().equals(userId))) {
             return toAdminResponse(c);
+        }
+
+        // 社区管理员只能从本社区现有成员中产生，不能把外部用户直接拉进来。
+        CommunityMember m = memberMapper.selectOne(
+                Wrappers.<CommunityMember>lambdaQuery()
+                        .eq(CommunityMember::getCommunityId, communityId)
+                        .eq(CommunityMember::getUserId, userId)
+        );
+        if (m == null || !ACTIVE.equals(m.getStatus())) {
+            throw new BusinessException(ErrorCode.COMMUNITY_ADMIN_MEMBER_ONLY);
+        }
+        if (!CERTIFIED.equals(user.getRole())) {
+            throw new BusinessException(ErrorCode.USER_NOT_CERTIFIED);
         }
 
         for (CommunityMember current : currentAdmins) {
@@ -150,25 +160,9 @@ public class PlatformService {
             }
         }
 
-        CommunityMember m = memberMapper.selectOne(
-                Wrappers.<CommunityMember>lambdaQuery()
-                        .eq(CommunityMember::getCommunityId, communityId)
-                        .eq(CommunityMember::getUserId, userId)
-        );
-        if (m == null) {
-            m = new CommunityMember();
-            m.setCommunityId(communityId);
-            m.setUserId(userId);
-            m.setRole(ADMIN);
-            m.setStatus(ACTIVE);
-            memberMapper.insert(m);
-            c.setMemberCount((c.getMemberCount() == null ? 0 : c.getMemberCount()) + 1);
-            communityMapper.updateById(c);
-        } else {
-            m.setRole(ADMIN);
-            m.setStatus(ACTIVE);
-            memberMapper.updateById(m);
-        }
+        m.setRole(ADMIN);
+        m.setStatus(ACTIVE);
+        memberMapper.updateById(m);
 
         user.setRole(COMMUNITY_ADMIN);
         userMapper.updateById(user);

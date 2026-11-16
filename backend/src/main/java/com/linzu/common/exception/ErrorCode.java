@@ -37,6 +37,7 @@ public enum ErrorCode {
     COMMUNITY_ADMIN_EXISTS(1110, "该社区已有管理员", HttpStatus.BAD_REQUEST),
     USER_NOT_CERTIFIED(1111, "用户未通过实名认证", HttpStatus.BAD_REQUEST),
     USER_ALREADY_ADMIN(1112, "该用户已是其他社区的管理员", HttpStatus.BAD_REQUEST),
+    COMMUNITY_ADMIN_MEMBER_ONLY(1113, "只能任命本社区的成员为社区管理员", HttpStatus.BAD_REQUEST),
 
     UNAUTHORIZED(2001, "未登录或登录已过期", HttpStatus.UNAUTHORIZED),
     FORBIDDEN(2002, "无权限执行该操作", HttpStatus.FORBIDDEN),
