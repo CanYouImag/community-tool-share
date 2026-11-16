@@ -114,17 +114,8 @@ public class PlatformService {
     public CommunityAdminResponse appointAdmin(Long operatorId, Long communityId, Long userId) {
         Community c = requireCommunity(communityId);
         User user = requireUser(userId);
-        // 校验顺序：先“本社区是否已有管理员”，再“该用户是否已在别处任职”，
-        // 最后才校验实名认证，避免对已任社区管理员的用户误报“未通过实名认证”。
-        Long hasAdmin = memberMapper.selectCount(
-                Wrappers.<CommunityMember>lambdaQuery()
-                        .eq(CommunityMember::getCommunityId, communityId)
-                        .eq(CommunityMember::getRole, ADMIN)
-                        .eq(CommunityMember::getStatus, ACTIVE)
-        );
-        if (hasAdmin != null && hasAdmin > 0) {
-            throw new BusinessException(ErrorCode.COMMUNITY_ADMIN_EXISTS);
-        }
+
+        // 一个社区只能有一名社区管理员；再次任命视为直接更换，避免前端必须先罢免再任命。
         Long otherAdmin = memberMapper.selectCount(
                 Wrappers.<CommunityMember>lambdaQuery()
                         .eq(CommunityMember::getUserId, userId)
@@ -137,6 +128,26 @@ public class PlatformService {
         }
         if (!CERTIFIED.equals(user.getRole())) {
             throw new BusinessException(ErrorCode.USER_NOT_CERTIFIED);
+        }
+
+        List<CommunityMember> currentAdmins = memberMapper.selectList(
+                Wrappers.<CommunityMember>lambdaQuery()
+                        .eq(CommunityMember::getCommunityId, communityId)
+                        .eq(CommunityMember::getRole, ADMIN)
+                        .eq(CommunityMember::getStatus, ACTIVE)
+        );
+        if (currentAdmins.stream().anyMatch(admin -> admin.getUserId().equals(userId))) {
+            return toAdminResponse(c);
+        }
+
+        for (CommunityMember current : currentAdmins) {
+            current.setRole(MEMBER);
+            memberMapper.updateById(current);
+            User previous = userMapper.selectById(current.getUserId());
+            if (previous != null && COMMUNITY_ADMIN.equals(previous.getRole())) {
+                previous.setRole(CERTIFIED);
+                userMapper.updateById(previous);
+            }
         }
 
         CommunityMember m = memberMapper.selectOne(

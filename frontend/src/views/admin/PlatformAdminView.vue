@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import Pagination from '@/components/Pagination.vue'
 import EmptyState from '@/components/EmptyState.vue'
@@ -8,8 +8,6 @@ import {
   getPlatformCommunities,
   createCommunity,
   updateCommunity,
-  appointAdmin,
-  dismissAdmin,
   getUsers,
   banUser,
   unbanUser,
@@ -50,10 +48,6 @@ const activeTab = ref('communities')
 const communities = ref([])
 const communityError = ref('')
 const editing = reactive({ id: null, name: '', intro: '', coverUrl: '', autoApprove: false, status: 'ACTIVE' })
-const appoint = reactive({ communityId: null, userId: '' })
-const appointableUsers = computed(() =>
-  (users.value || []).filter((u) => u.role === 'CERTIFIED' && u.status === 'ACTIVE')
-)
 
 async function loadCommunities() {
   communities.value = await getPlatformCommunities()
@@ -94,37 +88,6 @@ async function saveCommunity() {
   resetForm()
   loadCommunities()
 }
-function beginAppoint(c) {
-  communityError.value = ''
-  appoint.communityId = c.id
-  appoint.userId = ''
-}
-async function doAppoint() {
-  if (!appoint.userId) {
-    communityError.value = '请先选择要任命的认证用户'
-    return
-  }
-  communityError.value = ''
-  try {
-    await appointAdmin(appoint.communityId, { userId: Number(appoint.userId) })
-    appoint.communityId = null
-    appoint.userId = ''
-    await loadCommunities()
-    alert('已任命社区管理员，被任命者重新登录后生效')
-  } catch (err) {
-    communityError.value = err.message || '任命失败'
-  }
-}
-async function doDismiss(c) {
-  communityError.value = ''
-  try {
-    await dismissAdmin(c.id, c.adminId)
-    await loadCommunities()
-  } catch (err) {
-    communityError.value = err.message || '罢免失败'
-  }
-}
-
 // —— 物品审核 ——
 const itemStatus = ref('PENDING_REVIEW')
 const reviewItems = ref([])
@@ -431,6 +394,7 @@ onMounted(async () => {
                 <td>
                   {{ c.adminName || '未任命' }}
                   <small v-if="c.adminRole === 'PLATFORM_ADMIN'">系统管理员</small>
+                  <small v-else-if="c.adminId">社区管理员</small>
                 </td>
                 <td>
                   <div class="actions">
@@ -438,32 +402,6 @@ onMounted(async () => {
                     <router-link :to="{ name: 'admin-community', query: { communityId: c.id } }">
                       进入管理
                     </router-link>
-                    <a
-                      v-if="!c.adminId && appoint.communityId !== c.id"
-                      @click="beginAppoint(c)"
-                    >任命管理员</a>
-                    <a
-                      v-if="c.adminId && c.adminRole !== 'PLATFORM_ADMIN'"
-                      class="danger-text"
-                      @click="doDismiss(c)"
-                    >罢免</a>
-                    <span v-if="c.adminId && c.adminRole === 'PLATFORM_ADMIN'" class="muted">
-                      系统管理员不可罢免
-                    </span>
-                    <span
-                      v-else-if="c.adminId"
-                      class="muted"
-                    >（先罢免才能更换）</span>
-                  </div>
-                  <div v-if="appoint.communityId === c.id" class="actions">
-                    <select v-model="appoint.userId" aria-label="选择管理员">
-                      <option value="" disabled>选择认证用户</option>
-                      <option v-for="u in appointableUsers" :key="u.id" :value="u.id">
-                        {{ u.nickname || u.username }}（#{{ u.id }}）
-                      </option>
-                    </select>
-                    <a class="btn small primary" @click="doAppoint">确认</a>
-                    <a class="btn small" @click="appoint.communityId = null">取消</a>
                   </div>
                 </td>
               </tr>
