@@ -65,6 +65,7 @@ const form = reactive({ title: '', content: '', imageUrl: '' })
 
 // 管理员设置（仅系统管理员）
 const adminUsers = ref([])
+const adminMemberIds = ref([])
 const adminUserId = ref('')
 const adminError = ref('')
 const adminSaving = ref(false)
@@ -74,11 +75,16 @@ const selectedPlatformCommunity = computed(() =>
 const currentAdminId = computed(() => selectedPlatformCommunity.value?.adminId || null)
 const currentAdminName = computed(() => selectedPlatformCommunity.value?.adminName || '')
 const currentAdminRole = computed(() => selectedPlatformCommunity.value?.adminRole || '')
-const appointableUsers = computed(() =>
-  adminUsers.value.filter(
-    (u) => u.role === 'CERTIFIED' && u.status === 'ACTIVE' && u.id !== currentAdminId.value
+const appointableUsers = computed(() => {
+  const memberIds = new Set(adminMemberIds.value)
+  return adminUsers.value.filter(
+    (u) =>
+      memberIds.has(u.id) &&
+      u.role === 'CERTIFIED' &&
+      u.status === 'ACTIVE' &&
+      u.id !== currentAdminId.value
   )
-)
+})
 
 async function loadCommunityOptions() {
   if (!isPlatformAdmin) return
@@ -95,6 +101,15 @@ async function loadAdminData() {
   adminUsers.value = data.records || []
 }
 
+async function loadAdminMembers() {
+  if (!isPlatformAdmin || !community.value?.id) {
+    adminMemberIds.value = []
+    return
+  }
+  const data = await getMembers(community.value.id, { page: 1, size: 100 })
+  adminMemberIds.value = (data.records || []).map((m) => m.userId)
+}
+
 async function doAppointAdmin() {
   if (adminSaving.value) return
   adminError.value = ''
@@ -106,7 +121,7 @@ async function doAppointAdmin() {
   try {
     await appointAdmin(community.value.id, { userId: Number(adminUserId.value) })
     adminUserId.value = ''
-    await Promise.all([loadAdminData(), loadMembers()])
+    await Promise.all([loadAdminData(), loadMembers(), loadAdminMembers()])
     alert('社区管理员已设置，新管理员重新登录后生效')
   } catch (e) {
     adminError.value = e?.message || '任命社区管理员失败'
@@ -123,7 +138,7 @@ async function removeCurrentAdmin() {
   try {
     await dismissAdmin(community.value.id, currentAdminId.value)
     adminUserId.value = ''
-    await Promise.all([loadAdminData(), loadMembers()])
+    await Promise.all([loadAdminData(), loadMembers(), loadAdminMembers()])
   } catch (e) {
     adminError.value = e?.message || '罢免社区管理员失败'
   } finally {
@@ -145,7 +160,7 @@ async function load() {
     const selectedId = selectedCommunityId.value || undefined
     community.value = await getMyAdminCommunity(selectedId)
     stats.value = await getCommunityStats(selectedId)
-    await Promise.all([loadApplies(), loadMembers(), loadAnnouncements()])
+    await Promise.all([loadApplies(), loadMembers(), loadAdminMembers(), loadAnnouncements()])
   } catch (e) {
     communityError.value = e?.message || '社区管理数据加载失败'
     community.value = null
@@ -428,7 +443,7 @@ onMounted(async () => {
           </select>
         </label>
         <p v-if="!appointableUsers.length" class="muted">
-          暂无可任命的认证用户；目标用户需已通过实名认证，且不能是其他社区的现任管理员。
+          本社区暂无可任命的认证成员；目标用户需已加入本社区、通过实名认证，且不能是其他社区的现任管理员。
         </p>
         <div class="actions">
           <a class="btn primary" :class="{ disabled: adminSaving }" @click="doAppointAdmin">
